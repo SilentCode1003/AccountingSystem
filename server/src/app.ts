@@ -13,7 +13,7 @@ import MongoStore from "connect-mongo";
 import session from "express-session";
 import "dotenv/config";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
-import { login } from "./controller/login.controller";
+import { currentUser, login } from "./controller/login.controller";
 import { logout } from "./controller/logout.controller";
 
 declare module "express-session" {
@@ -24,10 +24,10 @@ declare module "express-session" {
 
 const app = express();
 
-app.use(cors({ origin: ["http://localhost:5173"] }));
+app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
 app.use(
   session({
-    store: MongoStore.create({ mongoUrl: "mongodb://localhost:27017/" }),
+    store: MongoStore.create({ mongoUrl: process.env.mongodb_url }),
     secret: process.env.SESSION_SECRET as string,
     resave: false,
     saveUninitialized: true,
@@ -41,6 +41,8 @@ app.post("/login", login);
 app.post("/logout", logout);
 
 app.use(authMiddleware);
+
+app.get("/login", currentUser);
 
 //route for all account actions
 app.use("/accounts", accountRouter);

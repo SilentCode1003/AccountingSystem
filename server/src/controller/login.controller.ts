@@ -28,3 +28,25 @@ export const login = async (req: Request, res: Response) => {
     return res.send(500).send({ error: "Server error" });
   }
 };
+
+export const currentUser = async (req: Request, res: Response) => {
+  try {
+    const user = await db.query.users.findFirst({
+      where: (user) => eq(user.userId, req.session.userId),
+    });
+    if (!user)
+      return res.status(401).send({
+        isLogged: false,
+      });
+
+    return res.status(200).send({
+      isLogged: true,
+      user: {
+        userId: user!.userId,
+        userType: user!.userType,
+      },
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "Server Error" });
+  }
+};
