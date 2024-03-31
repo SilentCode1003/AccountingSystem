@@ -21,6 +21,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@tanstack/react-query": "^5.28.9",
     "@tanstack/react-router": "^1.22.0",
     "@tanstack/react-table": "^8.15.0",
     "@tanstack/router-devtools": "^1.22.0",
@@ -40,6 +41,7 @@
     "to-words": "^4.0.1"
   },
   "devDependencies": {
+    "@tanstack/react-query-devtools": "^5.28.10",
     "@tanstack/router-vite-plugin": "^1.20.5",
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.64",
