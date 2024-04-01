@@ -1,23 +1,22 @@
 import DataTable from '@/components/DataTable'
 import {
-  payrollColumns,
-  type Payrolls,
-} from '@/components/table-columns/payrolls.columns'
+  inventoryColumns,
+  type Inventories,
+} from '@/components/table-columns/inventory.columns'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_layout/payrolls/')({
-  component: Payrolls,
+export const Route = createFileRoute('/_authenticated/_layout/inventory/')({
+  component: Inventory,
 })
 
-const data: Payrolls = {
-  prDateFrom: new Date().toLocaleDateString(),
-  prDateTo: new Date().toLocaleDateString(),
-  prEmpName: 'Nestor Gerona',
-  prFinalAmount: 1000,
-  prTotalDeduction: 200,
+const data: Inventories = {
+  invAssetName: 'Asset Name',
+  invId: 'Inv Id',
+  invStatus: 'GOOD',
+  invStocks: 200,
 }
 
-function Payrolls() {
+function Inventory() {
   const manyData = (() => {
     let many: Array<typeof data> = []
 
@@ -30,11 +29,11 @@ function Payrolls() {
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       <DataTable
         className="w-full md:w-[70vw]"
-        columns={payrollColumns}
+        columns={inventoryColumns}
         data={manyData}
       ></DataTable>
     </div>
   )
 }
 
-export default Payrolls
+export default Inventory

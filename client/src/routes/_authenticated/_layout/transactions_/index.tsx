@@ -39,7 +39,7 @@ const toWords = new ToWords({
   },
 })
 
-export const Route = createFileRoute('/_layout/transactions/')({
+export const Route = createFileRoute('/_authenticated/_layout/transactions/')({
   component: Transactions,
 })
 

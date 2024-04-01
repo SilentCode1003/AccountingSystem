@@ -1,11 +1,11 @@
+import DataTable from '@/components/DataTable'
 import {
   salesColumns,
   type Sales,
 } from '@/components/table-columns/sales.columns'
 import { createFileRoute } from '@tanstack/react-router'
-import DataTable from '@/components/DataTable'
 
-export const Route = createFileRoute('/_layout/sales/')({
+export const Route = createFileRoute('/_authenticated/_layout/sales/')({
   component: Sales,
 })
 

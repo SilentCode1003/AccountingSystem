@@ -1,9 +1,16 @@
 import Expenses from '@/components/Expenses'
 import Revenues from '@/components/Revenues'
 import { Text } from '@/components/ui/text'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_layout/')({
+export const Route = createFileRoute('/_authenticated/_layout/')({
+  beforeLoad: async ({ context: { auth } }) => {
+    if (!auth) {
+      throw redirect({
+        to: '/login',
+      })
+    }
+  },
   component: Home,
 })
 
