@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/sheet'
 import { Text } from './ui/text'
 import { RxBell, RxGear, RxHamburgerMenu } from 'react-icons/rx'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ArchiveIcon,
   ArrowLeftRightIcon,
@@ -35,7 +35,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 function Header() {
   const { setTheme, theme } = useTheme()
-
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const logout = useMutation({
@@ -47,19 +47,8 @@ function Header() {
       })
     },
     onSuccess: async () => {
-      // await queryClient.setQueryData(
-      //   ['CurrentUser'],
-      //   (oldData: {
-      //     isLogged: boolean
-      //     user: {
-      //       userId: string
-      //       userType: string
-      //     }
-      //   }) => {
-      //     return { ...oldData, isLogged: false }
-      //   },
-      // )
       await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
+      navigate({ to: '/login' })
     },
   })
 

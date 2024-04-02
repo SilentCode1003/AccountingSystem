@@ -8,35 +8,13 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/login/_layout/')({
-  beforeLoad: async ({ context: { auth, queryClient }, location }) => {
-    // const q = queryClient.getQueryData(['CurrentUser'])
-
-    // console.log(q)
-    const data = await queryClient.fetchQuery({
-      queryKey: ['CurrentUser'],
-      queryFn: async () => {
-        const response = await fetch('http://localhost:3000/login', {
-          credentials: 'include',
-        })
-
-        console.log(response)
-        return response.json() as Promise<{
-          isLogged: boolean
-          user: {
-            userId: string
-            userType: string
-          }
-        }>
-      },
-    })
-
-    if (auth && auth.isLogged) {
-      console.log('test')
+  beforeLoad: async ({ context: { currentUser }, location }) => {
+    if (currentUser && currentUser.isLogged) {
       throw redirect({
         to: '/',
-        // search: {
-        //   redirect: location.href,
-        // },
+        search: {
+          redirect: location.href,
+        },
       })
     }
   },
@@ -67,25 +45,13 @@ function login() {
       })
     },
     onSuccess: async () => {
-      // await queryClient.setQueryData(
-      //   ['CurrentUser'],
-      //   (oldData: {
-      //     isLogged: boolean
-      //     user: {
-      //       userId: string
-      //       userType: string
-      //     }
-      //   }) => {
-      //     return { ...oldData, isLogged: true }
-      //   },
-      // )
       await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
+      navigate({ to: '/' })
     },
   })
 
   const handleLogin = () => {
     login.mutate({ username, password })
-    navigate({ to: '/' })
   }
 
   return (

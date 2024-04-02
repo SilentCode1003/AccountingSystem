@@ -4,7 +4,7 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
-  auth: {
+  currentUser: {
     isLogged: boolean
     user?: {
       userId: string
@@ -13,7 +13,7 @@ export const Route = createRootRouteWithContext<{
   }
 }>()({
   loader: async ({ context: { queryClient } }) => {
-    await queryClient.ensureQueryData({
+    const currentUser = await queryClient.ensureQueryData({
       queryKey: ['CurrentUser'],
       queryFn: async () => {
         const response = await fetch('http://localhost:3000/login', {
@@ -36,6 +36,9 @@ export const Route = createRootRouteWithContext<{
         return data
       },
     })
+    return {
+      currentUser,
+    }
   },
   component: RootComponent,
 })
