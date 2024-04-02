@@ -1,6 +1,8 @@
 import DataTable from '@/components/DataTable'
 import {
+  Customer,
   transactionColumns,
+  Vendor,
   type Transactions,
 } from '@/components/table-columns/transactions.columns'
 import { Button } from '@/components/ui/button'
@@ -22,6 +24,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import DatePicker from '@/components/ui/DatePicker'
 import { useQuery } from '@tanstack/react-query'
+import { Employees } from '@/components/table-columns/employees.columns'
 
 const toWords = new ToWords({
   localeCode: 'en-IN',
@@ -48,7 +51,7 @@ export const Route = createFileRoute('/_authenticated/_layout/transactions/')({
 })
 
 function TransactionsComponent() {
-  const { data, isSuccess } = useQuery({
+  const transactions = useQuery({
     queryKey: ['Transactions'],
     queryFn: async () => {
       const response = await fetch('http://localhost:3000/transactions', {
@@ -63,16 +66,36 @@ function TransactionsComponent() {
     },
   })
 
+  const transactionPartners = useQuery({
+    queryKey: ['TransactionPartners'],
+    queryFn: async () => {
+      const response = await fetch(
+        'http://localhost:3000/transactionPartners',
+        {
+          credentials: 'include',
+        },
+      )
+      const data = response.json() as Promise<{
+        employees: Array<Employees>
+        customers: Array<Customer>
+        vendors: Array<Vendor>
+      }>
+      return data
+    },
+  })
+
   const [person, setPerson] = useState<string>('')
+  const [amount, setAmount] = useState<number>(0.0)
+  const [date, setDate] = useState<Date>()
 
   return (
     <div className="p-4 min-h-[85vh] items-center flex flex-col gap-8">
-      {isSuccess && (
+      {transactions.isSuccess && (
         <DataTable
           pageSize={5}
           className="w-full md:w-[70vw]"
           columns={transactionColumns}
-          data={data.transactions}
+          data={transactions.data.transactions}
         />
       )}
 
@@ -93,8 +116,12 @@ function TransactionsComponent() {
                 <div className="flex-1 flex flex-col h-40">
                   <div>
                     <div>
-                      {new Date().toLocaleDateString()}
-                      <div>{toWords.convert(100)}</div>
+                      {date
+                        ? date.toLocaleDateString()
+                        : new Date().toLocaleDateString()}
+                      <div>
+                        {toWords.convert(!Number.isNaN(amount) ? amount : 0)}
+                      </div>
                     </div>
                     <div>
                       From: <br />
@@ -105,9 +132,28 @@ function TransactionsComponent() {
                   </div>
                 </div>
                 <div className="flex-1 flex flex-col h-40">
-                  <div>₱100</div>
                   <div>
-                    Received by: Nestor
+                    {!Number.isNaN(amount)
+                      ? new Intl.NumberFormat('en-US', {
+                          style: 'currency',
+                          currency: 'PHP',
+                        }).format(amount)
+                      : 0}
+                  </div>
+                  <div>
+                    Received by:{' '}
+                    {(person.startsWith('emp') &&
+                      transactionPartners.data?.employees.filter(
+                        (e) => e.empId === person,
+                      )[0].empName) ||
+                      (person.startsWith('cust') &&
+                        transactionPartners.data?.customers.filter(
+                          (e) => e.custId === person,
+                        )[0].custName) ||
+                      (person.startsWith('vd') &&
+                        transactionPartners.data?.vendors.filter(
+                          (e) => e.vdId === person,
+                        )[0].vdName)}
                     <div>___________________</div>
                     <div>Signature Over Printed Name</div>
                   </div>
@@ -123,43 +169,57 @@ function TransactionsComponent() {
             <div className="flex gap-4">
               <div className="flex-1">
                 <Label>Amount</Label>
-                <Input className="w-full" type="text" placeholder="Amount" />
+                <Input
+                  className="w-full"
+                  type="number"
+                  placeholder="Amount"
+                  step="0.01"
+                  value={String(!Number.isNaN(amount) ? amount : 0)}
+                  onChange={(e) => setAmount(parseFloat(e.target.value))}
+                />
               </div>
               <div className="flex-1 flex flex-col">
                 <Label>Transaction Date</Label>
-                <DatePicker />
+                <DatePicker date={date} setDate={setDate} />
               </div>
             </div>
             <div className="flex flex-col">
               <Label>Person Transacting with</Label>
-              <Select value={person} onValueChange={setPerson}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pick One" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Employees</SelectLabel>
-                    <SelectItem value="Emp Id1">Nestor | Employee</SelectItem>
-                    <SelectItem value="Emp Id2">Nestor | Employee</SelectItem>
-                    <SelectItem value="Emp Id3">Nestor | Employee</SelectItem>
-                  </SelectGroup>
-                  <SelectSeparator />
-                  <SelectGroup>
-                    <SelectLabel>Customers</SelectLabel>
-                    <SelectItem value="Cust Id1">Nestor | Customer</SelectItem>
-                    <SelectItem value="Cust Id2">Nestor | Customer</SelectItem>
-                    <SelectItem value="Cust Id3">Nestor | Customer</SelectItem>
-                  </SelectGroup>
-                  <SelectSeparator />
-                  <SelectGroup>
-                    <SelectLabel>Vendors</SelectLabel>
-                    <SelectItem value="Vd Id1">Nestor | Vendor</SelectItem>
-                    <SelectItem value="Vd Id2">Nestor | Vendor</SelectItem>
-                    <SelectItem value="Vd Id3">Nestor | Vendor</SelectItem>
-                    <SelectItem value="Vd Id4">Nestor | Vendor</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              {transactionPartners.isSuccess && (
+                <Select value={person} onValueChange={setPerson}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pick One" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Employees</SelectLabel>
+                      {transactionPartners.data.employees.map((emp) => (
+                        <SelectItem key={emp.empId} value={emp.empId}>
+                          {emp.empName} | Employee
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectSeparator />
+                    <SelectGroup>
+                      <SelectLabel>Customers</SelectLabel>
+                      {transactionPartners.data.customers.map((cust) => (
+                        <SelectItem key={cust.custId} value={cust.custId}>
+                          {cust.custName} | Customers
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectSeparator />
+                    <SelectGroup>
+                      <SelectLabel>Vendors</SelectLabel>
+                      {transactionPartners.data.vendors.map((vd) => (
+                        <SelectItem key={vd.vdId} value={vd.vdId}>
+                          {vd.vdName} | Vendor
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <div className="flex flex-col">
               <Label>Transaction Description</Label>

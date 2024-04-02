@@ -4,11 +4,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
 import { Button } from '../ui/button'
-import { EyeOff, MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -30,14 +29,14 @@ type Account = {
   accUpdatedAt: boolean
 }
 
-type Vendor = {
+export type Vendor = {
   vdId: string
   vdName: string
   vdContactInfo: string
   vdEmail: string
   vdIsActive: string
 }
-type Customer = {
+export type Customer = {
   custId: string
   custName: string
   custAddress: string
@@ -145,7 +144,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
       const amount = parseFloat(row.getValue('tranAmount'))
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'PHP',
       }).format(amount)
       return formatted
     },

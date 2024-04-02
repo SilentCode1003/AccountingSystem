@@ -14,9 +14,13 @@ import {
 } from '@/components/ui/popover'
 import { text } from './text'
 
-export function DatePicker() {
-  const [date, setDate] = React.useState<Date>()
-
+export function DatePicker({
+  date,
+  setDate,
+}: {
+  date?: Date
+  setDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -40,6 +44,9 @@ export function DatePicker() {
           selected={date}
           onSelect={setDate}
           initialFocus
+          disabled={(date) =>
+            date > new Date() || date < new Date('1900-01-01')
+          }
         />
       </PopoverContent>
     </Popover>
