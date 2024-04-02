@@ -15,6 +15,7 @@ import "dotenv/config";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
 import { currentUser, login } from "./controller/login.controller";
 import { logout } from "./controller/logout.controller";
+import { getTransactionPartners } from "./controller/others.controllers";
 
 declare module "express-session" {
   interface SessionData {
@@ -43,6 +44,8 @@ app.post("/logout", logout);
 app.use(authMiddleware);
 
 app.get("/login", currentUser);
+
+app.get("/transactionPartners", getTransactionPartners);
 
 //route for all account actions
 app.use("/accounts", accountRouter);
