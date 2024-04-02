@@ -25,6 +25,7 @@ import { Route as AuthenticatedLayoutPayrollsIndexImport } from './routes/_authe
 import { Route as AuthenticatedLayoutInventoryIndexImport } from './routes/_authenticated/_layout/inventory_/index'
 import { Route as AuthenticatedLayoutEmployeesIndexImport } from './routes/_authenticated/_layout/employees_/index'
 import { Route as AuthenticatedLayoutChequesIndexImport } from './routes/_authenticated/_layout/cheques_/index'
+import { Route as AuthenticatedLayoutEmployeesEmpIdImport } from './routes/_authenticated/_layout/employees_/$empId'
 
 // Create Virtual Routes
 
@@ -104,6 +105,12 @@ const AuthenticatedLayoutChequesIndexRoute =
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
+const AuthenticatedLayoutEmployeesEmpIdRoute =
+  AuthenticatedLayoutEmployeesEmpIdImport.update({
+    path: '/employees/$empId',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -131,6 +138,10 @@ declare module '@tanstack/react-router' {
     '/login/_layout/': {
       preLoaderRoute: typeof LoginLayoutIndexImport
       parentRoute: typeof LoginLayoutImport
+    }
+    '/_authenticated/_layout/employees/$empId': {
+      preLoaderRoute: typeof AuthenticatedLayoutEmployeesEmpIdImport
+      parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/cheques/': {
       preLoaderRoute: typeof AuthenticatedLayoutChequesIndexImport
@@ -169,6 +180,7 @@ export const routeTree = rootRoute.addChildren([
   AuthenticatedRoute.addChildren([
     AuthenticatedLayoutRoute.addChildren([
       AuthenticatedLayoutIndexRoute,
+      AuthenticatedLayoutEmployeesEmpIdRoute,
       AuthenticatedLayoutChequesIndexRoute,
       AuthenticatedLayoutEmployeesIndexRoute,
       AuthenticatedLayoutInventoryIndexRoute,
