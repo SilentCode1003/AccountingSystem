@@ -8,8 +8,32 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/login/_layout/')({
-  beforeLoad: async ({ context: { currentUser }, location }) => {
-    if (currentUser && currentUser.isLogged) {
+  beforeLoad: async ({ context: { queryClient }, location }) => {
+    const data = await queryClient.ensureQueryData({
+      queryKey: ['CurrentUser'],
+      queryFn: async () => {
+        const response = await fetch('http://localhost:3000/login', {
+          credentials: 'include',
+        })
+
+        if (!response.ok)
+          return {
+            isLogged: false,
+          }
+
+        const data = (await response.json()) as Promise<{
+          isLogged: boolean
+          user?: {
+            userId: string
+            userType: string
+          }
+        }>
+
+        return data
+      },
+    })
+
+    if (data && data.isLogged) {
       throw redirect({
         to: '/',
         search: {

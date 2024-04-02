@@ -12,34 +12,7 @@ export const Route = createRootRouteWithContext<{
     }
   }
 }>()({
-  loader: async ({ context: { queryClient } }) => {
-    const currentUser = await queryClient.ensureQueryData({
-      queryKey: ['CurrentUser'],
-      queryFn: async () => {
-        const response = await fetch('http://localhost:3000/login', {
-          credentials: 'include',
-        })
-
-        if (!response.ok)
-          return {
-            isLogged: false,
-          }
-
-        const data = (await response.json()) as Promise<{
-          isLogged: boolean
-          user?: {
-            userId: string
-            userType: string
-          }
-        }>
-
-        return data
-      },
-    })
-    return {
-      currentUser,
-    }
-  },
+  loader: async () => {},
   component: RootComponent,
 })
 
