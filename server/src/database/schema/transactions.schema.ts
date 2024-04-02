@@ -10,6 +10,7 @@ import accounts from "./accounts.schema.ts";
 import vendors from "./vendors.schema.ts";
 import customers from "./customers.schema.ts";
 import { decimal } from "drizzle-orm/mysql-core";
+import { relations } from "drizzle-orm";
 
 const transactions = mysqlTable("transactions", {
   tranId: varchar("tran_id", { length: 60 }).primaryKey(),
@@ -36,5 +37,42 @@ const transactions = mysqlTable("transactions", {
   tranCreatedAt: datetime("tran_created_at").notNull().default(new Date()),
   tranUpdatedAt: datetime("tran_updated_at").notNull().default(new Date()),
 });
+
+export const transactionAccountRelation = relations(
+  transactions,
+  ({ one }) => ({
+    account: one(accounts, {
+      fields: [transactions.tranAccId],
+      references: [accounts.accId],
+    }),
+  })
+);
+
+export const transactionEmployeeRelation = relations(
+  transactions,
+  ({ one }) => ({
+    employee: one(employees, {
+      fields: [transactions.tranEmpId],
+      references: [employees.empId],
+    }),
+  })
+);
+
+export const transactionCustomerRelation = relations(
+  transactions,
+  ({ one }) => ({
+    customer: one(customers, {
+      fields: [transactions.tranCustId],
+      references: [customers.custId],
+    }),
+  })
+);
+
+export const transactionVendorRelation = relations(transactions, ({ one }) => ({
+  vendor: one(vendors, {
+    fields: [transactions.tranVdId],
+    references: [vendors.vdId],
+  }),
+}));
 
 export default transactions;

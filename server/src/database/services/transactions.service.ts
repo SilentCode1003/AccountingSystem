@@ -4,7 +4,9 @@ import transactions from "../schema/transactions.schema.ts";
 import { eq } from "drizzle-orm";
 
 export const getAllTransactions = async () => {
-  const transactions = await db.query.transactions.findMany();
+  const transactions = await db.query.transactions.findMany({
+    with: { account: true, employee: true, customer: true, vendor: true },
+  });
 
   return transactions;
 };

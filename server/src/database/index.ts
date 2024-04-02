@@ -8,7 +8,12 @@ import customers from "./schema/customers.schema.ts";
 import employees from "./schema/employees.schema.ts";
 import inventory from "./schema/inventory.schema.ts";
 import payrolls from "./schema/payrolls.schema.ts";
-import transactions from "./schema/transactions.schema.ts";
+import transactions, {
+  transactionAccountRelation,
+  transactionCustomerRelation,
+  transactionEmployeeRelation,
+  transactionVendorRelation,
+} from "./schema/transactions.schema.ts";
 import users from "./schema/users.schema.ts";
 import vendors from "./schema/vendors.schema.ts";
 import { Relations } from "drizzle-orm";
@@ -46,6 +51,10 @@ const db = drizzle(connection, {
     inventory,
     payrolls,
     chequesRelations,
+    transactionAccountRelation,
+    transactionCustomerRelation,
+    transactionEmployeeRelation,
+    transactionVendorRelation,
   } as DBSchema,
   mode: "default",
 });
