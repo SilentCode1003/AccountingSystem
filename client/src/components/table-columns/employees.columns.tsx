@@ -17,6 +17,7 @@ import {
 } from '../ui/dropdown-menu'
 import { Button } from '../ui/button'
 import { EyeOff, MoreHorizontal } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 
 export type Employees = {
   empId: string
@@ -27,7 +28,7 @@ export type Employees = {
   empDateHired: string
   empDateTerminated: string
   empImage: string
-  empBirtdate: string
+  empBirthdate: string
   empSalary: number
 }
 
@@ -76,12 +77,18 @@ export const employeeColumns: ColumnDef<Employees>[] = [
     header: 'Email',
   },
   {
-    accessorKey: 'empBirtdate',
+    accessorKey: 'empBirthdate',
     header: 'Birthdate',
+    cell: ({ row }) => {
+      return new Date(row.original.empBirthdate).toLocaleDateString()
+    },
   },
   {
     accessorKey: 'empDateHired',
     header: 'Date Hired',
+    cell: ({ row }) => {
+      return new Date(row.original.empDateHired).toLocaleDateString()
+    },
   },
   {
     accessorKey: 'empSalary',
@@ -100,7 +107,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
     header: 'Date Terminated',
     cell: ({ row }) => (
       <div className="flex justify-between">
-        <div>{row.original.empDateTerminated}</div>
+        <div>{new Date(row.original.empBirthdate).toLocaleDateString()}</div>
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -119,7 +126,12 @@ export const employeeColumns: ColumnDef<Employees>[] = [
                 Copy Product Code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>View Employee Profile</DropdownMenuItem>
+              <Link
+                to="/employees/$empId"
+                params={{ empId: row.original.empId }}
+              >
+                <DropdownMenuItem>View Employee Profile</DropdownMenuItem>
+              </Link>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="flex justify-between">
                 Hide <EyeOff />
