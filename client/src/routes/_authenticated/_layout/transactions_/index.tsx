@@ -1,5 +1,8 @@
 import DataTable from '@/components/DataTable'
-import { transactionColumns } from '@/components/table-columns/transactions.columns'
+import {
+  transactionColumns,
+  type Transactions,
+} from '@/components/table-columns/transactions.columns'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ToWords } from 'to-words'
@@ -18,6 +21,7 @@ import { SelectGroup, SelectValue } from '@radix-ui/react-select'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import DatePicker from '@/components/ui/DatePicker'
+import { useQuery } from '@tanstack/react-query'
 
 const toWords = new ToWords({
   localeCode: 'en-IN',
@@ -40,40 +44,38 @@ const toWords = new ToWords({
 })
 
 export const Route = createFileRoute('/_authenticated/_layout/transactions/')({
-  component: Transactions,
+  component: TransactionsComponent,
 })
 
-const data = {
-  tranAccId: 'accId',
-  tranAmount: 200,
-  tranCreatedAt: new Date().toLocaleDateString(),
-  tranUpdatedAt: new Date().toLocaleDateString(),
-  tranDescription: 'descrip',
-  tranId: 'tranId',
-  tranTransactionDate: new Date().toLocaleDateString(),
-  tranCustId: 'custId',
-  tranEmpId: 'empId',
-  tranVdId: 'vdId',
-}
+function TransactionsComponent() {
+  const { data, isSuccess } = useQuery({
+    queryKey: ['Transactions'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:3000/transactions', {
+        credentials: 'include',
+      })
 
-function Transactions() {
+      const transactionData = (await response.json()) as Promise<{
+        transactions: Array<Transactions>
+      }>
+
+      return transactionData
+    },
+  })
+
   const [person, setPerson] = useState<string>('')
-  const manyData = (() => {
-    let many: Array<typeof data> = []
 
-    for (let i = 0; i < 50; i++) {
-      many.push(data)
-    }
-    return many
-  })()
   return (
     <div className="p-4 min-h-[85vh] items-center flex flex-col gap-8">
-      <DataTable
-        pageSize={5}
-        className="w-full md:w-[70vw]"
-        columns={transactionColumns}
-        data={manyData}
-      />
+      {isSuccess && (
+        <DataTable
+          pageSize={5}
+          className="w-full md:w-[70vw]"
+          columns={transactionColumns}
+          data={data.transactions}
+        />
+      )}
+
       <div className="flex gap-4 flex-col md:flex-row w-full md:w-[70vw]">
         <Card className="flex-1 overflow-y-auto">
           <CardHeader>Receipt Preview</CardHeader>
@@ -176,4 +178,4 @@ function Transactions() {
   )
 }
 
-export default Transactions
+export default TransactionsComponent
