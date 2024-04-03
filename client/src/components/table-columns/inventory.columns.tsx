@@ -9,8 +9,9 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
 import { Button } from '../ui/button'
-import { EyeOff, MoreHorizontal } from 'lucide-react'
+import { ArrowUpDownIcon, EyeOff, MoreHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { text } from '../ui/text'
 
 export type Inventories = {
   invId: string
@@ -22,15 +23,48 @@ export type Inventories = {
 export const inventoryColumns: ColumnDef<Inventories>[] = [
   {
     accessorKey: 'invAssetName',
-    header: 'Asset Name',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body' })}
+        >
+          Asset Name
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'invStocks',
-    header: 'Asset Stocks',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body' })}
+        >
+          Asset Stocks
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'invStatus',
-    header: 'Asset Status',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body' })}
+        >
+          Asset Status
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       return (
         <div className="flex justify-between">
