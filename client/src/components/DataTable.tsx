@@ -19,7 +19,7 @@ import {
 } from './ui/table'
 import { text } from './ui/text'
 import { Button } from './ui/button'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, ElementType, useEffect, useState } from 'react'
 import { Input } from './ui/input'
 import {
   Select,
@@ -46,6 +46,7 @@ type DataTableProps<TData, TValue> = {
       filterPlaceHolder: string
       filterValues?: Array<string>
     }>
+    CrudComponents?: ElementType
   }
 
 function Filters({
@@ -60,7 +61,7 @@ function Filters({
   }>
 }) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:flex-wrap sm:mb-4">
+    <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:flex-wrap">
       {filter.map(({ filterColumn, filterPlaceHolder, filterValues }, index) =>
         !filterValues ? (
           <div className="flex items-center" key={index}>
@@ -81,7 +82,7 @@ function Filters({
             )}
           </div>
         ) : (
-          <div className="max-w-sm">
+          <div key={index} className="max-w-sm">
             <Select
               onValueChange={table.getColumn(filterColumn)?.setFilterValue}
               value={
@@ -115,6 +116,7 @@ function DataTable<TData, TValue>({
   data,
   pageSize,
   filter,
+  CrudComponents,
   ...props
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -141,25 +143,30 @@ function DataTable<TData, TValue>({
 
   return (
     <div {...props}>
-      {filter && (
-        <div className="flex justify-end sm:hidden mb-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <FilterIcon size={32} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Filters</DropdownMenuLabel>
-              <Filters table={table} filter={filter} />
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
+      <div className="flex items-center justify-between mb-4">
+        {CrudComponents && <CrudComponents />}
+        <div className="">
+          {filter && (
+            <div className="flex justify-end lg:hidden ">
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <FilterIcon size={32} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Filters</DropdownMenuLabel>
+                  <Filters table={table} filter={filter} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
 
-      {filter && (
-        <div className="hidden  sm:flex sm:justify-end">
-          <Filters table={table} filter={filter} />
+          {filter && (
+            <div className="hidden lg:flex lg:justify-end ">
+              <Filters table={table} filter={filter} />
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="rounded-md border">
         <Table>
