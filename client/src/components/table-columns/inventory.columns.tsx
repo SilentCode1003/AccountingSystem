@@ -28,7 +28,7 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body' })}
+          className={text({ variant: 'body', className: 'p-0' })}
         >
           Asset Name
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -43,7 +43,7 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body' })}
+          className={text({ variant: 'body', className: 'p-0' })}
         >
           Asset Stocks
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -58,7 +58,7 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body' })}
+          className={text({ variant: 'body', className: 'p-0' })}
         >
           Asset Status
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -67,9 +67,8 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className="flex justify-between">
+        <div className="flex justify-between ">
           <div className="flex gap-4 items-center">
-            <div>{row.original.invStatus}</div>
             <div
               className={cn([
                 'w-10 h-10 rounded-full',
@@ -78,6 +77,7 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
                 row.original.invStatus === 'DEPLETED' && 'bg-red-500 ',
               ])}
             ></div>
+            <div>{row.original.invStatus}</div>
           </div>
           <div>
             <DropdownMenu>
