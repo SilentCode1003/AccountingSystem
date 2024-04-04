@@ -126,12 +126,8 @@ export const employeeColumns: ColumnDef<Employees>[] = [
                 Copy Product Code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link
-                to="/employees/$empId"
-                params={{ empId: row.original.empId }}
-              >
-                <DropdownMenuItem>View Employee Profile</DropdownMenuItem>
-              </Link>
+
+              <DropdownMenuItem>Update Employee</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="flex justify-between">
                 Hide <EyeOff />
