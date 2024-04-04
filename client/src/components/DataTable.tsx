@@ -8,6 +8,7 @@ import {
   SortingState,
   ColumnFiltersState,
   getFilteredRowModel,
+  VisibilityState,
 } from '@tanstack/react-table'
 import {
   Table,
@@ -30,11 +31,13 @@ import {
 } from './ui/select'
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
 import { FilterIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[]
@@ -61,7 +64,7 @@ function Filters({
   }>
 }) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:flex-wrap">
+    <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-4">
       {filter.map(({ filterColumn, filterPlaceHolder, filterValues }, index) =>
         !filterValues ? (
           <div className="flex items-center" key={index}>
@@ -104,7 +107,11 @@ function Filters({
           </div>
         ),
       )}
-      <Button variant={'secondary'} onClick={() => table.resetColumnFilters()}>
+      <Button
+        className={cn(filter.length % 2 === 0 ? 'col-span-2' : '')}
+        variant={'secondary'}
+        onClick={() => table.resetColumnFilters()}
+      >
         Clear Filters
       </Button>
     </div>
@@ -121,6 +128,7 @@ function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   const table = useReactTable({
     data,
@@ -131,9 +139,11 @@ function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
   })
 
@@ -144,8 +154,42 @@ function DataTable<TData, TValue>({
   return (
     <div {...props}>
       <div className="flex items-center justify-between mb-4">
-        {CrudComponents && <CrudComponents />}
-        <div className="">
+        {CrudComponents ? (
+          <div className="self-end">
+            <CrudComponents />
+          </div>
+        ) : (
+          <div />
+        )}
+        <div className="flex gap-4">
+          <div className="self-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    )
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           {filter && (
             <div className="flex justify-end lg:hidden ">
               <DropdownMenu>
