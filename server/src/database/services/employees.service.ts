@@ -16,7 +16,6 @@ export const addEmployee = async (input: {
   empEmail: string;
   empBirthdate: Date;
   empDateHired: Date;
-  empDateTerminated: Date;
   empSalary: number;
 }) => {
   const newEmployeeId = `empId ${crypto.randomUUID()}`;

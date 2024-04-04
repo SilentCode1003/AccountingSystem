@@ -14,10 +14,6 @@ export const createValidator = z.object({
     .string()
     .datetime()
     .transform((date) => new Date(date)),
-  empDateTerminated: z
-    .string()
-    .datetime()
-    .transform((date) => new Date(date)),
   empSalary: z.number(),
 });
 
