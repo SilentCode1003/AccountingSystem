@@ -96,6 +96,12 @@ function TransactionsComponent() {
           className="w-full md:w-[70vw]"
           columns={transactionColumns}
           data={transactions.data.transactions}
+          filter={[
+            {
+              filterColumn: 'tranAmount',
+              filterPlaceHolder: 'Filter by Transaction Amount',
+            },
+          ]}
         />
       )}
 
