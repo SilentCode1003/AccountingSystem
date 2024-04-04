@@ -36,24 +36,17 @@ import {
   AlertDialogCancel,
   AlertDialogTrigger,
 } from '@radix-ui/react-alert-dialog'
+import { createInventorySchema } from '@/validators/inventory.validator'
 
 export const Route = createFileRoute('/_authenticated/_layout/inventory/')({
   component: Inventory,
 })
 
-const formSchema = z
-  .object({
-    invAssetName: z.string().min(1, { message: 'Required' }),
-    invStocks: z.number().min(1, { message: 'Required' }),
-    invStatus: z.enum(['GOOD', 'WARNING', 'DEPLETED']),
-  })
-  .required()
-
 function CrudComponents() {
   const queryClient = useQueryClient()
   const createInventory = useMutation({
     mutationKey: ['CreateInventory'],
-    mutationFn: async (payload: z.infer<typeof formSchema>) => {
+    mutationFn: async (payload: z.infer<typeof createInventorySchema>) => {
       const response = await fetch('http://localhost:3000/inventory', {
         method: 'POST',
         headers: {
@@ -69,28 +62,19 @@ function CrudComponents() {
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ['Inventories'] })
-      // queryClient.setQueryData(
-      //   ['Inventories'],
-      //   (old: { inventories: Array<Inventories> }) => {
-      //     console.log(old)
-      //     return {
-      //       inventories: [old.inventories, data.inventory],
-      //     }
-      //   },
-      // )
     },
   })
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.infer<typeof createInventorySchema>>({
     defaultValues: {
       invAssetName: '',
       invStocks: 0,
       invStatus: 'GOOD',
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(createInventorySchema),
   })
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = (values: z.infer<typeof createInventorySchema>) => {
     createInventory.mutate({
       invAssetName: values.invAssetName,
       invStocks: values.invStocks,
