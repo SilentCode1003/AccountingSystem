@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Employees } from '../../table-columns/employees.columns'
+import { Employees } from '../table-columns/employees.columns'
 import {
   Dialog,
   DialogClose,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../ui/dialog'
+} from '../ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,10 +18,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../ui/dropdown-menu'
-import { Button } from '../../ui/button'
+} from '../ui/dropdown-menu'
+import { Button } from '../ui/button'
 import { MoreHorizontal, ShieldXIcon } from 'lucide-react'
-import { Text } from '../../ui/text'
+import { Text } from '../ui/text'
 import {
   Form,
   FormControl,
@@ -29,9 +29,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../../ui/Form'
-import { Input } from '../../ui/input'
-import DatePicker from '../../ui/DatePicker'
+} from '../ui/Form'
+import { Input } from '../ui/input'
+import DatePicker from '../ui/DatePicker'
 import { CellContext } from '@tanstack/react-table'
 import {
   terminateEmployeeSchema,

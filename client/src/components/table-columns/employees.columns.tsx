@@ -7,7 +7,7 @@ import {
   DateTerminatedColumn,
   NameColumn,
   SalaryColumn,
-} from '../table-components/employees/employees.tblcomp'
+} from '../table-components/employees.tblcomp'
 import { ArrowUpDownIcon } from 'lucide-react'
 import { text } from '../ui/text'
 import { Button } from '../ui/button'
