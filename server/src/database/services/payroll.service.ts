@@ -18,11 +18,21 @@ export const addPayroll = async (input: {
   prTotalDeduction: number;
   prDateFrom: Date;
   prDateTo: Date;
-  prFinalAmount: number;
 }) => {
   const newPayrollId = `prId ${crypto.randomUUID()}`;
 
-  await db.insert(payrolls).values({ ...input, prId: newPayrollId });
+  const employee = await db.query.employees.findFirst({
+    where: (employee) => eq(employee.empId, input.prEmployeeId),
+  });
+
+  await db.insert(payrolls).values({
+    ...input,
+    prId: newPayrollId,
+    prFinalAmount:
+      (employee!.empSalary as number) - input.prTotalDeduction < 0
+        ? 0
+        : (employee!.empSalary as number) - input.prTotalDeduction,
+  });
 
   const newPayroll = await db.query.payrolls.findFirst({
     where: (payroll) => eq(payroll.prId, newPayrollId),
@@ -38,7 +48,6 @@ export const editPayroll = async (input: {
     prTotalDeduction?: number;
     prDateFrom?: Date;
     prDateTo?: Date;
-    prFinalAmount?: number;
   };
 }) => {
   await db

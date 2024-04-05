@@ -18,9 +18,10 @@ const payrolls = mysqlTable("payrolls", {
     .notNull(),
   prDateFrom: date("pr_date_from").notNull(),
   prDateTo: date("pr_date_to").notNull(),
-  prFinalAmount: decimal("pr_final_amount", { precision: 13, scale: 2 })
-    .$type<number>()
-    .notNull(),
+  prFinalAmount: decimal("pr_final_amount", {
+    precision: 13,
+    scale: 2,
+  }).$type<number>(),
 });
 
 export const payrollEmployeeRelation = relations(payrolls, ({ one }) => ({

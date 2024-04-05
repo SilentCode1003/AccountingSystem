@@ -25,7 +25,6 @@ export const createValidator = z.object({
     .string()
     .datetime()
     .transform((date) => new Date(date)),
-  prFinalAmount: z.number(),
 });
 
 //validator for PUT /payrolls input
@@ -73,6 +72,5 @@ export const updateValidator = z.object({
       .datetime()
       .transform((date) => new Date(date))
       .optional(),
-    prFinalAmount: z.number().optional(),
   }),
 });
