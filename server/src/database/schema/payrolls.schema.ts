@@ -6,6 +6,7 @@ import {
 } from "drizzle-orm/mysql-core";
 import employees from "./employees.schema.ts";
 import { decimal } from "drizzle-orm/mysql-core";
+import { relations } from "drizzle-orm";
 
 const payrolls = mysqlTable("payrolls", {
   prId: varchar("pr_id", { length: 60 }).primaryKey(),
@@ -21,5 +22,12 @@ const payrolls = mysqlTable("payrolls", {
     .$type<number>()
     .notNull(),
 });
+
+export const payrollEmployeeRelation = relations(payrolls, ({ one }) => ({
+  employee: one(employees, {
+    fields: [payrolls.prEmployeeId],
+    references: [employees.empId],
+  }),
+}));
 
 export default payrolls;

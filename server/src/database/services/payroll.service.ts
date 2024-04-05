@@ -4,7 +4,11 @@ import payrolls from "../schema/payrolls.schema.ts";
 import { eq } from "drizzle-orm";
 
 export const getAllPayrolls = async () => {
-  const payrolls = await db.query.payrolls.findMany();
+  const payrolls = await db.query.payrolls.findMany({
+    with: {
+      employee: true,
+    },
+  });
 
   return payrolls;
 };
