@@ -101,6 +101,10 @@ function TransactionsComponent() {
               filterColumn: 'tranAmount',
               filterPlaceHolder: 'Filter by Transaction Amount',
             },
+            {
+              filterColumn: 'tranPartner',
+              filterPlaceHolder: 'Filter by Transaction Partner',
+            },
           ]}
         />
       )}

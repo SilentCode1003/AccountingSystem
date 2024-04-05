@@ -127,12 +127,12 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranPartner',
-    meta: 'Transaction Partner',
     accessorFn: (row) => {
-      if (row.tranEmpId) return row.tranEmpId
-      else if (row.tranCustId) return row.tranCustId
-      else return row.tranVdId
+      if (row.tranEmpId) return row.employee.empName
+      else if (row.tranCustId) return row.customer.custName
+      else return row.vendor.vdName
     },
+    meta: 'Transaction Partner',
     header: ({ column }) => {
       return (
         <Button

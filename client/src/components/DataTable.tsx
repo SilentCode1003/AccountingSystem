@@ -9,6 +9,7 @@ import {
   ColumnFiltersState,
   getFilteredRowModel,
   VisibilityState,
+  Table as TableType,
 } from '@tanstack/react-table'
 import {
   Table,
@@ -52,11 +53,11 @@ type DataTableProps<TData, TValue> = {
     CrudComponents?: ElementType
   }
 
-function Filters({
+function Filters<TData>({
   table,
   filter,
 }: {
-  table: any
+  table: TableType<TData>
   filter: Array<{
     filterColumn: string
     filterPlaceHolder: string
