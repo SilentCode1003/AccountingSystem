@@ -14,6 +14,7 @@ export type Inventories = {
 export const inventoryColumns: ColumnDef<Inventories>[] = [
   {
     accessorKey: 'invAssetName',
+    meta: 'Asset Name',
     header: ({ column }) => {
       return (
         <Button
@@ -29,6 +30,7 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
   },
   {
     accessorKey: 'invStocks',
+    meta: 'Asset Stocks',
     header: ({ column }) => {
       return (
         <Button
@@ -44,6 +46,7 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
   },
   {
     accessorKey: 'invStatus',
+    meta: 'Asset Status',
     header: ({ column }) => {
       return (
         <Button

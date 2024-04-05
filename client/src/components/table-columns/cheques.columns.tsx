@@ -19,10 +19,12 @@ export type Cheques = {
 export const chequeColumns: ColumnDef<Cheques>[] = [
   {
     accessorKey: 'chqIssueDate',
+    meta: 'Issue Date',
     header: 'Issue Date',
   },
   {
     accessorKey: 'chqPayeeName',
+    meta: 'Payee Name',
     header: 'Payee Name',
     cell: ({ row }) => (
       <div className="min-w-32">{row.original.chqPayeeName}</div>
@@ -30,27 +32,33 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
   },
   {
     accessorKey: 'chqAmount',
+    meta: 'Amount',
     header: 'Amount',
     cell: PayeeNameColumn,
   },
   {
     accessorKey: 'chqAccId',
-    header: 'Account Id',
+    meta: 'Account',
+    header: 'Account',
   },
   {
     accessorKey: 'chqDescription',
+    meta: 'Description',
     header: 'Description',
   },
   {
     accessorKey: 'chqStatus',
+    meta: 'Status',
     header: 'Status',
   },
   {
     accessorKey: 'chqCreatedAt',
+    meta: 'Created At',
     header: 'Created At',
   },
   {
     accessorKey: 'chqUpdatedAt',
+    meta: 'Updated At',
     header: 'Updated At',
     cell: UpdatedAtColumn,
   },

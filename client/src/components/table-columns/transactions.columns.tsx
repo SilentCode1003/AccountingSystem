@@ -59,6 +59,7 @@ export type Transactions = {
 export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranId',
+    meta: 'Transaction ID',
     header: ({ column }) => {
       return (
         <Button
@@ -75,6 +76,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranAccId',
+    meta: 'Account',
     header: ({ column }) => {
       return (
         <Button
@@ -91,6 +93,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranAmount',
+    meta: 'Transaction Amount',
     header: ({ column }) => {
       return (
         <Button
@@ -106,11 +109,8 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
     cell: TransactionAmountColumn,
   },
   {
-    accessorKey: 'Conducted',
-    header: '',
-  },
-  {
     accessorKey: 'tranTransactionDate',
+    meta: 'Transaction Date',
     header: ({ column }) => {
       return (
         <Button
@@ -127,6 +127,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranPartner',
+    meta: 'Transaction Partner',
     accessorFn: (row) => {
       if (row.tranEmpId) return row.tranEmpId
       else if (row.tranCustId) return row.tranCustId
@@ -139,7 +140,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className={text({ variant: 'body', className: 'p-0' })}
         >
-          Transaction Date
+          Transaction Partner
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )

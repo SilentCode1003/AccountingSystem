@@ -28,6 +28,7 @@ export type Employees = {
 export const employeeColumns: ColumnDef<Employees>[] = [
   {
     accessorKey: 'empName',
+    meta: 'Employee Name',
     header: ({ column }) => {
       return (
         <Button
@@ -44,6 +45,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empAddress',
+    meta: 'Address',
     header: ({ column }) => {
       return (
         <Button
@@ -60,6 +62,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empContactInfo',
+    meta: 'Contact Info',
     header: ({ column }) => {
       return (
         <Button
@@ -75,6 +78,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empEmail',
+    meta: 'Email',
     header: ({ column }) => {
       return (
         <Button
@@ -90,6 +94,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empBirthdate',
+    meta: 'Birthdate',
     header: ({ column }) => {
       return (
         <Button
@@ -106,6 +111,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empDateHired',
+    meta: 'Date Hired',
     header: ({ column }) => {
       return (
         <Button
@@ -122,6 +128,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empDateTerminated',
+    meta: 'Date Terminated',
     header: ({ column }) => {
       return (
         <Button
@@ -138,6 +145,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empSalary',
+    meta: 'Salary',
     header: ({ column }) => {
       return (
         <Button
