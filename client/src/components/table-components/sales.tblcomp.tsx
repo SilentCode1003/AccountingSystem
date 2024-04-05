@@ -15,16 +15,9 @@ export const PricePerUnitColumn = ({ row }: CellContext<Sales, unknown>) => {
   const amount = parseFloat(row.getValue('pricePerUnit'))
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'PHP',
   }).format(amount)
-
-  return (
-    <>
-      <div className="flex justify-between items-center font-medium">
-        <div>{formatted}</div>
-      </div>
-    </>
-  )
+  return formatted
 }
 
 export const TotalColumn = ({ row }: CellContext<Sales, unknown>) => {

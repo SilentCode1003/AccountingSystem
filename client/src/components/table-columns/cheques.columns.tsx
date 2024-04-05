@@ -22,6 +22,7 @@ export type Cheques = {
 export const chequeColumns: ColumnDef<Cheques>[] = [
   {
     accessorKey: 'chqIssueDate',
+    filterFn: 'dateBetweenFilter',
     meta: 'Issue Date',
     header: ({ column }) => {
       return (

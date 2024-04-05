@@ -16,7 +16,7 @@ const getData = (): Array<Sales> => {
       productCode: 'code',
       dateSold: new Date().toLocaleDateString(),
       id: 'test',
-      pricePerUnit: 23,
+      pricePerUnit: 23.01,
       total: 23,
       unitsSold: 23,
     },
@@ -40,6 +40,21 @@ function Sales() {
         className="w-full md:w-[70vw]"
         columns={salesColumns}
         data={manyData}
+        filter={[
+          {
+            filterColumn: 'dateSold',
+            filterPlaceHolder: 'Filter Date Sold',
+            date: true,
+          },
+          {
+            filterColumn: 'productName',
+            filterPlaceHolder: 'Filter Product Name',
+          },
+          {
+            filterColumn: 'pricePerUnit',
+            filterPlaceHolder: 'Filter Price Per Unit',
+          },
+        ]}
       ></DataTable>
     </div>
   )

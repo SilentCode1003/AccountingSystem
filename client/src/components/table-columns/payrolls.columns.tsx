@@ -19,7 +19,7 @@ export type Payrolls = {
 
 export const payrollColumns: ColumnDef<Payrolls>[] = [
   {
-    accessorKey: 'empName',
+    accessorKey: 'prEmpName',
     meta: 'Employee Name',
     header: ({ column }) => {
       return (
@@ -54,6 +54,7 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
   },
   {
     accessorKey: 'prDateFrom',
+    filterFn: 'dateBetweenFilter',
     meta: 'Date From',
     header: ({ column }) => {
       return (
@@ -70,6 +71,7 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
   },
   {
     accessorKey: 'prDateTo',
+    filterFn: 'dateBetweenFilter',
     meta: 'Date To',
     header: ({ column }) => {
       return (

@@ -21,6 +21,7 @@ export type Sales = {
 export const salesColumns: ColumnDef<Sales>[] = [
   {
     accessorKey: 'dateSold',
+    filterFn: 'dateBetweenFilter',
     meta: 'Date Sold',
     header: ({ column }) => {
       return (

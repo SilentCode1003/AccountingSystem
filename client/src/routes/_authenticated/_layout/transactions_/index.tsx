@@ -89,7 +89,7 @@ function TransactionsComponent() {
   const [date, setDate] = useState<Date>()
 
   return (
-    <div className="p-4 min-h-[85vh] items-center flex flex-col gap-8">
+    <div className="p-4  flex flex-col gap-8 items-center min-h-[85vh]">
       {transactions.isSuccess && (
         <DataTable
           pageSize={5}
@@ -104,6 +104,11 @@ function TransactionsComponent() {
             {
               filterColumn: 'tranPartner',
               filterPlaceHolder: 'Filter by Transaction Partner',
+            },
+            {
+              filterColumn: 'tranTransactionDate',
+              filterPlaceHolder: 'Filter Transac Date',
+              date: true,
             },
           ]}
         />

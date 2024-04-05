@@ -118,7 +118,7 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
-  }).format(parseInt(row.getValue('empSalary')))
+  }).format(parseFloat(row.getValue('empSalary')))
 
   return (
     <div className="flex justify-between">

@@ -111,6 +111,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranTransactionDate',
     meta: 'Transaction Date',
+    filterFn: 'dateBetweenFilter',
     header: ({ column }) => {
       return (
         <Button

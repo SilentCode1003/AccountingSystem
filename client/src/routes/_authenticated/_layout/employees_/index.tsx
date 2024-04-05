@@ -69,7 +69,6 @@ const CrudComponents = () => {
 
   const handleSubmit = (values: z.infer<typeof createEmployeeSchema>) => {
     createEmployee.mutate(values)
-    console.log(values)
   }
 
   return (
@@ -271,8 +270,18 @@ function Employees() {
               filterPlaceHolder: 'Filter by name',
             },
             {
+              filterColumn: 'empSalary',
+              filterPlaceHolder: 'Filter by Salary',
+            },
+            {
               filterColumn: 'empDateTerminated',
-              filterPlaceHolder: 'Filter by name',
+              filterPlaceHolder: 'Filter Date Terminated',
+              date: true,
+            },
+            {
+              filterColumn: 'empBirthdate',
+              filterPlaceHolder: 'Filter birthdate',
+              date: true,
             },
           ]}
           CrudComponents={CrudComponents}

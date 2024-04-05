@@ -94,6 +94,7 @@ export const employeeColumns: ColumnDef<Employees>[] = [
   },
   {
     accessorKey: 'empBirthdate',
+    filterFn: 'dateBetweenFilter',
     meta: 'Birthdate',
     header: ({ column }) => {
       return (

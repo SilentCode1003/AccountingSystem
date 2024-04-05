@@ -32,6 +32,26 @@ function Payrolls() {
         className="w-full md:w-[70vw]"
         columns={payrollColumns}
         data={manyData}
+        filter={[
+          {
+            filterColumn: 'prEmpName',
+            filterPlaceHolder: 'Filter employee name',
+          },
+          {
+            filterColumn: 'prFinalAmount',
+            filterPlaceHolder: 'Filter total amount',
+          },
+          {
+            filterColumn: 'prDateFrom',
+            filterPlaceHolder: 'Filter Date From',
+            date: true,
+          },
+          {
+            filterColumn: 'prDateTo',
+            filterPlaceHolder: 'Filter Date To',
+            date: true,
+          },
+        ]}
       ></DataTable>
     </div>
   )
