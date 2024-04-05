@@ -1,6 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table'
 
 import {
+  DateFromColumn,
+  DateToColumn,
   EmployeeNameColumn,
   FinalAmountColumn,
   TotalDeductionColumn,
@@ -8,6 +10,7 @@ import {
 import { Button } from '../ui/button'
 import { text } from '../ui/text'
 import { ArrowUpDownIcon } from 'lucide-react'
+import { Employees } from './employees.columns'
 
 export type Payrolls = {
   prEmpName: string
@@ -15,12 +18,16 @@ export type Payrolls = {
   prDateFrom: string
   prDateTo: string
   prFinalAmount: number
+  employee: Employees
 }
 
 export const payrollColumns: ColumnDef<Payrolls>[] = [
   {
     accessorKey: 'prEmpName',
     meta: 'Employee Name',
+    accessorFn: (row) => {
+      return row.employee.empName
+    },
     header: ({ column }) => {
       return (
         <Button
@@ -68,6 +75,7 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
         </Button>
       )
     },
+    cell: DateFromColumn,
   },
   {
     accessorKey: 'prDateTo',
@@ -85,6 +93,7 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
         </Button>
       )
     },
+    cell: DateToColumn,
   },
   {
     accessorKey: 'prFinalAmount',

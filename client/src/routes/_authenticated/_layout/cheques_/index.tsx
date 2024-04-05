@@ -3,56 +3,58 @@ import {
   chequeColumns,
   type Cheques,
 } from '@/components/table-columns/cheques.columns'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/_layout/cheques/')({
   component: Cheques,
 })
 
-const data: Cheques = {
-  chqAccId: 'Account Id',
-  chqAmount: 4000,
-  chqCreatedAt: new Date().toLocaleDateString(),
-  chqDescription: 'Description',
-  chqIssueDate: new Date().toLocaleDateString(),
-  chqPayeeName: 'Nestor P. Gerona',
-  chqStatus: 'APPROVED',
-  chqUpdatedAt: new Date().toLocaleDateString(),
-}
-
 function Cheques() {
-  const manyData = (() => {
-    let many: Array<typeof data> = []
+  const cheques = useQuery({
+    queryKey: ['Cheques'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:3000/cheques', {
+        credentials: 'include',
+      })
 
-    for (let i = 0; i < 50; i++) {
-      many.push(data)
-    }
-    return many
-  })()
+      const data = (await response.json()) as Promise<{
+        cheques: Array<Cheques>
+      }>
+
+      return data
+    },
+  })
 
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
-      <DataTable
-        className="w-full md:w-[70vw]"
-        columns={chequeColumns}
-        data={manyData}
-        filter={[
-          {
-            filterColumn: 'chqIssueDate',
-            filterPlaceHolder: 'Filter Issue Date',
-            date: true,
-          },
-          {
-            filterColumn: 'chqPayeeName',
-            filterPlaceHolder: 'Filter by payee name',
-          },
-          {
-            filterColumn: 'chqStatus',
-            filterPlaceHolder: 'Filter by status',
-            filterValues: ['PENDING', 'APPROVED', 'REJECTED'],
-          },
-        ]}
-      ></DataTable>
+      {cheques.isSuccess && (
+        <DataTable
+          className="w-full md:w-[70vw]"
+          columns={chequeColumns}
+          data={cheques.data.cheques}
+          filter={[
+            {
+              filterColumn: 'chqIssueDate',
+              filterPlaceHolder: 'Filter Issue Date',
+              date: true,
+            },
+            {
+              filterColumn: 'chqAmount',
+              filterPlaceHolder: 'Filter Amount',
+            },
+            {
+              filterColumn: 'chqPayeeName',
+              filterPlaceHolder: 'Filter by payee name',
+            },
+            {
+              filterColumn: 'chqStatus',
+              filterPlaceHolder: 'Filter by status',
+              filterValues: ['PENDING', 'APPROVED', 'REJECTED'],
+            },
+          ]}
+        />
+      )}
     </div>
   )
 }

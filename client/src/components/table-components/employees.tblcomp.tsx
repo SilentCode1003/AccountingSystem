@@ -139,7 +139,7 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                   navigator.clipboard.writeText(row.original.empId)
                 }
               >
-                Copy Product Code
+                Copy Employee ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DialogTrigger asChild>

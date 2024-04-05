@@ -3,56 +3,55 @@ import {
   payrollColumns,
   type Payrolls,
 } from '@/components/table-columns/payrolls.columns'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/_layout/payrolls/')({
   component: Payrolls,
 })
 
-const data: Payrolls = {
-  prDateFrom: new Date().toLocaleDateString(),
-  prDateTo: new Date().toLocaleDateString(),
-  prEmpName: 'Nestor Gerona',
-  prFinalAmount: 1000,
-  prTotalDeduction: 200,
-}
-
 function Payrolls() {
-  const manyData = (() => {
-    let many: Array<typeof data> = []
-
-    for (let i = 0; i < 50; i++) {
-      many.push(data)
-    }
-    return many
-  })()
+  const payrolls = useQuery({
+    queryKey: ['payrolls'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:3000/payrolls', {
+        credentials: 'include',
+      })
+      const data = (await response.json()) as Promise<{
+        payrolls: Array<Payrolls>
+      }>
+      return data
+    },
+  })
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
-      <DataTable
-        className="w-full md:w-[70vw]"
-        columns={payrollColumns}
-        data={manyData}
-        filter={[
-          {
-            filterColumn: 'prEmpName',
-            filterPlaceHolder: 'Filter employee name',
-          },
-          {
-            filterColumn: 'prFinalAmount',
-            filterPlaceHolder: 'Filter total amount',
-          },
-          {
-            filterColumn: 'prDateFrom',
-            filterPlaceHolder: 'Filter Date From',
-            date: true,
-          },
-          {
-            filterColumn: 'prDateTo',
-            filterPlaceHolder: 'Filter Date To',
-            date: true,
-          },
-        ]}
-      ></DataTable>
+      {payrolls.isSuccess && (
+        <DataTable
+          className="w-full md:w-[70vw]"
+          columns={payrollColumns}
+          data={payrolls.data.payrolls}
+          filter={[
+            {
+              filterColumn: 'prEmpName',
+              filterPlaceHolder: 'Filter employee name',
+            },
+            {
+              filterColumn: 'prFinalAmount',
+              filterPlaceHolder: 'Filter total amount',
+            },
+            {
+              filterColumn: 'prDateFrom',
+              filterPlaceHolder: 'Filter Date From',
+              date: true,
+            },
+            {
+              filterColumn: 'prDateTo',
+              filterPlaceHolder: 'Filter Date To',
+              date: true,
+            },
+          ]}
+        />
+      )}
     </div>
   )
 }
