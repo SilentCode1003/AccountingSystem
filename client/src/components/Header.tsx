@@ -5,7 +5,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Text } from './ui/text'
-import { RxBell, RxGear, RxHamburgerMenu } from 'react-icons/rx'
+import { RxHamburgerMenu } from 'react-icons/rx'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ArchiveIcon,
@@ -56,7 +56,7 @@ function Header() {
     logout.mutate()
   }
   return (
-    <header className="h-[10vh] `z-[10] p-4 `top-0 sticky `w-screen">
+    <header className="h-[10vh] shadow-md bg-background max-w-screen  z-[10] p-4 top-0 sticky ">
       <Sheet>
         <div className="flex">
           <div className="flex-1 flex gap-4">
@@ -74,12 +74,6 @@ function Header() {
           </div>
 
           <div className="flex gap-4">
-            <div>
-              <RxGear size={40} />
-            </div>
-            <div>
-              <RxBell size={40} />
-            </div>
             <div className="ml-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
