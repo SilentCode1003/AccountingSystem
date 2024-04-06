@@ -116,7 +116,7 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DialogContent>
+          <DialogContent className="scale-75 md:scale-100">
             <DialogHeader>Update Inventory</DialogHeader>
             <div>
               <Form {...form}>

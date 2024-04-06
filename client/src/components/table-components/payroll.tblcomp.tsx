@@ -276,7 +276,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DialogContent>
+          <DialogContent className="scale-75 md:scale-100">
             <DialogHeader>Update Inventory</DialogHeader>
             <div className="space-y-4">
               <Form {...form}>

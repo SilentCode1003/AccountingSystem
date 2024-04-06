@@ -89,7 +89,7 @@ function CrudComponents() {
           Add Inventory <PackagePlusIcon />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="w-">
+      <AlertDialogContent className="scale-75 md:scale-100">
         <AlertDialogHeader>Create Inventory</AlertDialogHeader>
 
         <Form {...form}>
