@@ -2,6 +2,7 @@ import db from "../index.ts";
 import cheques from "../schema/cheques.schema.ts";
 import { eq } from "drizzle-orm";
 import { addAccount } from "./accounts.service.ts";
+import accounts from "../schema/accounts.schema.ts";
 
 const CHEQUE_STATUS = {
   PENDING: "PENDING",
@@ -70,12 +71,24 @@ export const editCheque = async (input: {
     chqAmount?: number;
     chqIssueDate?: Date;
     chqStatus?: ChequeStatus;
-    chqAccId?: string;
+    chqAccType: AccountType;
   };
+  chqAccId: string;
 }) => {
   await db
+    .update(accounts)
+    .set({ accType: input.newData.chqAccType })
+    .where(eq(accounts.accId, input.chqAccId));
+
+  await db
     .update(cheques)
-    .set({ ...input.newData, chqUpdatedAt: new Date() })
+    .set({
+      chqAmount: input.newData.chqAmount,
+      chqIssueDate: input.newData.chqIssueDate,
+      chqPayeeName: input.newData.chqPayeeName,
+      chqStatus: input.newData.chqStatus,
+      chqUpdatedAt: new Date(),
+    })
     .where(eq(cheques.chqId, input.chqId));
 
   const updatedChq = await db.query.cheques.findFirst({

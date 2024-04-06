@@ -39,6 +39,7 @@ export const updateCheque = async (req: Request, res: Response) => {
     const updatedChq = await editCheque({
       chqId: input.data.chqId,
       newData: input.data.newData,
+      chqAccId: input.data.chqAccId,
     });
 
     return res.status(200).send({ cheque: updatedChq });
