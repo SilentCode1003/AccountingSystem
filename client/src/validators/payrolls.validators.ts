@@ -29,7 +29,6 @@ export const createPayrollSchema = z.object({
   }),
   prDateFrom: z.date(),
   prDateTo: z.date(),
-  prFinalAmount: z.number(),
 })
 
 export const updatePayrollSchema = z.object({
@@ -65,17 +64,13 @@ export const updatePayrollSchema = z.object({
         }
       })
       .optional(),
-    prTotalDeduction: z.number().optional(),
-    prDateFrom: z
-      .string()
-      .datetime()
-      .transform((date) => new Date(date))
-      .optional(),
-    prDateTo: z
-      .string()
-      .datetime()
-      .transform((date) => new Date(date))
-      .optional(),
-    prFinalAmount: z.number().optional(),
+    prTotalDeduction: z.union([z.number(), z.nan()]).transform((val) => {
+      if (Number.isNaN(val)) {
+        return 0
+      }
+      return val
+    }),
+    prDateFrom: z.date().optional(),
+    prDateTo: z.date().optional(),
   }),
 })

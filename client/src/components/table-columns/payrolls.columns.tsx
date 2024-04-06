@@ -13,6 +13,7 @@ import { ArrowUpDownIcon } from 'lucide-react'
 import { Employees } from './employees.columns'
 
 export type Payrolls = {
+  prId: string
   prEmpName: string
   prTotalDeduction: number
   prDateFrom: string

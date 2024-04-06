@@ -81,7 +81,6 @@ const CrudComponents = () => {
     defaultValues: {
       prEmployeeId: '',
       prTotalDeduction: 0,
-      prFinalAmount: 0,
     },
     resolver: zodResolver(createPayrollSchema),
   })
