@@ -50,13 +50,28 @@ export const editPayroll = async (input: {
     prDateTo?: Date;
   };
 }) => {
+  const employee = await db.query.employees.findFirst({
+    where: (employee) =>
+      eq(employee.empId, input.newData.prEmployeeId as string),
+  });
+
   await db
     .update(payrolls)
-    .set(input.newData)
+    .set({
+      ...input.newData,
+      prFinalAmount:
+        input.newData.prTotalDeduction &&
+        ((employee!.empSalary as number) - input.newData.prTotalDeduction < 0
+          ? 0
+          : (employee!.empSalary as number) - input.newData.prTotalDeduction),
+    })
     .where(eq(payrolls.prId, input.prId));
 
   const updatedPr = await db.query.payrolls.findFirst({
     where: (pr) => eq(pr.prId, input.prId),
+    with: {
+      employee: true,
+    },
   });
 
   return updatedPr;
