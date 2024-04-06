@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -63,26 +62,30 @@ export const TransactionAccountIDColumn = ({
             </DialogHeader>
 
             <div className="space-y-4 sm:space-y-0">
-              <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-                <Text variant={'body'} className="w-full sm:w-[33%]">
-                  Account Id
+              <div className="flex flex-col sm:flex-row">
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
+                  Account ID
                 </Text>
-                <div className="flex-1">{row.original.account.accId}</div>
-              </DialogDescription>
-              <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-                <Text variant={'body'} className="w-full sm:w-[33%]">
+                <Text variant={'label'} className="flex-1">
+                  {row.original.account.accId}
+                </Text>
+              </div>
+              <div className="flex flex-col sm:flex-row">
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Account Type
                 </Text>
-                <div className="flex-1">{row.original.account.accType}</div>
-              </DialogDescription>
-              <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-                <Text variant={'body'} className="w-full sm:w-[33%]">
-                  Created At
+                <Text variant={'label'} className="flex-1">
+                  {row.original.account.accType}
                 </Text>
-                <div className="flex-1">
+              </div>
+              <div className="flex flex-col sm:flex-row">
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
+                  Description
+                </Text>
+                <Text variant={'label'} className="flex-1">
                   {row.original.account.accDescription}
-                </div>
-              </DialogDescription>
+                </Text>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
@@ -187,31 +190,39 @@ export const TransactionWithColumn = ({
             </DialogHeader>
 
             <div className="space-y-4 sm:space-y-0">
-              <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-                <Text variant={'body'} className="w-full sm:w-[33%]">
+              <div className="flex flex-col sm:flex-row">
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Name
                 </Text>
-                <div className="flex-1">{data.name}</div>
-              </DialogDescription>
-              <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-                <Text variant={'body'} className="w-full sm:w-[33%]">
+                <Text variant={'label'} className="flex-1">
+                  {data.name}
+                </Text>
+              </div>
+              <div className="flex flex-col sm:flex-row">
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Email
                 </Text>
-                <div className="flex-1">{data.email}</div>
-              </DialogDescription>
-              <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-                <Text variant={'body'} className="w-full sm:w-[33%]">
+                <Text variant={'label'} className="flex-1">
+                  {data.email}
+                </Text>
+              </div>
+              <div className="flex flex-col sm:flex-row">
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Contact Info
                 </Text>
-                <div className="flex-1">{data.contactInfo}</div>
-              </DialogDescription>
+                <Text variant={'label'} className="flex-1">
+                  {data.contactInfo}
+                </Text>
+              </div>
               {data.address && (
-                <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-                  <Text variant={'body'} className="w-full sm:w-[33%]">
+                <div className="flex flex-col sm:flex-row">
+                  <Text className="w-full sm:w-[33%]" variant={'body'}>
                     Address
                   </Text>
-                  <div className="flex-1">{data.address}</div>
-                </DialogDescription>
+                  <Text variant={'label'} className="flex-1">
+                    {data.address}
+                  </Text>
+                </div>
               )}
             </div>
           </DialogContent>
