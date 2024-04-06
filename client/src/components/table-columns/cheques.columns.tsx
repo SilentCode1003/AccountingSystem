@@ -13,7 +13,7 @@ import { ArrowUpDownIcon } from 'lucide-react'
 
 type Account = {
   accId: string
-  accType: string
+  accType: 'PAYABLE' | 'RECEIVABLE' | 'REVENUE' | 'EXPENSE'
   accAmount: number
   accDescription: string
   accIsActive: boolean
@@ -22,13 +22,15 @@ type Account = {
 }
 
 export type Cheques = {
+  chqId: string
   chqPayeeName: string
   chqAmount: number
   chqIssueDate: string
   chqStatus: 'APPROVED' | 'PENDING' | 'REJECTED'
-  chqAccId: string
+  chqAccType: 'PAYABLE' | 'RECEIVABLE' | 'REVENUE' | 'EXPENSE'
   chqCreatedAt: string
   chqUpdatedAt: string
+  chqAccId: string
   account: Account
 }
 

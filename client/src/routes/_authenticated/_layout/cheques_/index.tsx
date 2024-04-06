@@ -5,6 +5,7 @@ import {
 } from '@/components/table-columns/cheques.columns'
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
@@ -57,9 +58,14 @@ const CrudComponents = () => {
       const data = await response.json()
       return data
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       setOpen(false)
-      await queryClient.refetchQueries({ queryKey: ['Cheques'] })
+      await queryClient.setQueryData(
+        ['Cheques'],
+        (old: { cheques: Array<Cheques> }) => {
+          return { cheques: [...old.cheques, data.cheque] }
+        },
+      )
     },
   })
 
@@ -208,11 +214,11 @@ const CrudComponents = () => {
           </form>
         </Form>
         <div className="flex justify-between">
-          {/* <AlertDialogAction asChild> */}
-          <Button onClick={form.handleSubmit(handleSubmit)} type="submit">
-            Create
-          </Button>
-          {/* </AlertDialogAction> */}
+          <AlertDialogAction asChild>
+            <Button onClick={form.handleSubmit(handleSubmit)} type="submit">
+              Create
+            </Button>
+          </AlertDialogAction>
           <div className="flex gap-2 ">
             <Button variant={'secondary'} onClick={() => form.clearErrors()}>
               Clear

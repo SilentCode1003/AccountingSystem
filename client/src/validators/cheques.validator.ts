@@ -9,7 +9,12 @@ export const createChequeSchema = z.object({
       })
     }
   }),
-  chqAmount: z.number(),
+  chqAmount: z.union([z.number(), z.nan()]).transform((val) => {
+    if (Number.isNaN(val)) {
+      return 0
+    }
+    return val
+  }),
   chqIssueDate: z.date(),
   chqStatus: z.enum(['APPROVED', 'PENDING', 'REJECTED']),
   chqAccType: z.enum(['PAYABLE', 'RECEIVABLE', 'REVENUE', 'EXPENSE']),
@@ -32,7 +37,12 @@ export const chequeUpdateSchema = z.object({
   }),
   newData: z.object({
     chqPayeeName: z.optional(z.string()),
-    chqAmount: z.optional(z.number()),
+    chqAmount: z.union([z.number(), z.nan()]).transform((val) => {
+      if (Number.isNaN(val)) {
+        return 0
+      }
+      return val
+    }),
     chqIssueDate: z.optional(z.date()),
     chqStatus: z.optional(z.enum(['APPROVED', 'PENDING', 'REJECTED'])),
     chqAccType: z
