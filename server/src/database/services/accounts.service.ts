@@ -28,15 +28,16 @@ export const getAccountByID = async (accId: string) => {
 };
 
 export const addAccount = async (input: {
-  accId: string;
   accType: AccountType;
   accDescription: string;
   accAmount: number;
 }) => {
-  await db.insert(accounts).values(input);
+  const newAccountId = `accId ${crypto.randomUUID()}`;
+
+  await db.insert(accounts).values({ ...input, accId: newAccountId });
 
   const newAccount = await db.query.accounts.findFirst({
-    where: (account) => eq(account.accId, input.accId),
+    where: (account) => eq(account.accId, newAccountId),
   });
 
   return newAccount;

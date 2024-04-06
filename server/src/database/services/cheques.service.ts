@@ -37,7 +37,6 @@ export const getChequeById = async (chqId: string) => {
 };
 
 export const addCheque = async (input: {
-  chqId: string;
   chqPayeeName: string;
   chqAmount: number;
   chqIssueDate: Date;
@@ -50,10 +49,14 @@ export const addCheque = async (input: {
     accType: input.chqAccType,
   });
 
-  await db.insert(cheques).values({ ...input, chqAccId: account!.accId });
+  const newChqId = `chqId ${crypto.randomUUID()}`;
+
+  await db
+    .insert(cheques)
+    .values({ ...input, chqAccId: account!.accId, chqId: newChqId });
 
   const newCheque = await db.query.cheques.findFirst({
-    where: (cheque) => eq(cheque.chqId, input.chqId),
+    where: (cheque) => eq(cheque.chqId, newChqId),
     with: { account: true },
   });
 

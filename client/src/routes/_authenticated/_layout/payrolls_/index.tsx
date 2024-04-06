@@ -196,10 +196,7 @@ const CrudComponents = () => {
         </Form>
         <div className="flex justify-between">
           {/* <AlertDialogAction asChild> */}
-          <Button
-            onClick={() => form.handleSubmit(handleSubmit)()}
-            type="submit"
-          >
+          <Button onClick={() => form.handleSubmit(handleSubmit)} type="submit">
             Create
           </Button>
           {/* </AlertDialogAction> */}

@@ -23,9 +23,7 @@ export const createCheque = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: "invalid inputs" });
 
   try {
-    const newChqId = `chqId ${crypto.randomUUID()}`;
-
-    const newCheque = await addCheque({ ...input.data, chqId: newChqId });
+    const newCheque = await addCheque({ ...input.data });
 
     return res.status(200).send({ cheque: newCheque });
   } catch (error) {

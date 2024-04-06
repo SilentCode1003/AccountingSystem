@@ -25,7 +25,6 @@ export type Cheques = {
   chqPayeeName: string
   chqAmount: number
   chqIssueDate: string
-  chqDescription: string
   chqStatus: 'APPROVED' | 'PENDING' | 'REJECTED'
   chqAccId: string
   chqCreatedAt: string
@@ -104,22 +103,6 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
       )
     },
     cell: AccountColumn,
-  },
-  {
-    accessorKey: 'chqDescription',
-    meta: 'Description',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
-        >
-          Description
-          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
   },
   {
     accessorKey: 'chqStatus',
