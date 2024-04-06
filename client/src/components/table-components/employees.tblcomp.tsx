@@ -388,7 +388,9 @@ export const AddressColumn = ({ row }: CellContext<Employees, unknown>) => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <div className="line-clamp-2 max-w-60">{row.original.empAddress}</div>
+          <div className="line-clamp-2 max-w-60 text-left">
+            {row.original.empAddress}
+          </div>
         </TooltipTrigger>
         <TooltipContent>{row.original.empAddress}</TooltipContent>
       </Tooltip>

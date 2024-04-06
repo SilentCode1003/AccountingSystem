@@ -57,7 +57,7 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
             <AvatarFallback>NG</AvatarFallback>
           </Avatar>
         </div>
-        <div>{row.original.employee.empName}</div>
+        <div className="line-clamp-2">{row.original.employee.empName}</div>
       </div>
       <Dialog>
         <DropdownMenu>
