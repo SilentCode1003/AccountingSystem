@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { MySqlTable } from "drizzle-orm/mysql-core";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import accounts from "./schema/accounts.schema.ts";
@@ -16,20 +15,19 @@ import transactions, {
 } from "./schema/transactions.schema.ts";
 import users from "./schema/users.schema.ts";
 import vendors from "./schema/vendors.schema.ts";
-import { Relations } from "drizzle-orm";
 
-type DBSchema = {
-  accounts: MySqlTable;
-  users: MySqlTable;
-  employees: MySqlTable;
-  cheques: MySqlTable;
-  vendors: MySqlTable;
-  customers: MySqlTable;
-  inventory: MySqlTable;
-  transactions: MySqlTable;
-  payrolls: MySqlTable;
-  chequesRelations: Relations;
-};
+// type DBSchema = {
+//   accounts: MySqlTable;
+//   users: MySqlTable;
+//   employees: MySqlTable;
+//   cheques: MySqlTable;
+//   vendors: MySqlTable;
+//   customers: MySqlTable;
+//   inventory: MySqlTable;
+//   transactions: MySqlTable;
+//   payrolls: MySqlTable;
+//   chequesRelations: Relations;
+// };
 
 export const connection = mysql.createPool({
   host: process.env.DB_HOST,
@@ -56,7 +54,7 @@ const db = drizzle(connection, {
     transactionEmployeeRelation,
     transactionVendorRelation,
     payrollEmployeeRelation,
-  } as DBSchema,
+  },
   mode: "default",
 });
 

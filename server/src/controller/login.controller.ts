@@ -32,7 +32,7 @@ export const login = async (req: Request, res: Response) => {
 export const currentUser = async (req: Request, res: Response) => {
   try {
     const user = await db.query.users.findFirst({
-      where: (user) => eq(user.userId, req.session.userId),
+      where: (user) => eq(user.userId, req.session.userId as string),
     });
     if (!user)
       return res.status(401).send({
