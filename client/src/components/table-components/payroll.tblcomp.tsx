@@ -197,6 +197,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   const form = useForm<z.infer<typeof updatePayrollSchema>>({
     defaultValues: {
       prId: row.original.prId,
+      prAccId: row.original.prAccId,
       newData: {
         prTotalDeduction: Number(row.original.prTotalDeduction),
         prDateTo: new Date(row.original.prDateTo),

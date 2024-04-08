@@ -92,7 +92,6 @@ const CrudComponents = () => {
   })
 
   const handleSubmit = (values: z.infer<typeof createPayrollSchema>) => {
-    console.log(values)
     createPayroll.mutate(values)
   }
 
@@ -201,7 +200,10 @@ const CrudComponents = () => {
         </Form>
         <div className="flex justify-between">
           {/* <AlertDialogAction asChild> */}
-          <Button onClick={() => form.handleSubmit(handleSubmit)} type="submit">
+          <Button
+            onClick={() => form.handleSubmit(handleSubmit)()}
+            type="submit"
+          >
             Create
           </Button>
           {/* </AlertDialogAction> */}
