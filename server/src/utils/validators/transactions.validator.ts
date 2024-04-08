@@ -4,69 +4,34 @@ import z from "zod";
 export const createValidator = z.object({
   tranDescription: z.string(),
   tranAmount: z.number(),
-  tranEmpId: z
-    .string()
-    .superRefine((val, ctx) => {
-      if (val.split(" ")[0] !== "empId") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an employee id.`,
-        });
-      }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        });
-      }
-    })
-    .optional(),
-  tranCustId: z
-    .string()
-    .superRefine((val, ctx) => {
-      if (val.split(" ")[0] !== "custId") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an customer id.`,
-        });
-      }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        });
-      }
-    })
-    .optional(),
-  tranVdId: z
-    .string()
-    .superRefine((val, ctx) => {
-      if (val.split(" ")[0] !== "vdId") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an vendor id.`,
-        });
-      }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        });
-      }
-    })
-    .optional(),
+  tranPartner: z.string().superRefine((val, ctx) => {
+    if (val === "")
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Required`,
+      });
+    if (
+      val.split(" ")[0] !== "empId" &&
+      val.split(" ")[0] !== "custId" &&
+      val.split(" ")[0] !== "vdId"
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid employee/customer/vendor id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
   tranTransactionDate: z
     .string()
     .datetime()
     .transform((date) => new Date(date)),
-  tranCreatedAt: z
-    .string()
-    .datetime()
-    .transform((date) => new Date(date)),
-  tranUpdatedAt: z
-    .string()
-    .datetime()
-    .transform((date) => new Date(date)),
+  tranAccType: z.enum(["PAYABLE", "RECEIVABLE", "REVENUE", "EXPENSE"]),
 });
 
 //validator for PUT /transactions inputs
@@ -171,16 +136,6 @@ export const updateValidator = z.object({
       })
       .optional(),
     tranTransactionDate: z
-      .string()
-      .datetime()
-      .transform((date) => new Date(date))
-      .optional(),
-    tranCreatedAt: z
-      .string()
-      .datetime()
-      .transform((date) => new Date(date))
-      .optional(),
-    tranUpdatedAt: z
       .string()
       .datetime()
       .transform((date) => new Date(date))

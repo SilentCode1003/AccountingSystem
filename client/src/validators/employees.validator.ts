@@ -7,12 +7,11 @@ export const createEmployeeSchema = z.object({
   empEmail: z.string().email().min(1, { message: 'required' }),
   empBirthdate: z.date(),
   empDateHired: z.date(),
-  empSalary: z.union([z.number(), z.nan()]).transform((val) => {
-    if (Number.isNaN(val)) {
-      return 0
-    }
-    return val
-  }),
+  empSalary: z
+    .union([z.number(), z.nan()])
+    .refine((val) => !Number.isNaN(val), {
+      message: 'required',
+    }),
 })
 
 export const updateEmployeeSchema = z.object({

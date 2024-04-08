@@ -21,12 +21,11 @@ export const createPayrollSchema = z.object({
       })
     }
   }),
-  prTotalDeduction: z.union([z.number(), z.nan()]).transform((val) => {
-    if (Number.isNaN(val)) {
-      return 0
-    }
-    return val
-  }),
+  prTotalDeduction: z
+    .union([z.number(), z.nan()])
+    .refine((val) => !Number.isNaN(val), {
+      message: 'required',
+    }),
   prDateFrom: z.date(),
   prDateTo: z.date(),
 })
@@ -78,12 +77,11 @@ export const updatePayrollSchema = z.object({
         }
       })
       .optional(),
-    prTotalDeduction: z.union([z.number(), z.nan()]).transform((val) => {
-      if (Number.isNaN(val)) {
-        return 0
-      }
-      return val
-    }),
+    prTotalDeduction: z
+      .union([z.number(), z.nan()])
+      .refine((val) => !Number.isNaN(val), {
+        message: 'required',
+      }),
     prDateFrom: z.date().optional(),
     prDateTo: z.date().optional(),
   }),
