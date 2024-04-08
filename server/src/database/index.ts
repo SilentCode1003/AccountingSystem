@@ -6,7 +6,10 @@ import cheques, { chequesRelations } from "./schema/cheques.schema";
 import customers from "./schema/customers.schema";
 import employees from "./schema/employees.schema";
 import inventory from "./schema/inventory.schema";
-import payrolls, { payrollEmployeeRelation } from "./schema/payrolls.schema";
+import payrolls, {
+  payrollAccountRelation,
+  payrollEmployeeRelation,
+} from "./schema/payrolls.schema";
 import transactions, {
   transactionAccountRelation,
   transactionCustomerRelation,
@@ -54,6 +57,7 @@ const db = drizzle(connection, {
     transactionEmployeeRelation,
     transactionVendorRelation,
     payrollEmployeeRelation,
+    payrollAccountRelation,
   },
   mode: "default",
 });

@@ -7,9 +7,13 @@ import {
 import employees from "./employees.schema";
 import { decimal } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
+import accounts from "./accounts.schema";
 
 const payrolls = mysqlTable("payrolls", {
   prId: varchar("pr_id", { length: 60 }).primaryKey(),
+  prAccId: varchar("pr_account_id", { length: 60 })
+    .references((): AnyMySqlColumn => accounts.accId, { onDelete: "cascade" })
+    .notNull(),
   prEmployeeId: varchar("pr_employee_id", { length: 60 })
     .references((): AnyMySqlColumn => employees.empId, { onDelete: "cascade" })
     .notNull(),
@@ -28,6 +32,13 @@ export const payrollEmployeeRelation = relations(payrolls, ({ one }) => ({
   employee: one(employees, {
     fields: [payrolls.prEmployeeId],
     references: [employees.empId],
+  }),
+}));
+
+export const payrollAccountRelation = relations(payrolls, ({ one }) => ({
+  account: one(accounts, {
+    fields: [payrolls.prAccId],
+    references: [accounts.accId],
   }),
 }));
 

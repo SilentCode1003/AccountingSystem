@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "a8929e2e-9d85-4a75-a95b-b3ff570d5cce",
+  "id": "9baa47e8-eb7b-4336-9a9d-2f145da1c5d6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -9,14 +9,21 @@
       "columns": {
         "acc_id": {
           "name": "acc_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "acc_type": {
           "name": "acc_type",
-          "type": "varchar(20)",
+          "type": "enum('PAYABLE','RECEIVABLE','REVENUE','EXPENSE')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_amount": {
+          "name": "acc_amount",
+          "type": "decimal(13,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -42,7 +49,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-03-20 04:42:58.305'"
+          "default": "'2024-04-08 02:54:34.531'"
         },
         "acc_updated_at": {
           "name": "acc_updated_at",
@@ -50,7 +57,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-03-20 04:42:58.305'"
+          "default": "'2024-04-08 02:54:34.531'"
         }
       },
       "indexes": {},
@@ -70,7 +77,7 @@
       "columns": {
         "chq_id": {
           "name": "chq_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -84,7 +91,7 @@
         },
         "chq_amount": {
           "name": "chq_amount",
-          "type": "int",
+          "type": "decimal(13,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -92,13 +99,6 @@
         "chq_issue_date": {
           "name": "chq_issue_date",
           "type": "date",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "chq_description": {
-          "name": "chq_description",
-          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -112,9 +112,9 @@
         },
         "chq_account_id": {
           "name": "chq_account_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "chq_created_at": {
@@ -123,7 +123,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-03-20 04:42:58.310'"
+          "default": "'2024-04-08 02:54:34.537'"
         },
         "chq_updated_at": {
           "name": "chq_updated_at",
@@ -131,7 +131,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-03-20 04:42:58.310'"
+          "default": "'2024-04-08 02:54:34.537'"
         }
       },
       "indexes": {},
@@ -165,7 +165,7 @@
       "columns": {
         "cust_id": {
           "name": "cust_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -186,7 +186,7 @@
         },
         "cust_contact_info": {
           "name": "cust_contact_info",
-          "type": "int",
+          "type": "varchar(15)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -231,9 +231,16 @@
       "columns": {
         "emp_id": {
           "name": "emp_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "emp_name": {
+          "name": "emp_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "emp_address": {
@@ -245,7 +252,7 @@
         },
         "emp_contact_info": {
           "name": "emp_contact_info",
-          "type": "int",
+          "type": "varchar(15)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -275,12 +282,12 @@
           "name": "emp_date_terminated",
           "type": "date",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "emp_salary": {
           "name": "emp_salary",
-          "type": "int",
+          "type": "decimal(13,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -310,7 +317,7 @@
       "columns": {
         "inv_id": {
           "name": "inv_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -361,21 +368,28 @@
       "columns": {
         "pr_id": {
           "name": "pr_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pr_account_id": {
+          "name": "pr_account_id",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "pr_employee_id": {
           "name": "pr_employee_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "pr_total_deduction": {
           "name": "pr_total_deduction",
-          "type": "int",
+          "type": "decimal(13,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -396,14 +410,27 @@
         },
         "pr_final_amount": {
           "name": "pr_final_amount",
-          "type": "int",
+          "type": "decimal(13,2)",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
+        "payrolls_pr_account_id_accounts_acc_id_fk": {
+          "name": "payrolls_pr_account_id_accounts_acc_id_fk",
+          "tableFrom": "payrolls",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "pr_account_id"
+          ],
+          "columnsTo": [
+            "acc_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "payrolls_pr_employee_id_employees_emp_id_fk": {
           "name": "payrolls_pr_employee_id_employees_emp_id_fk",
           "tableFrom": "payrolls",
@@ -433,14 +460,14 @@
       "columns": {
         "tran_id": {
           "name": "tran_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "tran_account_id": {
           "name": "tran_account_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -454,28 +481,28 @@
         },
         "tran_amount": {
           "name": "tran_amount",
-          "type": "int",
+          "type": "decimal(13,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "tran_employee_id": {
           "name": "tran_employee_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "tran_vendor_id": {
           "name": "tran_vendor_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "tran_customer_id": {
           "name": "tran_customer_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -493,7 +520,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-03-20 04:42:58.335'"
+          "default": "'2024-04-08 02:54:34.565'"
         },
         "tran_updated_at": {
           "name": "tran_updated_at",
@@ -501,7 +528,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-03-20 04:42:58.335'"
+          "default": "'2024-04-08 02:54:34.565'"
         }
       },
       "indexes": {},
@@ -574,7 +601,7 @@
       "columns": {
         "user_id": {
           "name": "user_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -626,7 +653,7 @@
       "columns": {
         "vd_id": {
           "name": "vd_id",
-          "type": "varchar(40)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -647,7 +674,7 @@
         },
         "vd_contact_info": {
           "name": "vd_contact_info",
-          "type": "int",
+          "type": "varchar(15)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

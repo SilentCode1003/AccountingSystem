@@ -2,11 +2,14 @@ import db from "../index";
 import crypto from "crypto";
 import payrolls from "../schema/payrolls.schema";
 import { eq } from "drizzle-orm";
+import accounts from "../schema/accounts.schema";
+import { addAccount, editAccount } from "./accounts.service";
 
 export const getAllPayrolls = async () => {
   const payrolls = await db.query.payrolls.findMany({
     with: {
       employee: true,
+      account: true,
     },
   });
 
@@ -25,13 +28,22 @@ export const addPayroll = async (input: {
     where: (employee) => eq(employee.empId, input.prEmployeeId),
   });
 
+  const finalAmount =
+    (employee!.empSalary as number) - input.prTotalDeduction < 0
+      ? 0
+      : (employee!.empSalary as number) - input.prTotalDeduction;
+
+  const newAccount = await addAccount({
+    accAmount: finalAmount,
+    accDescription: "PAYROLL",
+    accType: "EXPENSE",
+  });
+
   await db.insert(payrolls).values({
     ...input,
     prId: newPayrollId,
-    prFinalAmount:
-      (employee!.empSalary as number) - input.prTotalDeduction < 0
-        ? 0
-        : (employee!.empSalary as number) - input.prTotalDeduction,
+    prFinalAmount: finalAmount,
+    prAccId: newAccount!.accId,
   });
 
   const newPayroll = await db.query.payrolls.findFirst({
@@ -43,6 +55,7 @@ export const addPayroll = async (input: {
 
 export const editPayroll = async (input: {
   prId: string;
+  prAccId: string;
   newData: {
     prEmployeeId?: string;
     prTotalDeduction?: number;
@@ -55,22 +68,32 @@ export const editPayroll = async (input: {
       eq(employee.empId, input.newData.prEmployeeId as string),
   });
 
+  const finalAmount =
+    input.newData.prTotalDeduction &&
+    ((employee!.empSalary as number) - input.newData.prTotalDeduction < 0
+      ? 0
+      : (employee!.empSalary as number) - input.newData.prTotalDeduction);
+
   await db
     .update(payrolls)
     .set({
       ...input.newData,
-      prFinalAmount:
-        input.newData.prTotalDeduction &&
-        ((employee!.empSalary as number) - input.newData.prTotalDeduction < 0
-          ? 0
-          : (employee!.empSalary as number) - input.newData.prTotalDeduction),
+      prFinalAmount: finalAmount,
     })
     .where(eq(payrolls.prId, input.prId));
+
+  await editAccount({
+    accId: input.prAccId,
+    newData: {
+      accAmount: finalAmount,
+    },
+  });
 
   const updatedPr = await db.query.payrolls.findFirst({
     where: (pr) => eq(pr.prId, input.prId),
     with: {
       employee: true,
+      account: true,
     },
   });
 
