@@ -37,12 +37,14 @@ app.use(
     secret: process.env.SESSION_SECRET as string,
     resave: false,
     saveUninitialized: true,
-    // cookie: {
-    //   secure: true,
-    //   httpOnly: true,
-    //   sameSite: "none",
-
-    // },
+    cookie:
+      process.env.NODE_ENV === "PROD"
+        ? {
+            secure: true,
+            httpOnly: true,
+            sameSite: "none",
+          }
+        : undefined,
   })
 );
 
