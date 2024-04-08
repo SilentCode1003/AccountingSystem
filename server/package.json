@@ -10,7 +10,9 @@
     "push": "drizzle-kit push:mysql",
     "generate": "drizzle-kit generate:mysql",
     "migrate": "tsx migrate.ts",
-    "studio": "drizzle-kit studio --verbose"
+    "studio": "drizzle-kit studio --verbose",
+    "introspect": "drizzle-kit introspect:mysql",
+    "start": "npm run build && node dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +26,7 @@
     "express": "^4.18.3",
     "express-session": "^1.18.0",
     "mysql2": "^3.9.2",
+    "serve": "^14.2.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

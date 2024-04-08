@@ -2,20 +2,6 @@ import z from "zod";
 
 //validator for POST /transactions inputs
 export const createValidator = z.object({
-  tranAccId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an account id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
-  }),
   tranDescription: z.string(),
   tranAmount: z.number(),
   tranEmpId: z
@@ -90,6 +76,20 @@ export const updateValidator = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not an transaction id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
+  tranAccId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "accId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an account id.`,
       });
     }
     if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {

@@ -4,7 +4,7 @@ import {
   getEmployees,
   updateEmployee,
   terminateEmployee,
-} from "../controller/employees.controller.ts";
+} from "../controller/employees.controller";
 
 const employeesRouter = Router();
 
