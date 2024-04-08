@@ -1,0 +1,61 @@
+import "dotenv/config";
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
+import accounts from "./schema/accounts.schema.ts";
+import cheques, { chequesRelations } from "./schema/cheques.schema.ts";
+import customers from "./schema/customers.schema.ts";
+import employees from "./schema/employees.schema.ts";
+import inventory from "./schema/inventory.schema.ts";
+import payrolls, { payrollEmployeeRelation } from "./schema/payrolls.schema.ts";
+import transactions, {
+  transactionAccountRelation,
+  transactionCustomerRelation,
+  transactionEmployeeRelation,
+  transactionVendorRelation,
+} from "./schema/transactions.schema.ts";
+import users from "./schema/users.schema.ts";
+import vendors from "./schema/vendors.schema.ts";
+
+// type DBSchema = {
+//   accounts: MySqlTable;
+//   users: MySqlTable;
+//   employees: MySqlTable;
+//   cheques: MySqlTable;
+//   vendors: MySqlTable;
+//   customers: MySqlTable;
+//   inventory: MySqlTable;
+//   transactions: MySqlTable;
+//   payrolls: MySqlTable;
+//   chequesRelations: Relations;
+// };
+
+export const connection = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT as string),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+});
+
+const db = drizzle(connection, {
+  schema: {
+    accounts,
+    users,
+    employees,
+    cheques,
+    vendors,
+    customers,
+    transactions,
+    inventory,
+    payrolls,
+    chequesRelations,
+    transactionAccountRelation,
+    transactionCustomerRelation,
+    transactionEmployeeRelation,
+    transactionVendorRelation,
+    payrollEmployeeRelation,
+  },
+  mode: "default",
+});
+
+export default db;
