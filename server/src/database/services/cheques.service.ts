@@ -1,8 +1,8 @@
-import db from "../index.ts";
-import cheques from "../schema/cheques.schema.ts";
+import db from "../index";
+import cheques from "../schema/cheques.schema";
 import { eq } from "drizzle-orm";
-import { addAccount } from "./accounts.service.ts";
-import accounts from "../schema/accounts.schema.ts";
+import { addAccount } from "./accounts.service";
+import accounts from "../schema/accounts.schema";
 
 const CHEQUE_STATUS = {
   PENDING: "PENDING",

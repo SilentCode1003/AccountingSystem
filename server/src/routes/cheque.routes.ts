@@ -3,7 +3,7 @@ import {
   createCheque,
   getCheques,
   updateCheque,
-} from "../controller/cheques.controller.ts";
+} from "../controller/cheques.controller";
 
 const chequeRouter = Router();
 

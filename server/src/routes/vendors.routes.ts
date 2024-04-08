@@ -4,7 +4,7 @@ import {
   getVendors,
   toggleVendorIsActive,
   updateVendor,
-} from "../controller/vendors.controller.ts";
+} from "../controller/vendors.controller";
 
 const vendorRouter = Router();
 

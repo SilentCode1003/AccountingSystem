@@ -1,6 +1,6 @@
-import db from "../index.ts";
+import db from "../index";
 import crypto from "crypto";
-import users from "../schema/users.schema.ts";
+import users from "../schema/users.schema";
 import { eq, not } from "drizzle-orm";
 
 const USER_TYPE = {

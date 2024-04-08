@@ -1,5 +1,5 @@
-import db from "../index.ts";
-import accounts from "../schema/accounts.schema.ts";
+import db from "../index";
+import accounts from "../schema/accounts.schema";
 import { eq, not } from "drizzle-orm";
 
 const ACCOUNT_TYPE = {

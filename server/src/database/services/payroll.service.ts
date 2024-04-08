@@ -1,6 +1,6 @@
-import db from "../index.ts";
+import db from "../index";
 import crypto from "crypto";
-import payrolls from "../schema/payrolls.schema.ts";
+import payrolls from "../schema/payrolls.schema";
 import { eq } from "drizzle-orm";
 
 export const getAllPayrolls = async () => {

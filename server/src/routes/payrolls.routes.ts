@@ -3,7 +3,7 @@ import {
   createPayroll,
   getPayrolls,
   updatePayroll,
-} from "../controller/payrolls.controller.ts";
+} from "../controller/payrolls.controller";
 
 const payrollRouter = Router();
 
