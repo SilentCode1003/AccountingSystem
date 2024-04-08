@@ -4,7 +4,7 @@ import {
   getAccounts,
   updateAccount,
   toggleAccountIsActive,
-} from "../controller/accounts.controller.ts";
+} from "../controller/accounts.controller";
 
 const accountRouter = Router();
 

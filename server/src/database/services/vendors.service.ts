@@ -1,6 +1,6 @@
-import db from "../index.ts";
+import db from "../index";
 import crypto from "crypto";
-import vendors from "../schema/vendors.schema.ts";
+import vendors from "../schema/vendors.schema";
 import { eq, not } from "drizzle-orm";
 
 export const getAllVendors = async () => {

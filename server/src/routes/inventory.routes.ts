@@ -3,7 +3,7 @@ import {
   createInventory,
   getInventories,
   updateInventory,
-} from "../controller/inventory.controller.ts";
+} from "../controller/inventory.controller";
 
 const inventoryRouter = Router();
 

@@ -20,6 +20,7 @@ export type Payrolls = {
   prDateTo: string
   prFinalAmount: number
   employee: Employees
+  prAccId: string
 }
 
 export const payrollColumns: ColumnDef<Payrolls>[] = [
