@@ -54,9 +54,12 @@ function TransactionsComponent() {
   const transactions = useQuery({
     queryKey: ['Transactions'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/transactions', {
-        credentials: 'include',
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactions`,
+        {
+          credentials: 'include',
+        },
+      )
 
       const transactionData = (await response.json()) as Promise<{
         transactions: Array<Transactions>
@@ -70,7 +73,7 @@ function TransactionsComponent() {
     queryKey: ['TransactionPartners'],
     queryFn: async () => {
       const response = await fetch(
-        'http://localhost:3000/transactionPartners',
+        `${import.meta.env.VITE_SERVER_URL}/transactionPartners`,
         {
           credentials: 'include',
         },

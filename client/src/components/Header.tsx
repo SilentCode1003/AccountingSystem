@@ -41,7 +41,7 @@ function Header() {
   const logout = useMutation({
     mutationKey: ['logout'],
     mutationFn: async () => {
-      await fetch('http://localhost:3000/logout', {
+      await fetch(`${import.meta.env.VITE_SERVER_URL}/logout`, {
         method: 'POST',
         credentials: 'include',
       })

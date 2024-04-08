@@ -58,7 +58,7 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
   const updateInventory = useMutation({
     mutationKey: ['updateInventory'],
     mutationFn: (payload: z.infer<typeof updateFormSchema>) => {
-      return fetch('http://localhost:3000/inventory', {
+      return fetch(`${import.meta.env.VITE_SERVER_URL}/inventory`, {
         method: 'PUT',
         headers: {
           'content-type': 'application/json',

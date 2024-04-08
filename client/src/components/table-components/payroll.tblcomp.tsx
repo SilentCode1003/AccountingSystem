@@ -177,13 +177,16 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   const employees = useQuery({
     queryKey: ['Employees'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/employees', {
-        method: 'GET',
-        headers: {
-          'content-type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/employees`,
+        {
+          method: 'GET',
+          headers: {
+            'content-type': 'application/json',
+          },
+          credentials: 'include',
         },
-        credentials: 'include',
-      })
+      )
       const data = (await response.json()) as Promise<{
         employees: Array<Employees>
       }>
@@ -209,14 +212,17 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   const updateCheque = useMutation({
     mutationKey: ['updateCheque'],
     mutationFn: async (payload: z.infer<typeof updatePayrollSchema>) => {
-      const response = await fetch('http://localhost:3000/payrolls', {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/payrolls`,
+        {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          credentials: 'include',
         },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
+      )
       const data = (await response.json()) as Promise<{
         payroll: Payrolls
       }>

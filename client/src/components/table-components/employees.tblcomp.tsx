@@ -67,7 +67,7 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
     mutationKey: ['terminateEmployee'],
     mutationFn: async (payload: z.infer<typeof terminateEmployeeSchema>) => {
       const response = await fetch(
-        `http://localhost:3000/employees/${payload.empId}`,
+        `${import.meta.env.VITE_SERVER_URL}/employees/${payload.empId}`,
         {
           method: 'PUT',
           headers: {
@@ -91,14 +91,17 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
   const updateEmployee = useMutation({
     mutationKey: ['updateEmployee'],
     mutationFn: async (payload: z.infer<typeof updateEmployeeSchema>) => {
-      const response = await fetch('http://localhost:3000/employees', {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/employees`,
+        {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          credentials: 'include',
         },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
+      )
       const data = (await response.json()) as Promise<{
         employee: Employees
       }>
