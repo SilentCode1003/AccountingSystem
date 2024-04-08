@@ -47,14 +47,17 @@ const CrudComponents = () => {
   const queryClient = useQueryClient()
   const createCheque = useMutation({
     mutationFn: async (payload: z.infer<typeof createChequeSchema>) => {
-      const response = await fetch('http://localhost:3000/cheques', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/cheques`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
         },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      })
+      )
       const data = await response.json()
       return data
     },
@@ -239,9 +242,12 @@ function Cheques() {
   const cheques = useQuery({
     queryKey: ['Cheques'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/cheques', {
-        credentials: 'include',
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/cheques`,
+        {
+          credentials: 'include',
+        },
+      )
 
       const data = (await response.json()) as Promise<{
         cheques: Array<Cheques>

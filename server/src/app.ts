@@ -25,13 +25,26 @@ declare module "express-session" {
 
 const app = express();
 
-app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
+app.use(
+  cors({
+    origin: [process.env.CLIENT_URL as string],
+    credentials: true,
+  })
+);
 app.use(
   session({
     store: MongoStore.create({ mongoUrl: process.env.mongodb_url }),
     secret: process.env.SESSION_SECRET as string,
     resave: false,
     saveUninitialized: true,
+    cookie:
+      process.env.NODE_ENV === "PROD"
+        ? {
+            secure: true,
+            httpOnly: true,
+            sameSite: "none",
+          }
+        : undefined,
   })
 );
 

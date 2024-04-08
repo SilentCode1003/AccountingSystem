@@ -39,14 +39,17 @@ const CrudComponents = () => {
   const queryClient = useQueryClient()
   const createEmployee = useMutation({
     mutationFn: async (payload: z.infer<typeof createEmployeeSchema>) => {
-      const response = await fetch('http://localhost:3000/employees', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/employees`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
         },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      })
+      )
       const data = await response.json()
       return data
     },
@@ -246,9 +249,12 @@ function Employees() {
   const employees = useQuery({
     queryKey: ['Employees'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/employees', {
-        credentials: 'include',
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/employees`,
+        {
+          credentials: 'include',
+        },
+      )
       const data = (await response.json()) as Promise<{
         employees: Array<Employees>
       }>

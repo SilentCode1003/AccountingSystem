@@ -5,10 +5,10 @@ import {
   text,
   varchar,
 } from "drizzle-orm/mysql-core";
-import employees from "./employees.schema.ts";
-import accounts from "./accounts.schema.ts";
-import vendors from "./vendors.schema.ts";
-import customers from "./customers.schema.ts";
+import employees from "./employees.schema";
+import accounts from "./accounts.schema";
+import vendors from "./vendors.schema";
+import customers from "./customers.schema";
 import { decimal } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 

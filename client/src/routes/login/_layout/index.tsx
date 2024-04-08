@@ -12,9 +12,12 @@ export const Route = createFileRoute('/login/_layout/')({
     const data = await queryClient.ensureQueryData({
       queryKey: ['CurrentUser'],
       queryFn: async () => {
-        const response = await fetch('http://localhost:3000/login', {
-          credentials: 'include',
-        })
+        const response = await fetch(
+          `${import.meta.env.VITE_SERVER_URL}/login`,
+          {
+            credentials: 'include',
+          },
+        )
 
         if (!response.ok)
           return {
@@ -59,7 +62,7 @@ function login() {
   const login = useMutation({
     mutationKey: ['login'],
     mutationFn: async (payload: LoginPayload) => {
-      await fetch('http://localhost:3000/login', {
+      await fetch(`${import.meta.env.VITE_SERVER_URL}/login`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',

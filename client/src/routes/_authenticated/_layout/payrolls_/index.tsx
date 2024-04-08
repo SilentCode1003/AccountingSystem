@@ -48,9 +48,12 @@ const CrudComponents = () => {
   const employees = useQuery({
     queryKey: ['Employees'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/employees', {
-        credentials: 'include',
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/employees`,
+        {
+          credentials: 'include',
+        },
+      )
       const data = (await response.json()) as Promise<{
         employees: Array<Employees>
       }>
@@ -60,14 +63,17 @@ const CrudComponents = () => {
   })
   const createPayroll = useMutation({
     mutationFn: async (payload: z.infer<typeof createPayrollSchema>) => {
-      const response = await fetch('http://localhost:3000/payrolls', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/payrolls`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
         },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      })
+      )
       const data = await response.json()
       return data
     },
@@ -86,7 +92,6 @@ const CrudComponents = () => {
   })
 
   const handleSubmit = (values: z.infer<typeof createPayrollSchema>) => {
-    console.log(values)
     createPayroll.mutate(values)
   }
 
@@ -195,7 +200,10 @@ const CrudComponents = () => {
         </Form>
         <div className="flex justify-between">
           {/* <AlertDialogAction asChild> */}
-          <Button onClick={() => form.handleSubmit(handleSubmit)} type="submit">
+          <Button
+            onClick={() => form.handleSubmit(handleSubmit)()}
+            type="submit"
+          >
             Create
           </Button>
           {/* </AlertDialogAction> */}
@@ -219,9 +227,12 @@ function Payrolls() {
   const payrolls = useQuery({
     queryKey: ['Payrolls'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/payrolls', {
-        credentials: 'include',
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/payrolls`,
+        {
+          credentials: 'include',
+        },
+      )
       const data = (await response.json()) as Promise<{
         payrolls: Array<Payrolls>
       }>

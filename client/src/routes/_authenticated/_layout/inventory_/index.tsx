@@ -47,14 +47,17 @@ function CrudComponents() {
   const createInventory = useMutation({
     mutationKey: ['CreateInventory'],
     mutationFn: async (payload: z.infer<typeof createInventorySchema>) => {
-      const response = await fetch('http://localhost:3000/inventory', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventory`,
+        {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          credentials: 'include',
         },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
+      )
       const data = (await response.json()) as Promise<{
         inventory: Inventories
       }>
@@ -187,9 +190,12 @@ function Inventory() {
   const Inventories = useQuery({
     queryKey: ['Inventories'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/inventory', {
-        credentials: 'include',
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventory`,
+        {
+          credentials: 'include',
+        },
+      )
       const data = (await response.json()) as Promise<{
         inventories: Array<Inventories>
       }>

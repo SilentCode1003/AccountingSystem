@@ -5,7 +5,7 @@ import {
   mysqlTable,
   varchar,
 } from "drizzle-orm/mysql-core";
-import accounts from "./accounts.schema.ts";
+import accounts from "./accounts.schema";
 import { relations } from "drizzle-orm";
 import { decimal } from "drizzle-orm/mysql-core";
 
