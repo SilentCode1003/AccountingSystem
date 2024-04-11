@@ -1,7 +1,12 @@
-import { Transactions } from '@/components/table-columns/transactions.columns'
+import {
+  Customer,
+  Transactions,
+  Vendor,
+} from '@/components/table-columns/transactions.columns'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -17,6 +22,39 @@ import {
 import { Text } from '@/components/ui/text'
 import { CellContext } from '@tanstack/react-table'
 import { MoreHorizontalIcon } from 'lucide-react'
+import {
+  MultiDialog,
+  MultiDialogContainer,
+  MultiDialogTrigger,
+} from '../ui/multi-dialog'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { updateTransactionSchema } from '@/validators/transactions.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/Form'
+import { Input } from '../ui/input'
+import {
+  SelectItem,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectValue,
+  SelectTrigger,
+  SelectSeparator,
+} from '../ui/select'
+import { Textarea } from '../ui/textarea'
+import { Employees } from '../table-columns/employees.columns'
+import DatePicker from '../ui/DatePicker'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 
 export const TransactionIndexColumn = ({
   row,
@@ -116,6 +154,84 @@ export const TransactionDate = ({
 export const TransactionWithColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
+  const [openUpdate, setOpenUpdate] = useState<boolean>(false)
+  const form = useForm<z.infer<typeof updateTransactionSchema>>({
+    defaultValues: {
+      tranId: row.original.tranId,
+      newData: {
+        tranAccId: row.original.account.accId,
+        tranAmount: Number.parseFloat(String(row.original.tranAmount)),
+        tranDescription: row.original.tranDescription,
+        tranPartner:
+          row.original.tranEmpId ??
+          row.original.tranCustId ??
+          row.original.tranVdId,
+        tranAccType: row.original.account.accType,
+        tranTransactionDate: new Date(row.original.tranTransactionDate),
+      },
+    },
+    resolver: zodResolver(updateTransactionSchema),
+  })
+  const transactionPartners = useQuery({
+    queryKey: ['TransactionPartners'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionPartners`,
+        {
+          credentials: 'include',
+        },
+      )
+      const data = response.json() as Promise<{
+        employees: Array<Employees>
+        customers: Array<Customer>
+        vendors: Array<Vendor>
+      }>
+      return data
+    },
+  })
+
+  const queryClient = useQueryClient()
+
+  const updateTransaction = useMutation({
+    mutationKey: ['updateTransaction'],
+    mutationFn: async (payload: z.infer<typeof updateTransactionSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactions`,
+        {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      const data = response.json() as Promise<{
+        transaction: Transactions
+      }>
+      return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ['Transactions'],
+        (old: { transactions: Array<Transactions> }) => {
+          const newTransactions = old.transactions.map((transaction) => {
+            if (transaction.tranId === row.original.tranId) {
+              return data.transaction
+            }
+            return transaction
+          })
+          return { transactions: newTransactions }
+        },
+      )
+      setOpenUpdate(false)
+    },
+  })
+
+  const handleSubmit = (values: z.infer<typeof updateTransactionSchema>) => {
+    updateTransaction.mutate(values)
+  }
+
   let data: {
     id: string
     type: string
@@ -157,7 +273,7 @@ export const TransactionWithColumn = ({
     <div className="flex justify-between">
       <div>{data.name}</div>
       <div>
-        <Dialog>
+        <MultiDialog>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -173,60 +289,313 @@ export const TransactionWithColumn = ({
               >
                 Copy ID
               </DropdownMenuItem>
-              <DialogTrigger asChild>
+              <MultiDialogTrigger value="viewDetails">
                 <DropdownMenuItem className="hover:cursor-pointer">
                   View Details
                 </DropdownMenuItem>
-              </DialogTrigger>
+              </MultiDialogTrigger>
+              <MultiDialogTrigger value="updateTransaction">
+                <DropdownMenuItem className="hover:cursor-pointer">
+                  Update Transaction
+                </DropdownMenuItem>
+              </MultiDialogTrigger>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DialogContent className="rounded-md sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>
-                {(data.type === 'employee' && 'Employee Details') ||
-                  (data.type === 'customer' && 'Customer Details') ||
-                  (data.type === 'vendor' && 'Vendor Details')}
-              </DialogTitle>
-            </DialogHeader>
 
-            <div className="space-y-4 sm:space-y-0">
-              <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={'body'}>
-                  Name
-                </Text>
-                <Text variant={'label'} className="flex-1">
-                  {data.name}
-                </Text>
-              </div>
-              <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={'body'}>
-                  Email
-                </Text>
-                <Text variant={'label'} className="flex-1">
-                  {data.email}
-                </Text>
-              </div>
-              <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={'body'}>
-                  Contact Info
-                </Text>
-                <Text variant={'label'} className="flex-1">
-                  {data.contactInfo}
-                </Text>
-              </div>
-              {data.address && (
-                <div className="flex flex-col sm:flex-row">
-                  <Text className="w-full sm:w-[33%]" variant={'body'}>
-                    Address
-                  </Text>
-                  <Text variant={'label'} className="flex-1">
-                    {data.address}
-                  </Text>
+          <MultiDialogContainer value="viewDetails">
+            <Dialog>
+              <DialogContent className="rounded-md sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>
+                    {(data.type === 'employee' && 'Employee Details') ||
+                      (data.type === 'customer' && 'Customer Details') ||
+                      (data.type === 'vendor' && 'Vendor Details')}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-4 sm:space-y-0">
+                  <div className="flex flex-col sm:flex-row">
+                    <Text className="w-full sm:w-[33%]" variant={'body'}>
+                      Name
+                    </Text>
+                    <Text variant={'label'} className="flex-1">
+                      {data.name}
+                    </Text>
+                  </div>
+                  <div className="flex flex-col sm:flex-row">
+                    <Text className="w-full sm:w-[33%]" variant={'body'}>
+                      Email
+                    </Text>
+                    <Text variant={'label'} className="flex-1">
+                      {data.email}
+                    </Text>
+                  </div>
+                  <div className="flex flex-col sm:flex-row">
+                    <Text className="w-full sm:w-[33%]" variant={'body'}>
+                      Contact Info
+                    </Text>
+                    <Text variant={'label'} className="flex-1">
+                      {data.contactInfo}
+                    </Text>
+                  </div>
+                  {data.address && (
+                    <div className="flex flex-col sm:flex-row">
+                      <Text className="w-full sm:w-[33%]" variant={'body'}>
+                        Address
+                      </Text>
+                      <Text variant={'label'} className="flex-1">
+                        {data.address}
+                      </Text>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+              </DialogContent>
+            </Dialog>
+          </MultiDialogContainer>
+          <MultiDialogContainer value="updateTransaction">
+            <Dialog open={openUpdate} onOpenChange={setOpenUpdate}>
+              <DialogContent>
+                <DialogHeader>Update Transaction</DialogHeader>
+                <div className="space-y-4">
+                  <Form {...form}>
+                    <form className="flex flex-col gap-4">
+                      <FormField
+                        control={form.control}
+                        name="tranId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex items-center justify-between">
+                              <FormLabel>Transaction ID</FormLabel>
+                              <FormMessage />
+                            </div>
+                            <FormControl>
+                              <Input
+                                disabled
+                                className="w-full"
+                                placeholder="Transaction ID"
+                                {...field}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <FormField
+                            name="newData.tranAmount"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <div className="flex items-center justify-between">
+                                  <FormLabel>Amount</FormLabel>
+                                  <FormMessage />
+                                </div>
+                                <FormControl>
+                                  <Input
+                                    className="w-full"
+                                    type="number"
+                                    placeholder="Total Deduction"
+                                    step="0.01"
+                                    {...field}
+                                    value={
+                                      Number.isNaN(field.value)
+                                        ? ''
+                                        : Number.parseFloat(String(field.value))
+                                    }
+                                    onChange={(e) =>
+                                      field.onChange(parseFloat(e.target.value))
+                                    }
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="flex-1 flex flex-col">
+                          <FormField
+                            name="newData.tranTransactionDate"
+                            control={form.control}
+                            render={({ field }) => {
+                              return (
+                                <FormItem>
+                                  <div className="flex items-center justify-between">
+                                    <FormLabel>Transaction Date</FormLabel>
+                                    <FormMessage />
+                                  </div>
+                                  <FormControl>
+                                    <DatePicker
+                                      date={field.value}
+                                      setDate={field.onChange}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <FormField
+                          name="newData.tranPartner"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="flex-1">
+                              <div className="flex flex-col justify-between">
+                                <FormLabel>Person Transacting with</FormLabel>
+                              </div>
+                              <FormControl>
+                                {transactionPartners.isSuccess && (
+                                  <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Pick One" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectGroup>
+                                        <SelectLabel>Employees</SelectLabel>
+                                        {transactionPartners.data.employees.map(
+                                          (emp) => (
+                                            <SelectItem
+                                              key={emp.empId}
+                                              value={emp.empId}
+                                            >
+                                              {emp.empName} | Employee
+                                            </SelectItem>
+                                          ),
+                                        )}
+                                      </SelectGroup>
+                                      <SelectSeparator />
+                                      <SelectGroup>
+                                        <SelectLabel>Customers</SelectLabel>
+                                        {transactionPartners.data.customers.map(
+                                          (cust) => (
+                                            <SelectItem
+                                              key={cust.custId}
+                                              value={cust.custId}
+                                            >
+                                              {cust.custName} | Customers
+                                            </SelectItem>
+                                          ),
+                                        )}
+                                      </SelectGroup>
+                                      <SelectSeparator />
+                                      <SelectGroup>
+                                        <SelectLabel>Vendors</SelectLabel>
+                                        {transactionPartners.data.vendors.map(
+                                          (vd) => (
+                                            <SelectItem
+                                              key={vd.vdId}
+                                              value={vd.vdId}
+                                            >
+                                              {vd.vdName} | Vendor
+                                            </SelectItem>
+                                          ),
+                                        )}
+                                      </SelectGroup>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          name="newData.tranAccType"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Account Type</FormLabel>
+                              </div>
+                              <FormControl>
+                                {transactionPartners.isSuccess && (
+                                  <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Account type" />
+                                    </SelectTrigger>
+                                    <SelectContent className="flex-1">
+                                      <SelectItem value="EXPENSE">
+                                        EXPENSE
+                                      </SelectItem>
+                                      <SelectItem value="REVENUE">
+                                        REVENUE
+                                      </SelectItem>
+                                      <SelectItem value="RECEIVABLE">
+                                        RECEIVABLE
+                                      </SelectItem>
+                                      <SelectItem value="PAYABLE">
+                                        PAYABLE
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                )}
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <FormField
+                          name="newData.tranDescription"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Transaction Description</FormLabel>
+                                <FormMessage />
+                              </div>
+                              <FormControl>
+                                <Textarea
+                                  {...field}
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  placeholder="Transaction Description"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </form>
+                  </Form>
+                  <div className="flex justify-between">
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() => {
+                          form.handleSubmit(handleSubmit)()
+                        }}
+                        type="submit"
+                      >
+                        Update
+                      </Button>
+                    </DialogClose>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={'secondary'}
+                        onClick={() => {
+                          form.clearErrors()
+                          form.reset()
+                        }}
+                      >
+                        Clear
+                      </Button>
+                      <DialogClose asChild>
+                        <Button variant={'outline'}>Cancel</Button>
+                      </DialogClose>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </MultiDialogContainer>
+        </MultiDialog>
       </div>
     </div>
   )

@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ToWords } from 'to-words'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -86,7 +85,7 @@ function TransactionsComponent() {
     mutationKey: ['createTransaction'],
     mutationFn: async (payload: z.infer<typeof createTransactionSchema>) => {
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/createTransaction`,
+        `${import.meta.env.VITE_SERVER_URL}/transactions`,
         {
           method: 'POST',
           credentials: 'include',
@@ -100,6 +99,15 @@ function TransactionsComponent() {
         transaction: Transactions
       }
       return data
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ['Transactions'],
+        (old: { transactions: Array<Transactions> }) => {
+          return { transactions: [...old.transactions, data.transaction] }
+        },
+      )
+      form.reset()
     },
   })
 
@@ -255,9 +263,14 @@ function TransactionsComponent() {
                               value={
                                 Number.isNaN(field.value) ? '' : field.value
                               }
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                setAmount(
+                                  Number.isNaN(parseFloat(e.target.value))
+                                    ? 0
+                                    : (e.target.value as unknown as number),
+                                )
                                 field.onChange(parseFloat(e.target.value))
-                              }
+                              }}
                             />
                           </FormControl>
                         </FormItem>
@@ -278,7 +291,10 @@ function TransactionsComponent() {
                             <FormControl>
                               <DatePicker
                                 date={field.value}
-                                setDate={field.onChange}
+                                setDate={(value: Date) => {
+                                  setDate(value)
+                                  field.onChange(value)
+                                }}
                               />
                             </FormControl>
                           </FormItem>
@@ -300,7 +316,10 @@ function TransactionsComponent() {
                           {transactionPartners.isSuccess && (
                             <Select
                               defaultValue={field.value}
-                              onValueChange={field.onChange}
+                              onValueChange={(value) => {
+                                setPerson(value)
+                                field.onChange(value)
+                              }}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Pick One" />

@@ -15,7 +15,7 @@ import {
 
 type Account = {
   accId: string
-  accType: string
+  accType: 'PAYABLE' | 'RECEIVABLE' | 'REVENUE' | 'EXPENSE'
   accAmount: number
   accDescription: string
   accIsActive: boolean
