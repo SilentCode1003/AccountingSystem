@@ -51,7 +51,7 @@ export const PayeeNameColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
-  }).format(parseInt(row.getValue('chqAmount')))
+  }).format(row.getValue('chqAmount'))
 
   return formatted
 }
@@ -135,7 +135,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
       chqId: row.original.chqId,
       newData: {
         chqAccType: row.original.account.accType,
-        chqAmount: Number(row.original.chqAmount),
+        chqAmount: Number.parseFloat(String(row.original.chqAmount)),
         chqIssueDate: new Date(row.original.chqIssueDate),
         chqPayeeName: row.original.chqPayeeName,
         chqStatus: row.original.chqStatus,
@@ -282,7 +282,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                               value={
                                 Number.isNaN(field.value)
                                   ? ''
-                                  : Number(field.value)
+                                  : Number.parseFloat(String(field.value))
                               }
                               onChange={(e) =>
                                 field.onChange(parseFloat(e.target.value))

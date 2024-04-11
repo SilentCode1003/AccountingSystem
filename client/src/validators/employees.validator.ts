@@ -38,8 +38,10 @@ export const updateEmployeeSchema = z.object({
     empDateHired: z.date().optional(),
     empDateTerminated: z.date().optional(),
     empSalary: z
-      .string()
-      .transform((val) => Number(val))
+      .union([z.number(), z.nan()])
+      .refine((val) => !Number.isNaN(val), {
+        message: 'required',
+      })
       .optional(),
   }),
 })

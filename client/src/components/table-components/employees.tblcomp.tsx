@@ -56,7 +56,7 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
         empEmail: row.original.empEmail,
         empBirthdate: new Date(row.original.empBirthdate),
         empDateHired: new Date(row.original.empDateHired),
-        empSalary: row.original.empSalary,
+        empSalary: Number.parseFloat(String(row.original.empSalary)),
       },
     },
     resolver: zodResolver(updateEmployeeSchema),
@@ -81,10 +81,19 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
       }>
       return data
     },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({
-        queryKey: ['Employees'],
-      })
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ['Employees'],
+        (old: { employees: Array<Employees> }) => {
+          const newEmployees = old.employees.map((employee) => {
+            if (employee.empId === data.employee.empId) {
+              return data.employee
+            }
+            return employee
+          })
+          return { employees: newEmployees }
+        },
+      )
     },
   })
 
@@ -172,7 +181,7 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                 <Text variant="heading3bold">Update Employee</Text>
               </DialogTitle>
             </DialogHeader>
-            <div>
+            <div className="space-y-4">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
                   <div className="flex flex-col gap-4">
@@ -285,18 +294,12 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                                 step="0.01"
                                 {...field}
                                 value={
-                                  Number.isNaN(parseFloat(String(field.value)))
-                                    ? 0
-                                    : parseFloat(String(field.value))
+                                  Number.isNaN(field.value)
+                                    ? ''
+                                    : Number.parseFloat(String(field.value))
                                 }
                                 onChange={(e) =>
-                                  field.onChange(
-                                    Number.isNaN(
-                                      parseFloat(String(e.target.value)),
-                                    )
-                                      ? 0
-                                      : e.target.value,
-                                  )
+                                  field.onChange(parseFloat(e.target.value))
                                 }
                               />
                             </FormControl>
@@ -340,26 +343,35 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                         )}
                       />
                     </div>
-
-                    <div className="flex justify-between">
-                      <DialogClose asChild>
-                        <Button type="submit">Update</Button>
-                      </DialogClose>
-                      <div className="flex gap-2">
-                        <Button
-                          variant={'secondary'}
-                          onClick={() => form.reset()}
-                        >
-                          Clear
-                        </Button>
-                        <DialogClose asChild>
-                          <Button variant={'outline'}>Cancel</Button>
-                        </DialogClose>
-                      </div>
-                    </div>
                   </div>
                 </form>
               </Form>
+              <div className="flex justify-between">
+                <DialogClose asChild>
+                  <Button
+                    onClick={() => {
+                      form.handleSubmit(handleSubmit)()
+                    }}
+                    type="submit"
+                  >
+                    Update
+                  </Button>
+                </DialogClose>
+                <div className="flex gap-2">
+                  <Button
+                    variant={'secondary'}
+                    onClick={() => {
+                      form.clearErrors()
+                      form.reset()
+                    }}
+                  >
+                    Clear
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant={'outline'}>Cancel</Button>
+                  </DialogClose>
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

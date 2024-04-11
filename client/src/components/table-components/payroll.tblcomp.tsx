@@ -166,7 +166,7 @@ export const TotalDeductionColumn = ({
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
-  }).format(parseInt(row.getValue('prTotalDeduction')))
+  }).format(row.getValue('prTotalDeduction'))
 
   return formatted
 }
@@ -199,7 +199,9 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
       prId: row.original.prId,
       prAccId: row.original.prAccId,
       newData: {
-        prTotalDeduction: Number(row.original.prTotalDeduction),
+        prTotalDeduction: Number.parseFloat(
+          String(row.original.prTotalDeduction),
+        ),
         prDateTo: new Date(row.original.prDateTo),
         prDateFrom: new Date(row.original.prDateFrom),
         prEmployeeId: row.original.employee.empId,
@@ -257,7 +259,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
-  }).format(parseInt(row.getValue('prFinalAmount')))
+  }).format(row.getValue('prFinalAmount'))
 
   return (
     <div className="flex justify-between">
@@ -363,7 +365,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
                               value={
                                 Number.isNaN(field.value)
                                   ? ''
-                                  : Number(field.value)
+                                  : Number.parseFloat(String(field.value))
                               }
                               onChange={(e) =>
                                 field.onChange(parseFloat(e.target.value))
