@@ -64,6 +64,7 @@ type DataTableProps<TData, TValue> = {
     }>
     CrudComponents?: ElementType
     showVisibility?: boolean
+    showFooter?: boolean
   }
 
 const dateBetweenFilter: FilterFn<any> = (row, columnId, value) => {
@@ -226,6 +227,7 @@ function DataTable<TData, TValue>({
   filter,
   CrudComponents,
   showVisibility,
+  showFooter,
   ...props
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -365,24 +367,26 @@ function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
-          <TableFooter className={`${text({ variant: 'label' })}`}>
-            {table.getFooterGroups().map((footerGroup) => (
-              <TableRow key={footerGroup.id}>
-                {footerGroup.headers.map((footer) => {
-                  return (
-                    <TableHead key={footer.id} className="bg-background">
-                      {footer.isPlaceholder
-                        ? null
-                        : flexRender(
-                            footer.column.columnDef.footer,
-                            footer.getContext(),
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableFooter>
+          {showFooter && (
+            <TableFooter className={`${text({ variant: 'label' })}`}>
+              {table.getFooterGroups().map((footerGroup) => (
+                <TableRow key={footerGroup.id}>
+                  {footerGroup.headers.map((footer) => {
+                    return (
+                      <TableHead key={footer.id} className="bg-background">
+                        {footer.isPlaceholder
+                          ? null
+                          : flexRender(
+                              footer.column.columnDef.footer,
+                              footer.getContext(),
+                            )}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableFooter>
+          )}
         </Table>
       </div>
       <div className="flex items-center justify-center space-x-2 py-4">
