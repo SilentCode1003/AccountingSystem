@@ -10,7 +10,9 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ArchiveIcon,
   ArrowLeftRightIcon,
-  BadgeDollarSignIcon,
+  BookMinusIcon,
+  BookPlusIcon,
+  BookTextIcon,
   ClipboardListIcon,
   HandCoinsIcon,
   HomeIcon,
@@ -32,6 +34,12 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useTheme } from './ui/theme.provider'
 import { Switch } from './ui/switch'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion'
 
 function Header() {
   const { setTheme, theme } = useTheme()
@@ -144,18 +152,59 @@ function Header() {
               </Text>
             </SheetClose>
           </Link>
-          <Link to="/sales">
-            <SheetClose>
-              <Text
-                variant={'heading1'}
-                style={'underline'}
-                className="flex gap-4 items-center"
-              >
-                <BadgeDollarSignIcon />
-                Sales
-              </Text>
-            </SheetClose>
-          </Link>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1" className="border-0">
+              <AccordionTrigger hideArrow className="p-0 hover:no-underline">
+                <Text
+                  variant={'heading1'}
+                  style={'underline'}
+                  className="flex gap-4 items-center"
+                >
+                  <BookTextIcon />
+                  Statements
+                </Text>
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-4 ps-8 pt-4 pb-0">
+                <Link to="/income_statement">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4 items-center"
+                    >
+                      <BookPlusIcon />
+                      Income Statement
+                    </Text>
+                  </SheetClose>
+                </Link>
+                <Link to="/balance_sheet">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4 items-center"
+                    >
+                      <BookPlusIcon />
+                      Balance Sheet
+                    </Text>
+                  </SheetClose>
+                </Link>
+                <Link to="/cash_flow">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4"
+                    >
+                      <BookMinusIcon />
+                      Cash Flow
+                    </Text>
+                  </SheetClose>
+                </Link>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
           <Link to="/transactions">
             <SheetClose>
               <Text
