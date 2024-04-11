@@ -50,20 +50,6 @@ export const updateValidator = z.object({
       });
     }
   }),
-  tranAccId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an account id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
-  }),
   newData: z.object({
     tranAccId: z
       .string()
@@ -83,48 +69,26 @@ export const updateValidator = z.object({
       })
       .optional(),
     tranDescription: z.string().optional(),
+    tranAccType: z
+      .enum(["PAYABLE", "RECEIVABLE", "REVENUE", "EXPENSE"])
+      .optional(),
     tranAmount: z.number().optional(),
-    tranEmpId: z
+    tranPartner: z
       .string()
       .superRefine((val, ctx) => {
-        if (val.split(" ")[0] !== "empId") {
+        if (val === "")
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Not an employee id.`,
+            message: `Required`,
           });
-        }
-        if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+        if (
+          val.split(" ")[0] !== "empId" &&
+          val.split(" ")[0] !== "custId" &&
+          val.split(" ")[0] !== "vdId"
+        ) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Not valid uuid.`,
-          });
-        }
-      })
-      .optional(),
-    tranCustId: z
-      .string()
-      .superRefine((val, ctx) => {
-        if (val.split(" ")[0] !== "custId") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not an customer id.`,
-          });
-        }
-        if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not valid uuid.`,
-          });
-        }
-      })
-      .optional(),
-    tranVdId: z
-      .string()
-      .superRefine((val, ctx) => {
-        if (val.split(" ")[0] !== "vdId") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not an vendor id.`,
+            message: `Not valid employee/customer/vendor id.`,
           });
         }
         if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {

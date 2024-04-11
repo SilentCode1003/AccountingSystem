@@ -27,7 +27,6 @@ export const addTransaction = async (input: {
     accType: input.tranAccType,
   });
 
-  console.log(input.tranPartner);
   await db.insert(transactions).values({
     tranId: newTransactionId,
     tranAccId: newAccount!.accId,
@@ -44,6 +43,7 @@ export const addTransaction = async (input: {
 
   const newTransaction = await db.query.transactions.findFirst({
     where: (transaction) => eq(transaction.tranId, newTransactionId),
+    with: { account: true, employee: true, customer: true, vendor: true },
   });
 
   return newTransaction;
@@ -55,20 +55,37 @@ export const editTransaction = async (input: {
     tranAccId?: string;
     tranDescription?: string;
     tranAmount?: number;
-    tranEmpId?: string;
-    tranVdId?: string;
-    tranCustId?: string;
+    tranPartner?: string;
+    tranAccType?: AccountType;
     tranTransactionDate?: Date;
   };
 }) => {
   await db
     .update(transactions)
-    .set(input.newData)
+    .set({
+      tranAccId: input.newData.tranAccId,
+      tranAmount: input.newData.tranAmount,
+      tranDescription: input.newData.tranDescription,
+      tranTransactionDate: input.newData.tranTransactionDate,
+      tranEmpId:
+        input.newData.tranPartner!.split(" ")[0] === "empId"
+          ? input.newData.tranPartner
+          : null,
+      tranCustId:
+        input.newData.tranPartner!.split(" ")[0] === "custId"
+          ? input.newData.tranPartner
+          : null,
+      tranVdId:
+        input.newData.tranPartner!.split(" ")[0] === "vdId"
+          ? input.newData.tranPartner
+          : null,
+    })
     .where(eq(transactions.tranId, input.tranId));
 
   await editAccount({
     accId: input.newData.tranAccId as string,
     newData: {
+      accType: input.newData.tranAccType,
       accAmount: input.newData.tranAmount,
     },
   });
