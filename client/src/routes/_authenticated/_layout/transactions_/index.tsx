@@ -151,6 +151,7 @@ function TransactionsComponent() {
     <div className="p-4  flex flex-col gap-8 items-center min-h-[85vh]">
       {transactions.isSuccess && (
         <DataTable
+          showVisibility
           pageSize={5}
           className="w-full md:w-[70vw]"
           columns={transactionColumns}

@@ -243,6 +243,7 @@ function Payrolls() {
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       {payrolls.isSuccess && (
         <DataTable
+          showVisibility
           CrudComponents={CrudComponents}
           className="w-full md:w-[70vw]"
           columns={payrollColumns}

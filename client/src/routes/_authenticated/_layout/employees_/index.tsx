@@ -267,6 +267,7 @@ function Employees() {
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       {employees.isSuccess && (
         <DataTable
+          showVisibility
           className="w-full md:w-[70vw]"
           columns={employeeColumns}
           data={employees.data.employees}
@@ -291,7 +292,7 @@ function Employees() {
             },
           ]}
           CrudComponents={CrudComponents}
-        ></DataTable>
+        />
       )}
     </div>
   )

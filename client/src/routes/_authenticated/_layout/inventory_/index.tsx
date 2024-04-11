@@ -208,6 +208,7 @@ function Inventory() {
       <div className="w-full translate-y-12 md:translate-y-12 sm:w-[70vw] mb-4"></div>
       {Inventories.isSuccess && (
         <DataTable
+          showVisibility
           className="w-full md:w-[70vw]"
           columns={inventoryColumns}
           data={Inventories.data.inventories}
@@ -223,7 +224,7 @@ function Inventory() {
             },
           ]}
           CrudComponents={CrudComponents}
-        ></DataTable>
+        />
       )}
     </div>
   )

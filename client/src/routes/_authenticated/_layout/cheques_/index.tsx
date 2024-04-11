@@ -265,6 +265,7 @@ function Cheques() {
           className="w-full md:w-[70vw]"
           columns={chequeColumns}
           data={cheques.data.cheques}
+          showVisibility
           filter={[
             {
               filterColumn: 'chqIssueDate',
