@@ -1,7 +1,7 @@
 import { CellContext } from '@tanstack/react-table'
-import { Expense, Revenue } from '../table-columns/incomeStatement.columns'
+import { Asset, Liability } from '../table-columns/balanceSheet.columns'
 
-export const RevenueAmountColumn = ({ row }: CellContext<Revenue, unknown>) => {
+export const AssetAmountColumn = ({ row }: CellContext<Asset, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
@@ -9,7 +9,9 @@ export const RevenueAmountColumn = ({ row }: CellContext<Revenue, unknown>) => {
   return formatted
 }
 
-export const ExpenseAmountColumn = ({ row }: CellContext<Expense, unknown>) => {
+export const LiabilityAmountColumn = ({
+  row,
+}: CellContext<Liability, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
