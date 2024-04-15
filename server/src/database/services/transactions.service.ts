@@ -2,11 +2,16 @@ import db from "../index";
 import crypto from "crypto";
 import transactions from "../schema/transactions.schema";
 import { eq } from "drizzle-orm";
-import { AccountType, addAccount, editAccount } from "./accounts.service";
+import { addAccount, editAccount } from "./accounts.service";
 
 export const getAllTransactions = async () => {
   const transactions = await db.query.transactions.findMany({
-    with: { account: true, employee: true, customer: true, vendor: true },
+    with: {
+      account: { accountType: true },
+      employee: true,
+      customer: true,
+      vendor: true,
+    },
   });
 
   return transactions;
@@ -17,14 +22,14 @@ export const addTransaction = async (input: {
   tranAmount: number;
   tranPartner: string;
   tranTransactionDate: Date;
-  tranAccType: AccountType;
+  tranAccTypeId: string;
 }) => {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
   const newAccount = await addAccount({
     accAmount: input.tranAmount,
-    accDescription: `${input.tranAccType} TRANSACTION`,
-    accType: input.tranAccType,
+    accDescription: `${input.tranAccTypeId} TRANSACTION`,
+    accTypeId: input.tranAccTypeId,
   });
 
   await db.insert(transactions).values({
@@ -43,7 +48,12 @@ export const addTransaction = async (input: {
 
   const newTransaction = await db.query.transactions.findFirst({
     where: (transaction) => eq(transaction.tranId, newTransactionId),
-    with: { account: true, employee: true, customer: true, vendor: true },
+    with: {
+      account: { accountType: true },
+      employee: true,
+      customer: true,
+      vendor: true,
+    },
   });
 
   return newTransaction;
@@ -56,7 +66,7 @@ export const editTransaction = async (input: {
     tranDescription?: string;
     tranAmount?: number;
     tranPartner?: string;
-    tranAccType?: AccountType;
+    tranAccTypeId?: string;
     tranTransactionDate?: Date;
   };
 }) => {
@@ -85,14 +95,19 @@ export const editTransaction = async (input: {
   await editAccount({
     accId: input.newData.tranAccId as string,
     newData: {
-      accType: input.newData.tranAccType,
+      accTypeId: input.newData.tranAccTypeId,
       accAmount: input.newData.tranAmount,
     },
   });
 
   const editedTran = await db.query.transactions.findFirst({
     where: (tran) => eq(tran.tranId, input.tranId),
-    with: { account: true, employee: true, customer: true, vendor: true },
+    with: {
+      account: { accountType: true },
+      employee: true,
+      customer: true,
+      vendor: true,
+    },
   });
 
   return editedTran;

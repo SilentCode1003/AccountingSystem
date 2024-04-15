@@ -2,7 +2,20 @@ import z from "zod";
 
 //validator for POST /accounts input
 export const createValidator = z.object({
-  accType: z.enum(["PAYABLE", "RECEIVABLE", "EXPENSE", "REVENUE"]),
+  accTypeId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "accTypeId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an account type id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
   accDescription: z.string(),
   accAmount: z.number(),
 });
@@ -24,9 +37,20 @@ export const updateValidator = z.object({
     }
   }),
   newData: z.object({
-    accType: z.optional(
-      z.enum(["PAYABLE", "RECEIVABLE", "EXPENSE", "REVENUE"])
-    ),
+    accTypeId: z.string().superRefine((val, ctx) => {
+      if (val.split(" ")[0] !== "accTypeId") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not an account type id.`,
+        });
+      }
+      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        });
+      }
+    }),
     accDescription: z.optional(z.string()),
     accAmount: z.optional(z.number()),
   }),

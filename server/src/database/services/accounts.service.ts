@@ -2,19 +2,10 @@ import db from "../index";
 import accounts from "../schema/accounts.schema";
 import { eq, not } from "drizzle-orm";
 
-const ACCOUNT_TYPE = {
-  RECEIVABLE: "RECEIVABLE",
-  PAYABLE: "PAYABLE",
-  REVENUE: "REVENUE",
-  EXPENSE: "EXPENSE",
-} as const;
-
-type ObjectTypes<T> = T[keyof T];
-
-export type AccountType = ObjectTypes<typeof ACCOUNT_TYPE>;
-
 export const getAllAccounts = async () => {
-  const accounts = await db.query.accounts.findMany();
+  const accounts = await db.query.accounts.findMany({
+    with: { accountType: true },
+  });
 
   return accounts;
 };
@@ -22,13 +13,16 @@ export const getAllAccounts = async () => {
 export const getAccountByID = async (accId: string) => {
   const account = await db.query.accounts.findFirst({
     where: (account) => eq(account.accId, accId),
+    with: {
+      accountType: true,
+    },
   });
 
   return account;
 };
 
 export const addAccount = async (input: {
-  accType: AccountType;
+  accTypeId: string;
   accDescription: string;
   accAmount: number;
 }) => {
@@ -38,6 +32,9 @@ export const addAccount = async (input: {
 
   const newAccount = await db.query.accounts.findFirst({
     where: (account) => eq(account.accId, newAccountId),
+    with: {
+      accountType: true,
+    },
   });
 
   return newAccount;
@@ -46,7 +43,7 @@ export const addAccount = async (input: {
 export const editAccount = async (input: {
   accId: string;
   newData: {
-    accType?: AccountType;
+    accTypeId?: string;
     accDescription?: string;
     accAmount?: number;
   };
@@ -58,6 +55,9 @@ export const editAccount = async (input: {
 
   const updatedAcc = await db.query.accounts.findFirst({
     where: (acc) => eq(acc.accId, input.accId),
+    with: {
+      accountType: true,
+    },
   });
 
   return updatedAcc;
@@ -73,6 +73,9 @@ export const updateAccountIsActive = async (input: { accId: string }) => {
 
   const updatedAcc = await db.query.accounts.findFirst({
     where: (acc) => eq(acc.accId, input.accId),
+    with: {
+      accountType: true,
+    },
   });
 
   return updatedAcc;

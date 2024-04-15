@@ -1,27 +1,34 @@
-CREATE TABLE `accounts` (
+CREATE TABLE IF NOT EXISTS `accounts` (
 	`acc_id` varchar(60) NOT NULL,
-	`acc_type` enum('PAYABLE','RECEIVABLE','REVENUE','EXPENSE') NOT NULL,
+	`acc_type_id` varchar(60) NOT NULL,
 	`acc_amount` decimal(13,2) NOT NULL,
 	`acc_description` text NOT NULL,
 	`acc_is_active` boolean NOT NULL DEFAULT true,
-	`acc_created_at` datetime NOT NULL DEFAULT '2024-04-08 02:54:34.531',
-	`acc_updated_at` datetime NOT NULL DEFAULT '2024-04-08 02:54:34.531',
+	`acc_created_at` datetime NOT NULL DEFAULT '2024-04-15 08:30:15.027',
+	`acc_updated_at` datetime NOT NULL DEFAULT '2024-04-15 08:30:15.027',
 	CONSTRAINT `accounts_acc_id` PRIMARY KEY(`acc_id`)
 );
 --> statement-breakpoint
-CREATE TABLE `cheques` (
+CREATE TABLE IF NOT EXISTS `account_types` (
+	`acc_type_id` varchar(60) NOT NULL,
+	`acc_type_name` varchar(60) NOT NULL,
+	CONSTRAINT `account_types_acc_type_id` PRIMARY KEY(`acc_type_id`),
+	CONSTRAINT `account_types_acc_type_name_unique` UNIQUE(`acc_type_name`)
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `cheques` (
 	`chq_id` varchar(60) NOT NULL,
 	`chq_payee_name` varchar(50) NOT NULL,
 	`chq_amount` decimal(13,2) NOT NULL,
 	`chq_issue_date` date NOT NULL,
 	`chq_status` enum('APPROVED','PENDING','REJECTED'),
 	`chq_account_id` varchar(60) NOT NULL,
-	`chq_created_at` datetime NOT NULL DEFAULT '2024-04-08 02:54:34.537',
-	`chq_updated_at` datetime NOT NULL DEFAULT '2024-04-08 02:54:34.537',
+	`chq_created_at` datetime NOT NULL DEFAULT '2024-04-15 08:30:15.034',
+	`chq_updated_at` datetime NOT NULL DEFAULT '2024-04-15 08:30:15.034',
 	CONSTRAINT `cheques_chq_id` PRIMARY KEY(`chq_id`)
 );
 --> statement-breakpoint
-CREATE TABLE `customers` (
+CREATE TABLE IF NOT EXISTS `customers` (
 	`cust_id` varchar(60) NOT NULL,
 	`cust_name` varchar(50) NOT NULL,
 	`cust_address` varchar(50) NOT NULL,
@@ -32,7 +39,7 @@ CREATE TABLE `customers` (
 	CONSTRAINT `customers_cust_email_unique` UNIQUE(`cust_email`)
 );
 --> statement-breakpoint
-CREATE TABLE `employees` (
+CREATE TABLE IF NOT EXISTS `employees` (
 	`emp_id` varchar(60) NOT NULL,
 	`emp_name` varchar(50),
 	`emp_address` varchar(50) NOT NULL,
@@ -46,7 +53,7 @@ CREATE TABLE `employees` (
 	CONSTRAINT `employees_emp_email_unique` UNIQUE(`emp_email`)
 );
 --> statement-breakpoint
-CREATE TABLE `inventory` (
+CREATE TABLE IF NOT EXISTS `inventory` (
 	`inv_id` varchar(60) NOT NULL,
 	`inv_asset_name` varchar(40) NOT NULL,
 	`inv_stocks` int NOT NULL,
@@ -55,7 +62,7 @@ CREATE TABLE `inventory` (
 	CONSTRAINT `inventory_inv_asset_name_unique` UNIQUE(`inv_asset_name`)
 );
 --> statement-breakpoint
-CREATE TABLE `payrolls` (
+CREATE TABLE IF NOT EXISTS `payrolls` (
 	`pr_id` varchar(60) NOT NULL,
 	`pr_account_id` varchar(60) NOT NULL,
 	`pr_employee_id` varchar(60) NOT NULL,
@@ -66,7 +73,7 @@ CREATE TABLE `payrolls` (
 	CONSTRAINT `payrolls_pr_id` PRIMARY KEY(`pr_id`)
 );
 --> statement-breakpoint
-CREATE TABLE `transactions` (
+CREATE TABLE IF NOT EXISTS `transactions` (
 	`tran_id` varchar(60) NOT NULL,
 	`tran_account_id` varchar(60) NOT NULL,
 	`tran_description` text NOT NULL,
@@ -75,12 +82,12 @@ CREATE TABLE `transactions` (
 	`tran_vendor_id` varchar(60),
 	`tran_customer_id` varchar(60),
 	`tran_transaction_date` datetime NOT NULL,
-	`tran_created_at` datetime NOT NULL DEFAULT '2024-04-08 02:54:34.565',
-	`tran_updated_at` datetime NOT NULL DEFAULT '2024-04-08 02:54:34.565',
+	`tran_created_at` datetime NOT NULL DEFAULT '2024-04-15 08:30:15.067',
+	`tran_updated_at` datetime NOT NULL DEFAULT '2024-04-15 08:30:15.067',
 	CONSTRAINT `transactions_tran_id` PRIMARY KEY(`tran_id`)
 );
 --> statement-breakpoint
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
 	`user_id` varchar(60) NOT NULL,
 	`user_type` enum('FINANCE','HIGHER_DEPARTMENT'),
 	`user_username` varchar(16) NOT NULL,
@@ -89,7 +96,7 @@ CREATE TABLE `users` (
 	CONSTRAINT `users_user_id` PRIMARY KEY(`user_id`)
 );
 --> statement-breakpoint
-CREATE TABLE `vendors` (
+CREATE TABLE IF NOT EXISTS `vendors` (
 	`vd_id` varchar(60) NOT NULL,
 	`vd_name` varchar(50) NOT NULL,
 	`vd_address` varchar(50) NOT NULL,
@@ -100,6 +107,7 @@ CREATE TABLE `vendors` (
 	CONSTRAINT `vendors_vd_email_unique` UNIQUE(`vd_email`)
 );
 --> statement-breakpoint
+ALTER TABLE `accounts` ADD CONSTRAINT `accounts_acc_type_id_account_types_acc_type_id_fk` FOREIGN KEY (`acc_type_id`) REFERENCES `account_types`(`acc_type_id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `cheques` ADD CONSTRAINT `cheques_chq_account_id_accounts_acc_id_fk` FOREIGN KEY (`chq_account_id`) REFERENCES `accounts`(`acc_id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `payrolls` ADD CONSTRAINT `payrolls_pr_account_id_accounts_acc_id_fk` FOREIGN KEY (`pr_account_id`) REFERENCES `accounts`(`acc_id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `payrolls` ADD CONSTRAINT `payrolls_pr_employee_id_employees_emp_id_fk` FOREIGN KEY (`pr_employee_id`) REFERENCES `employees`(`emp_id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
