@@ -9,7 +9,6 @@ import {
   NameType,
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent'
-import { text } from './ui/text'
 
 const CustomToolTip = ({
   active,
@@ -17,13 +16,17 @@ const CustomToolTip = ({
 }: TooltipProps<ValueType, NameType>) =>
   active &&
   payload && (
-    <div
-      className={text({
-        variant: 'body',
-        class: `rounded-md px-3 bg-popover border`,
-      })}
-    >
-      {payload[0].name}
+    <div className="rounded-lg border bg-background p-2 shadow-sm">
+      <div className="flex justify-center">
+        <div className="flex flex-col items-center">
+          <span className="text-[0.70rem] uppercase text-muted-foreground">
+            {payload[0].name}
+          </span>
+          <span className="font-bold text-muted-foreground">
+            {payload[0].value}
+          </span>
+        </div>
+      </div>
     </div>
   )
 
@@ -45,7 +48,9 @@ function PieChart({
         cy="50%"
         innerRadius={30}
         outerRadius={60}
-        fill="#8884d8"
+        blendStroke={false}
+        labelLine={false}
+        stroke="none"
       >
         {data.map((d, index) => (
           <Cell key={index} fill={d.color} className="outline-none" />

@@ -1,35 +1,36 @@
 import "dotenv/config";
-import { MySqlTable } from "drizzle-orm/mysql-core";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import accounts from "./schema/accounts.schema.ts";
-import cheques, { chequesRelations } from "./schema/cheques.schema.ts";
-import customers from "./schema/customers.schema.ts";
-import employees from "./schema/employees.schema.ts";
-import inventory from "./schema/inventory.schema.ts";
-import payrolls from "./schema/payrolls.schema.ts";
+import accounts from "./schema/accounts.schema";
+import cheques, { chequesRelations } from "./schema/cheques.schema";
+import customers from "./schema/customers.schema";
+import employees from "./schema/employees.schema";
+import inventory from "./schema/inventory.schema";
+import payrolls, {
+  payrollAccountRelation,
+  payrollEmployeeRelation,
+} from "./schema/payrolls.schema";
 import transactions, {
   transactionAccountRelation,
   transactionCustomerRelation,
   transactionEmployeeRelation,
   transactionVendorRelation,
-} from "./schema/transactions.schema.ts";
-import users from "./schema/users.schema.ts";
-import vendors from "./schema/vendors.schema.ts";
-import { Relations } from "drizzle-orm";
+} from "./schema/transactions.schema";
+import users from "./schema/users.schema";
+import vendors from "./schema/vendors.schema";
 
-type DBSchema = {
-  accounts: MySqlTable;
-  users: MySqlTable;
-  employees: MySqlTable;
-  cheques: MySqlTable;
-  vendors: MySqlTable;
-  customers: MySqlTable;
-  inventory: MySqlTable;
-  transactions: MySqlTable;
-  payrolls: MySqlTable;
-  chequesRelations: Relations;
-};
+// type DBSchema = {
+//   accounts: MySqlTable;
+//   users: MySqlTable;
+//   employees: MySqlTable;
+//   cheques: MySqlTable;
+//   vendors: MySqlTable;
+//   customers: MySqlTable;
+//   inventory: MySqlTable;
+//   transactions: MySqlTable;
+//   payrolls: MySqlTable;
+//   chequesRelations: Relations;
+// };
 
 export const connection = mysql.createPool({
   host: process.env.DB_HOST,
@@ -55,7 +56,9 @@ const db = drizzle(connection, {
     transactionCustomerRelation,
     transactionEmployeeRelation,
     transactionVendorRelation,
-  } as DBSchema,
+    payrollEmployeeRelation,
+    payrollAccountRelation,
+  },
   mode: "default",
 });
 

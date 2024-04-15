@@ -8,30 +8,8 @@ export const createValidator = z.object({
     .string()
     .datetime()
     .transform((date) => new Date(date)),
-  chqDescription: z.string(),
   chqStatus: z.enum(["APPROVED", "PENDING", "REJECTED"]),
-  chqAccId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an account id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
-  }),
-  chqCreatedAt: z
-    .string()
-    .datetime()
-    .transform((date) => new Date(date)),
-  chqUpdatedAt: z
-    .string()
-    .datetime()
-    .transform((date) => new Date(date)),
+  chqAccType: z.enum(["PAYABLE", "RECEIVABLE", "REVENUE", "EXPENSE"]),
 });
 
 //validor for PUT /cheques input
@@ -59,35 +37,27 @@ export const updateValidator = z.object({
         .datetime()
         .transform((date) => new Date(date))
     ),
-    chqDescription: z.optional(z.string()),
     chqStatus: z.optional(z.enum(["APPROVED", "PENDING", "REJECTED"])),
-    chqAccId: z.optional(
-      z.string().superRefine((val, ctx) => {
-        if (val.split(" ")[0] !== "accId") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not an account id.`,
-          });
-        }
-        if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not valid uuid.`,
-          });
-        }
-      })
-    ),
-    chqCreatedAt: z.optional(
-      z
-        .string()
-        .datetime()
-        .transform((date) => new Date(date))
-    ),
+    chqAccType: z.enum(["PAYABLE", "RECEIVABLE", "REVENUE", "EXPENSE"]),
     chqUpdatedAt: z.optional(
       z
         .string()
         .datetime()
         .transform((date) => new Date(date))
     ),
+  }),
+  chqAccId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "accId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an account id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
   }),
 });

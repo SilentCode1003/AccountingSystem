@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_authenticated/_layout/')({
 function Home() {
   return (
     <div className="max-h-[85vh] px-4 overflow-y-auto w-screens">
-      <div className="border-b-2 border-black pb-4 mb-4">
+      <div className="border-b-2 border-foreground pb-4 mb-4">
         <Text variant={'heading1bold'}>Dashboard</Text>
       </div>
       <div className="flex flex-col md:grid md:grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4">

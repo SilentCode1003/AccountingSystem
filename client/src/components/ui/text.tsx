@@ -17,7 +17,7 @@ export const text = cva(['w-fit'], {
       heading4bold: ['font-spinnaker', 'text-lg', 'font-bold'],
       heading4ghost: ['font-spinnaker', 'text-lg', 'opacity-50'],
       body: ['font-galdeano', 'text-lg'],
-      bodybold: ['font-galdeano', 'text-lg'],
+      bodybold: ['font-galdeano', 'text-lg', 'font-semibold'],
       label: ['font-galdeano', 'text-lg', 'opacity-70'],
       footer: ['font-spinnaker', 'font-bold', 'text-xs'],
     },

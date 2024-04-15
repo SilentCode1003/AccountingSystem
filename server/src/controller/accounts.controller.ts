@@ -28,9 +28,7 @@ export const createAccount = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: "invalid input" });
 
   try {
-    const newAccountId = `accId ${crypto.randomUUID()}`;
-
-    const newAccount = await addAccount({ ...input.data, accId: newAccountId });
+    const newAccount = await addAccount({ ...input.data });
 
     return res.status(200).send({ account: newAccount });
   } catch (error) {

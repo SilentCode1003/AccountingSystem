@@ -1,14 +1,12 @@
 import { ColumnDef } from '@tanstack/react-table'
+
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
+  PricePerUnitColumn,
+  TotalColumn,
+} from '../table-components/sales.tblcomp'
 import { Button } from '../ui/button'
-import { EyeOff, MoreHorizontal } from 'lucide-react'
+import { text } from '../ui/text'
+import { ArrowUpDownIcon } from 'lucide-react'
 
 export type Sales = {
   id: string
@@ -23,79 +21,102 @@ export type Sales = {
 export const salesColumns: ColumnDef<Sales>[] = [
   {
     accessorKey: 'dateSold',
-    header: () => 'Date Sold',
+    filterFn: 'dateBetweenFilter',
+    meta: 'Date Sold',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Date Sold
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'productCode',
-    header: () => 'Product Code',
+    meta: 'Product Code',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Product Code
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'productName',
-    header: () => 'Product Name',
+    meta: 'Product Name',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Product Name
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'pricePerUnit',
-    header: () => <div className="">Price Per Unit</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('pricePerUnit'))
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount)
-
+    meta: 'Price Per Unit',
+    header: ({ column }) => {
       return (
-        <>
-          <div className="flex justify-between items-center font-medium">
-            <div>{formatted}</div>
-          </div>
-        </>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Price Per Unit
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
       )
     },
+    cell: PricePerUnitColumn,
   },
 
   {
     accessorKey: 'unitsSold',
-    header: 'Units Sold',
+    meta: 'Units Sold',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Units Sold
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'total',
-    header: 'Total',
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('total'))
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount * parseInt(row.getValue('unitsSold')))
+    meta: 'Total',
+    header: ({ column }) => {
       return (
-        <div className="flex justify-between">
-          <div>{formatted}</div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(row.original.productCode)
-                }
-              >
-                Copy Product Code
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View Details</DropdownMenuItem>
-              <DropdownMenuItem>View Product</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex justify-between">
-                Hide <EyeOff />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Total
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
       )
     },
+    cell: TotalColumn,
   },
 ]

@@ -24,8 +24,8 @@ export const updateValidator = z.object({
     }
   }),
   newData: z.object({
-    invAssetName: z.string(),
-    invStocks: z.number(),
-    invStatus: z.enum(["GOOD", "WARNING", "DEPLETED"]),
+    invAssetName: z.string().optional(),
+    invStocks: z.number().optional(),
+    invStatus: z.enum(["GOOD", "WARNING", "DEPLETED"]).optional(),
   }),
 });

@@ -8,7 +8,7 @@ const employees = mysqlTable("employees", {
   empEmail: varchar("emp_email", { length: 50 }).notNull().unique(),
   empBirthdate: date("emp_birthdate").notNull(),
   empDateHired: date("emp_date_hired").notNull(),
-  empDateTerminated: date("emp_date_terminated").notNull(),
+  empDateTerminated: date("emp_date_terminated"),
   empSalary: decimal("emp_salary", { precision: 13, scale: 2 })
     .$type<number>()
     .notNull(),

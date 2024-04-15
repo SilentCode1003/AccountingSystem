@@ -3,7 +3,7 @@ import {
   createTransaction,
   getTransactions,
   updateTransaction,
-} from "../controller/transactions.controller.ts";
+} from "../controller/transactions.controller";
 
 const transactionRouter = Router();
 

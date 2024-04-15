@@ -3,10 +3,9 @@ import {
   datetime,
   mysqlEnum,
   mysqlTable,
-  text,
   varchar,
 } from "drizzle-orm/mysql-core";
-import accounts from "./accounts.schema.ts";
+import accounts from "./accounts.schema";
 import { relations } from "drizzle-orm";
 import { decimal } from "drizzle-orm/mysql-core";
 
@@ -17,12 +16,10 @@ const cheques = mysqlTable("cheques", {
     .$type<number>()
     .notNull(),
   chqIssueDate: date("chq_issue_date").notNull(),
-  chqDescription: text("chq_description").notNull(),
   chqStatus: mysqlEnum("chq_status", ["APPROVED", "PENDING", "REJECTED"]),
-  chqAccId: varchar("chq_account_id", { length: 60 }).references(
-    () => accounts.accId,
-    { onDelete: "cascade" }
-  ),
+  chqAccId: varchar("chq_account_id", { length: 60 })
+    .references(() => accounts.accId, { onDelete: "cascade" })
+    .notNull(),
   chqCreatedAt: datetime("chq_created_at").notNull().default(new Date()),
   chqUpdatedAt: datetime("chq_updated_at").notNull().default(new Date()),
 });

@@ -4,7 +4,7 @@ import {
   getUsers,
   updateUser,
   toggleUserIsActive,
-} from "../controller/users.controller.ts";
+} from "../controller/users.controller";
 
 const usersRouter = Router();
 

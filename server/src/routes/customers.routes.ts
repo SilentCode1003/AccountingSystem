@@ -4,7 +4,7 @@ import {
   getCustomers,
   toggleCustomerIsActive,
   updateCustomer,
-} from "../controller/customers.controller.ts";
+} from "../controller/customers.controller";
 
 const customerRouter = Router();
 

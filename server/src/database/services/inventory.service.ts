@@ -1,6 +1,6 @@
-import db from "../index.ts";
+import db from "../index";
 import crypto from "crypto";
-import inventory from "../schema/inventory.schema.ts";
+import inventory from "../schema/inventory.schema";
 import { eq } from "drizzle-orm";
 
 const INVENTORY_STATUS = {

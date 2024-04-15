@@ -5,12 +5,14 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Text } from './ui/text'
-import { RxBell, RxGear, RxHamburgerMenu } from 'react-icons/rx'
+import { RxHamburgerMenu } from 'react-icons/rx'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ArchiveIcon,
   ArrowLeftRightIcon,
-  BadgeDollarSignIcon,
+  BookMinusIcon,
+  BookPlusIcon,
+  BookTextIcon,
   ClipboardListIcon,
   HandCoinsIcon,
   HomeIcon,
@@ -32,6 +34,12 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useTheme } from './ui/theme.provider'
 import { Switch } from './ui/switch'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion'
 
 function Header() {
   const { setTheme, theme } = useTheme()
@@ -41,7 +49,7 @@ function Header() {
   const logout = useMutation({
     mutationKey: ['logout'],
     mutationFn: async () => {
-      await fetch('http://localhost:3000/logout', {
+      await fetch(`${import.meta.env.VITE_SERVER_URL}/logout`, {
         method: 'POST',
         credentials: 'include',
       })
@@ -56,7 +64,7 @@ function Header() {
     logout.mutate()
   }
   return (
-    <header className="h-[10vh] `z-[10] p-4 `top-0 sticky `w-screen">
+    <header className="h-[10vh] shadow-md bg-background max-w-screen  z-[10] p-4 top-0 sticky ">
       <Sheet>
         <div className="flex">
           <div className="flex-1 flex gap-4">
@@ -74,12 +82,6 @@ function Header() {
           </div>
 
           <div className="flex gap-4">
-            <div>
-              <RxGear size={40} />
-            </div>
-            <div>
-              <RxBell size={40} />
-            </div>
             <div className="ml-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -150,18 +152,59 @@ function Header() {
               </Text>
             </SheetClose>
           </Link>
-          <Link to="/sales">
-            <SheetClose>
-              <Text
-                variant={'heading1'}
-                style={'underline'}
-                className="flex gap-4 items-center"
-              >
-                <BadgeDollarSignIcon />
-                Sales
-              </Text>
-            </SheetClose>
-          </Link>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1" className="border-0">
+              <AccordionTrigger hideArrow className="p-0 hover:no-underline">
+                <Text
+                  variant={'heading1'}
+                  style={'underline'}
+                  className="flex gap-4 items-center"
+                >
+                  <BookTextIcon />
+                  Statements
+                </Text>
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-4 ps-8 pt-4 pb-0">
+                <Link to="/income_statement">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4 items-center"
+                    >
+                      <BookPlusIcon />
+                      Income Statement
+                    </Text>
+                  </SheetClose>
+                </Link>
+                <Link to="/balance_sheet">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4 items-center"
+                    >
+                      <BookPlusIcon />
+                      Balance Sheet
+                    </Text>
+                  </SheetClose>
+                </Link>
+                <Link to="/cash_flow">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4"
+                    >
+                      <BookMinusIcon />
+                      Cash Flow
+                    </Text>
+                  </SheetClose>
+                </Link>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
           <Link to="/transactions">
             <SheetClose>
               <Text

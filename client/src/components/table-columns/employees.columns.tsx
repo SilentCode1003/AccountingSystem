@@ -1,23 +1,16 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Avatar } from '../ui/avatar'
-import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
+
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../ui/tooltip'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
+  AddressColumn,
+  BirthdateColumn,
+  DateHiredColumn,
+  DateTerminatedColumn,
+  NameColumn,
+  SalaryColumn,
+} from '../table-components/employees.tblcomp'
+import { ArrowUpDownIcon } from 'lucide-react'
+import { text } from '../ui/text'
 import { Button } from '../ui/button'
-import { EyeOff, MoreHorizontal } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
 
 export type Employees = {
   empId: string
@@ -35,111 +28,137 @@ export type Employees = {
 export const employeeColumns: ColumnDef<Employees>[] = [
   {
     accessorKey: 'empName',
-    header: 'Employee Name',
-    cell: ({ row }) => {
+    meta: 'Employee Name',
+    header: ({ column }) => {
       return (
-        <div className="flex gap-4 min-w-32 items-center">
-          <div>
-            <Avatar>
-              <AvatarImage src={row.original.empImage} />
-              <AvatarFallback>NG</AvatarFallback>
-            </Avatar>
-          </div>
-          <div>{row.original.empName}</div>
-        </div>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Employee Name
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: NameColumn,
+  },
+  {
+    accessorKey: 'empAddress',
+    meta: 'Address',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Address
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: AddressColumn,
+  },
+  {
+    accessorKey: 'empContactInfo',
+    meta: 'Contact Info',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Contact Info
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
       )
     },
   },
   {
-    accessorKey: 'empAddress',
-    header: 'Address',
-    cell: ({ row }) => (
-      <div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="line-clamp-2 max-w-60">
-                {row.original.empAddress}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>{row.original.empAddress}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'empContactInfo',
-    header: 'Contact Info',
-  },
-  {
     accessorKey: 'empEmail',
-    header: 'Email',
+    meta: 'Email',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Email
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'empBirthdate',
-    header: 'Birthdate',
-    cell: ({ row }) => {
-      return new Date(row.original.empBirthdate).toLocaleDateString()
+    filterFn: 'dateBetweenFilter',
+    meta: 'Birthdate',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Birthdate
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
     },
+    cell: BirthdateColumn,
   },
   {
     accessorKey: 'empDateHired',
-    header: 'Date Hired',
-    cell: ({ row }) => {
-      return new Date(row.original.empDateHired).toLocaleDateString()
+    meta: 'Date Hired',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Date Hired
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
     },
-  },
-  {
-    accessorKey: 'empSalary',
-    header: 'Salary',
-    cell: ({ row }) => {
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'PHP',
-      }).format(parseInt(row.getValue('empSalary')))
-
-      return formatted
-    },
+    cell: DateHiredColumn,
   },
   {
     accessorKey: 'empDateTerminated',
-    header: 'Date Terminated',
-    cell: ({ row }) => (
-      <div className="flex justify-between">
-        <div>{new Date(row.original.empBirthdate).toLocaleDateString()}</div>
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(row.original.empId)
-                }
-              >
-                Copy Product Code
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <Link
-                to="/employees/$empId"
-                params={{ empId: row.original.empId }}
-              >
-                <DropdownMenuItem>View Employee Profile</DropdownMenuItem>
-              </Link>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex justify-between">
-                Hide <EyeOff />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-    ),
+    meta: 'Date Terminated',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Date Terminated
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: DateTerminatedColumn,
+  },
+  {
+    accessorKey: 'empSalary',
+    meta: 'Salary',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Salary
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: SalaryColumn,
   },
 ]
