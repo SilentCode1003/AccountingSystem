@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createAccountType,
+  deleteAccountType,
   getAccountTypes,
   updateAccountType,
 } from "../controller/accountTypes.controller";
@@ -15,5 +16,8 @@ accountTypeRouter.post("/", createAccountType);
 
 //update an accountType
 accountTypeRouter.put("/", updateAccountType);
+
+//delete an accountType
+accountTypeRouter.delete("/:accTypeId", deleteAccountType);
 
 export default accountTypeRouter;

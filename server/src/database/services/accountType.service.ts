@@ -43,3 +43,9 @@ export const editAccountType = async (input: {
 
   return updatedAccountType;
 };
+
+export const removeAccountType = async (input: { accTypeId: string }) => {
+  await db
+    .delete(accountTypes)
+    .where(eq(accountTypes.accTypeId, input.accTypeId));
+};
