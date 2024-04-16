@@ -27,6 +27,7 @@ export const addTransaction = async (input: {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
   const newAccount = await addAccount({
+    accName: `ACCOUNT TRANSACTION`,
     accAmount: input.tranAmount,
     accDescription: `${input.tranAccTypeId} TRANSACTION`,
     accTypeId: input.tranAccTypeId,

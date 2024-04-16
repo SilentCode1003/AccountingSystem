@@ -36,6 +36,7 @@ export const addPayroll = async (input: {
   // const accountType = await getAccountTypeByName({ accTypeName: "EXPENSE" });
 
   const newAccount = await addAccount({
+    accName: "PAYROLL ACCOUNT",
     accAmount: finalAmount,
     accDescription: "PAYROLL",
     accTypeId: input.prAccountTypeId,

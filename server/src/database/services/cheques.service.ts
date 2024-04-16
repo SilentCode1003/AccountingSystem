@@ -39,6 +39,7 @@ export const addCheque = async (input: {
   chqAccTypeId: string;
 }) => {
   const account = await addAccount({
+    accName: "CHEQUE ACCOUNT",
     accAmount: input.chqAmount,
     accDescription: "CHEQUE",
     accTypeId: input.chqAccTypeId,

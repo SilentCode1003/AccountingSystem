@@ -22,6 +22,7 @@ export const getAccountByID = async (accId: string) => {
 };
 
 export const addAccount = async (input: {
+  accName: string;
   accTypeId: string;
   accDescription: string;
   accAmount: number;
@@ -43,6 +44,7 @@ export const addAccount = async (input: {
 export const editAccount = async (input: {
   accId: string;
   newData: {
+    accName?: string;
     accTypeId?: string;
     accDescription?: string;
     accAmount?: number;

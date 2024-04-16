@@ -16,6 +16,7 @@ export const createValidator = z.object({
       });
     }
   }),
+  accName: z.string(),
   accDescription: z.string(),
   accAmount: z.number(),
 });
@@ -51,6 +52,7 @@ export const updateValidator = z.object({
         });
       }
     }),
+    accName: z.string().optional(),
     accDescription: z.optional(z.string()),
     accAmount: z.optional(z.number()),
   }),
