@@ -2,6 +2,7 @@ import db from "../index";
 import crypto from "crypto";
 import users from "../schema/users.schema";
 import { eq, not } from "drizzle-orm";
+import * as bcrypt from "bcrypt";
 
 const USER_TYPE = {
   FINANCE: "FINANCE",
@@ -33,7 +34,11 @@ export const addUser = async (input: {
 }) => {
   const newUserId = `userId ${crypto.randomUUID()}`;
 
-  await db.insert(users).values({ ...input, userId: newUserId });
+  const hashPassword = await bcrypt.hash(input.userPassword, 10);
+
+  await db
+    .insert(users)
+    .values({ ...input, userId: newUserId, userPassword: hashPassword });
 
   const newUser = await db.query.users.findFirst({
     where: (user) => eq(user.userId, newUserId),
