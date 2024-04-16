@@ -11,6 +11,7 @@ import { relations } from "drizzle-orm";
 
 const accounts = mysqlTable("accounts", {
   accId: varchar("acc_id", { length: 60 }).primaryKey(),
+  accName: text("acc_name").notNull(),
   accTypeId: varchar("acc_type_id", { length: 60 })
     .references(() => accountTypes.accTypeId, { onDelete: "cascade" })
     .notNull(),

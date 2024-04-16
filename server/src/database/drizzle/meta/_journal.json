@@ -15,6 +15,13 @@
       "when": 1713244460017,
       "tag": "0001_whole_green_goblin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1713251371371,
+      "tag": "0002_panoramic_layla_miller",
+      "breakpoints": true
     }
   ]
 }
