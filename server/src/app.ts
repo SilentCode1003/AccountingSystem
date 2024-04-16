@@ -13,10 +13,10 @@ import MongoStore from "connect-mongo";
 import session from "express-session";
 import "dotenv/config";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
-import { currentUser, login } from "./controller/login.controller";
-import { logout } from "./controller/logout.controller";
+import { currentUser } from "./controller/login.controller";
 import { getTransactionPartners } from "./controller/others.controllers";
 import accountTypeRouter from "./routes/accountType.routes";
+import authRouter from "./routes/auth.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -51,9 +51,7 @@ app.use(
 
 app.use(express.json());
 
-app.post("/login", login);
-
-app.post("/logout", logout);
+app.use("/auth", authRouter);
 
 app.use(authMiddleware);
 
