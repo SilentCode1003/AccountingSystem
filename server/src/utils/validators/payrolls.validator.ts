@@ -25,20 +25,6 @@ export const createValidator = z.object({
     .string()
     .datetime()
     .transform((date) => new Date(date)),
-  prAccountTypeId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accTypeId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an account type id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
-  }),
 });
 
 //validator for PUT /payrolls input
@@ -100,19 +86,5 @@ export const updateValidator = z.object({
       .datetime()
       .transform((date) => new Date(date))
       .optional(),
-    prAccountTypeId: z.string().superRefine((val, ctx) => {
-      if (val.split(" ")[0] !== "accTypeId") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an account type id.`,
-        });
-      }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        });
-      }
-    }),
   }),
 });

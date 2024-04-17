@@ -3,6 +3,7 @@ import crypto from "crypto";
 import payrolls from "../schema/payrolls.schema";
 import { eq } from "drizzle-orm";
 import { addAccount, editAccount } from "./accounts.service";
+import accountTypes from "../schema/accountType.schema";
 
 export const getAllPayrolls = async () => {
   const payrolls = await db.query.payrolls.findMany({
@@ -20,7 +21,6 @@ export const addPayroll = async (input: {
   prTotalDeduction: number;
   prDateFrom: Date;
   prDateTo: Date;
-  prAccountTypeId: string;
 }) => {
   const newPayrollId = `prId ${crypto.randomUUID()}`;
 
@@ -33,13 +33,15 @@ export const addPayroll = async (input: {
       ? 0
       : (employee!.empSalary as number) - input.prTotalDeduction;
 
-  // const accountType = await getAccountTypeByName({ accTypeName: "EXPENSE" });
+  const accountType = await db.query.accountTypes.findFirst({
+    where: eq(accountTypes.accTypeName, "EXPENSE"),
+  });
 
   const newAccount = await addAccount({
     accName: "PAYROLL ACCOUNT",
     accAmount: finalAmount,
     accDescription: "PAYROLL",
-    accTypeId: input.prAccountTypeId,
+    accTypeId: accountType!.accTypeId,
   });
 
   await db.insert(payrolls).values({
@@ -60,7 +62,6 @@ export const editPayroll = async (input: {
   prId: string;
   prAccId: string;
   newData: {
-    prAccountTypeId: string;
     prEmployeeId?: string;
     prTotalDeduction?: number;
     prDateFrom?: Date;
