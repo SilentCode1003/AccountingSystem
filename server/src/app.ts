@@ -16,6 +16,7 @@ import { authMiddleware } from "./utils/middlewares/auth.middleware";
 import { currentUser, login } from "./controller/login.controller";
 import { logout } from "./controller/logout.controller";
 import { getTransactionPartners } from "./controller/others.controllers";
+import othersRouter from "./routes/others.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -59,6 +60,8 @@ app.use(authMiddleware);
 app.get("/login", currentUser);
 
 app.get("/transactionPartners", getTransactionPartners);
+
+app.use("/others", othersRouter);
 
 //route for all account actions
 app.use("/accounts", accountRouter);
