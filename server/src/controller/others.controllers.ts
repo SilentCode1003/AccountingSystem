@@ -72,11 +72,16 @@ export const getIncomeStatementByMonth = async (
     accTypes: req.query.accTypes,
   });
 
-  if (!input.success) return res.status(400).send({ error: input.error });
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
 
   const accountByMonth = await getIncomeStatement(
     input.data.month as Date,
     input.data.accTypes
+      ? typeof input.data.accTypes === "string"
+        ? [input.data.accTypes]
+        : input.data.accTypes
+      : []
   );
 
   return res.send(accountByMonth);
