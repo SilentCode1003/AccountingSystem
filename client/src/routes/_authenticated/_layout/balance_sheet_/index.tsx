@@ -5,15 +5,11 @@ import {
   liabilitiesColumn,
   Liability,
 } from '@/components/table-columns/balanceSheet.columns'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { text, Text } from '@/components/ui/text'
+import DatePicker from '@/components/ui/DatePicker'
+import { Text } from '@/components/ui/text'
+import { useQueries } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_authenticated/_layout/balance_sheet/')({
   component: BalanceSheet,
@@ -37,20 +33,42 @@ const liabilitiesData: Array<Liability> = [
 ]
 
 function BalanceSheet() {
+  const [date, setDate] = useState<Date>(new Date())
+
+  const balanceSheet = useQueries<
+    Array<{
+      type: string
+      amount: number
+    }>,
+    Error
+  >({
+    queries: ['Assets', 'Liabilities'].map((accType) => ({
+      queryKey: ['BalanceSheet', accType],
+      queryFn: async () => {
+        const response = await fetch(
+          `${import.meta.env.VITE_SERVER_URL}/others/accountTotal`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({
+              accType,
+              accCreatedAt: date,
+            }),
+          },
+        )
+        const data = await response.json()
+        return data
+      },
+    })),
+  })
+
   return (
     <div className="p-4 min-h-[85vh] flex gap-4 flex-col items-center">
       <div className="flex items-center w-full md:w-[70vw] justify-between">
-        <Text variant={'heading1bold'}>Balance Sheet</Text>
-        <Select>
-          <SelectTrigger className={`${text({ variant: 'heading3ghost' })}`}>
-            <SelectValue placeholder="Current Month" />
-          </SelectTrigger>
-
-          <SelectContent className={`${text({ variant: 'heading3ghost' })}`}>
-            <SelectItem value="Current Month">Current Month</SelectItem>
-            <SelectItem value="Last Month">Last Month</SelectItem>
-          </SelectContent>
-        </Select>
+        <Text variant={'heading1bold'} className="w-full">
+          Balance Sheet
+        </Text>
+        <DatePicker date={date} setDate={setDate} yearMonth />
       </div>
       <div className="w-full md:w-[70vw]">
         <div className="flex flex-col gap-4 items-center md:items-start">
