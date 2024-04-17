@@ -13,9 +13,10 @@ import MongoStore from "connect-mongo";
 import session from "express-session";
 import "dotenv/config";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
-import { currentUser, login } from "./controller/login.controller";
-import { logout } from "./controller/logout.controller";
+import { currentUser } from "./controller/login.controller";
 import { getTransactionPartners } from "./controller/others.controllers";
+import accountTypeRouter from "./routes/accountType.routes";
+import authRouter from "./routes/auth.routes";
 import othersRouter from "./routes/others.routes";
 
 declare module "express-session" {
@@ -51,9 +52,7 @@ app.use(
 
 app.use(express.json());
 
-app.post("/login", login);
-
-app.post("/logout", logout);
+app.use("/auth", authRouter);
 
 app.use(authMiddleware);
 
@@ -65,6 +64,9 @@ app.use("/others", othersRouter);
 
 //route for all account actions
 app.use("/accounts", accountRouter);
+
+//route for all account type actions
+app.use("/accountTypes", accountTypeRouter);
 
 //route for all employee actions
 app.use("/employees", employeesRouter);

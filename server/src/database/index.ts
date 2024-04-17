@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import accounts from "./schema/accounts.schema";
+import accounts, { accountTypeRelation } from "./schema/accounts.schema";
 import cheques, { chequesRelations } from "./schema/cheques.schema";
 import customers from "./schema/customers.schema";
 import employees from "./schema/employees.schema";
@@ -18,6 +18,7 @@ import transactions, {
 } from "./schema/transactions.schema";
 import users from "./schema/users.schema";
 import vendors from "./schema/vendors.schema";
+import accountTypes from "./schema/accountType.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -46,6 +47,7 @@ const db = drizzle(connection, {
     users,
     employees,
     cheques,
+    accountTypes,
     vendors,
     customers,
     transactions,
@@ -58,6 +60,7 @@ const db = drizzle(connection, {
     transactionVendorRelation,
     payrollEmployeeRelation,
     payrollAccountRelation,
+    accountTypeRelation,
   },
   mode: "default",
 });

@@ -1,21 +1,20 @@
-import { decimal } from "drizzle-orm/mysql-core";
 import {
   boolean,
   datetime,
-  mysqlEnum,
+  decimal,
   mysqlTable,
   text,
   varchar,
 } from "drizzle-orm/mysql-core";
+import accountTypes from "./accountType.schema";
+import { relations } from "drizzle-orm";
 
 const accounts = mysqlTable("accounts", {
   accId: varchar("acc_id", { length: 60 }).primaryKey(),
-  accType: mysqlEnum("acc_type", [
-    "PAYABLE",
-    "RECEIVABLE",
-    "REVENUE",
-    "EXPENSE",
-  ]).notNull(),
+  accName: text("acc_name").notNull(),
+  accTypeId: varchar("acc_type_id", { length: 60 })
+    .references(() => accountTypes.accTypeId, { onDelete: "cascade" })
+    .notNull(),
   accAmount: decimal("acc_amount", { precision: 13, scale: 2 })
     .$type<number>()
     .notNull(),
@@ -24,5 +23,12 @@ const accounts = mysqlTable("accounts", {
   accCreatedAt: datetime("acc_created_at").notNull().default(new Date()),
   accUpdatedAt: datetime("acc_updated_at").notNull().default(new Date()),
 });
+
+export const accountTypeRelation = relations(accounts, ({ one }) => ({
+  accountType: one(accountTypes, {
+    fields: [accounts.accTypeId],
+    references: [accountTypes.accTypeId],
+  }),
+}));
 
 export default accounts;

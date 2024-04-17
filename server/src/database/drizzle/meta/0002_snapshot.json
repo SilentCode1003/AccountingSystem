@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "76f821bf-d53c-4a99-9fb5-2f7e99779456",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "6b54d8df-5460-421e-b42e-808e2b33a64a",
+  "prevId": "9bd31a5b-9add-40d7-a315-0e46a11f6dc6",
   "tables": {
     "accounts": {
       "name": "accounts",
@@ -10,6 +10,13 @@
         "acc_id": {
           "name": "acc_id",
           "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_name": {
+          "name": "acc_name",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -49,7 +56,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-04-15 08:30:15.027'"
+          "default": "'2024-04-16 07:09:31.194'"
         },
         "acc_updated_at": {
           "name": "acc_updated_at",
@@ -57,7 +64,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-04-15 08:30:15.027'"
+          "default": "'2024-04-16 07:09:31.194'"
         }
       },
       "indexes": {},
@@ -174,7 +181,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-04-15 08:30:15.034'"
+          "default": "'2024-04-16 07:09:31.233'"
         },
         "chq_updated_at": {
           "name": "chq_updated_at",
@@ -182,7 +189,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-04-15 08:30:15.034'"
+          "default": "'2024-04-16 07:09:31.233'"
         }
       },
       "indexes": {},
@@ -571,7 +578,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-04-15 08:30:15.067'"
+          "default": "'2024-04-16 07:09:31.266'"
         },
         "tran_updated_at": {
           "name": "tran_updated_at",
@@ -579,7 +586,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'2024-04-15 08:30:15.067'"
+          "default": "'2024-04-16 07:09:31.266'"
         }
       },
       "indexes": {},
@@ -673,7 +680,7 @@
         },
         "user_password": {
           "name": "user_password",
-          "type": "varchar(16)",
+          "type": "varchar(60)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
