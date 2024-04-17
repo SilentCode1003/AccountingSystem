@@ -13,9 +13,15 @@ import {
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
 
+type AccountType = {
+  accTypeId: string
+  accTypeName: string
+}
+
 type Account = {
   accId: string
-  accType: 'PAYABLE' | 'RECEIVABLE' | 'REVENUE' | 'EXPENSE'
+  accTypeId: string
+  accountType: AccountType
   accAmount: number
   accDescription: string
   accIsActive: boolean

@@ -32,7 +32,7 @@ export const createTransactionSchema = z.object({
     }
   }),
   tranTransactionDate: z.date(),
-  tranAccType: z.enum(['PAYABLE', 'RECEIVABLE', 'REVENUE', 'EXPENSE']),
+  tranAccTypeId: z.string(),
 })
 
 //validator for PUT /transactions inputs
@@ -97,8 +97,6 @@ export const updateTransactionSchema = z.object({
       })
       .optional(),
     tranTransactionDate: z.date().optional(),
-    tranAccType: z
-      .enum(['PAYABLE', 'RECEIVABLE', 'REVENUE', 'EXPENSE'])
-      .optional(),
+    tranAccTypeId: z.string().optional(),
   }),
 })

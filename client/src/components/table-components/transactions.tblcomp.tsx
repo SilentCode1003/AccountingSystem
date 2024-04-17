@@ -67,7 +67,7 @@ export const TransactionAccountIDColumn = ({
 }: CellContext<Transactions, unknown>) => {
   return (
     <div className="flex justify-between">
-      <div>{row.original.account.accType}</div>
+      <div>{row.original.account.accountType.accTypeName}</div>
       <div>
         <Dialog>
           <DropdownMenu>
@@ -113,7 +113,7 @@ export const TransactionAccountIDColumn = ({
                   Account Type
                 </Text>
                 <Text variant={'label'} className="flex-1">
-                  {row.original.account.accType}
+                  {row.original.account.accountType.accTypeName}
                 </Text>
               </div>
               <div className="flex flex-col sm:flex-row">
@@ -155,6 +155,25 @@ export const TransactionWithColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
   const [openUpdate, setOpenUpdate] = useState<boolean>(false)
+
+  const accountTypes = useQuery({
+    queryKey: ['cccountTypes'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
+        {
+          credentials: 'include',
+        },
+      )
+      const accountTypeData = response.json() as Promise<{
+        accountTypes: Array<{
+          accTypeId: string
+          accTypeName: string
+        }>
+      }>
+      return accountTypeData
+    },
+  })
   const form = useForm<z.infer<typeof updateTransactionSchema>>({
     defaultValues: {
       tranId: row.original.tranId,
@@ -166,7 +185,7 @@ export const TransactionWithColumn = ({
           row.original.tranEmpId ??
           row.original.tranCustId ??
           row.original.tranVdId,
-        tranAccType: row.original.account.accType,
+        tranAccTypeId: row.original.account.accountType.accTypeId,
         tranTransactionDate: new Date(row.original.tranTransactionDate),
       },
     },
@@ -503,7 +522,7 @@ export const TransactionWithColumn = ({
                           )}
                         />
                         <FormField
-                          name="newData.tranAccType"
+                          name="newData.tranAccTypeId"
                           control={form.control}
                           render={({ field }) => (
                             <FormItem className="flex-1">
@@ -520,18 +539,20 @@ export const TransactionWithColumn = ({
                                       <SelectValue placeholder="Account type" />
                                     </SelectTrigger>
                                     <SelectContent className="flex-1">
-                                      <SelectItem value="EXPENSE">
-                                        EXPENSE
-                                      </SelectItem>
-                                      <SelectItem value="REVENUE">
-                                        REVENUE
-                                      </SelectItem>
-                                      <SelectItem value="RECEIVABLE">
-                                        RECEIVABLE
-                                      </SelectItem>
-                                      <SelectItem value="PAYABLE">
-                                        PAYABLE
-                                      </SelectItem>
+                                      {accountTypes.isSuccess && (
+                                        <SelectGroup>
+                                          {accountTypes.data.accountTypes.map(
+                                            (accType) => (
+                                              <SelectItem
+                                                key={accType.accTypeId}
+                                                value={accType.accTypeId}
+                                              >
+                                                {accType.accTypeName}
+                                              </SelectItem>
+                                            ),
+                                          )}
+                                        </SelectGroup>
+                                      )}
                                     </SelectContent>
                                   </Select>
                                 )}

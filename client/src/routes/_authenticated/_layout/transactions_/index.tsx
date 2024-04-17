@@ -80,6 +80,25 @@ function TransactionsComponent() {
     },
   })
 
+  const accountTypes = useQuery({
+    queryKey: ['cccountTypes'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
+        {
+          credentials: 'include',
+        },
+      )
+      const accountTypeData = response.json() as Promise<{
+        accountTypes: Array<{
+          accTypeId: string
+          accTypeName: string
+        }>
+      }>
+      return accountTypeData
+    },
+  })
+
   const queryClient = useQueryClient()
   const createTransaction = useMutation({
     mutationKey: ['createTransaction'],
@@ -138,7 +157,6 @@ function TransactionsComponent() {
       tranAmount: 0,
       tranDescription: '',
       tranPartner: '',
-      tranAccType: 'EXPENSE',
     },
     resolver: zodResolver(createTransactionSchema),
   })
@@ -373,7 +391,7 @@ function TransactionsComponent() {
                     )}
                   />
                   <FormField
-                    name="tranAccType"
+                    name="tranAccTypeId"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem className="flex-1">
@@ -390,12 +408,20 @@ function TransactionsComponent() {
                                 <SelectValue placeholder="Account type" />
                               </SelectTrigger>
                               <SelectContent className="flex-1">
-                                <SelectItem value="EXPENSE">EXPENSE</SelectItem>
-                                <SelectItem value="REVENUE">REVENUE</SelectItem>
-                                <SelectItem value="RECEIVABLE">
-                                  RECEIVABLE
-                                </SelectItem>
-                                <SelectItem value="PAYABLE">PAYABLE</SelectItem>
+                                {accountTypes.isSuccess && (
+                                  <SelectGroup>
+                                    {accountTypes.data.accountTypes.map(
+                                      (accType) => (
+                                        <SelectItem
+                                          key={accType.accTypeId}
+                                          value={accType.accTypeId}
+                                        >
+                                          {accType.accTypeName}
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectGroup>
+                                )}
                               </SelectContent>
                             </Select>
                           )}
