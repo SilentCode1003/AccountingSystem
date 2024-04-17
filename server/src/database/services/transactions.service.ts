@@ -7,7 +7,11 @@ import { addAccount, editAccount } from "./accounts.service";
 export const getAllTransactions = async () => {
   const transactions = await db.query.transactions.findMany({
     with: {
-      account: { accountType: true },
+      account: {
+        with: {
+          accountType: true,
+        },
+      },
       employee: true,
       customer: true,
       vendor: true,
@@ -50,7 +54,11 @@ export const addTransaction = async (input: {
   const newTransaction = await db.query.transactions.findFirst({
     where: (transaction) => eq(transaction.tranId, newTransactionId),
     with: {
-      account: { accountType: true },
+      account: {
+        with: {
+          accountType: true,
+        },
+      },
       employee: true,
       customer: true,
       vendor: true,
@@ -104,7 +112,11 @@ export const editTransaction = async (input: {
   const editedTran = await db.query.transactions.findFirst({
     where: (tran) => eq(tran.tranId, input.tranId),
     with: {
-      account: { accountType: true },
+      account: {
+        with: {
+          accountType: true,
+        },
+      },
       employee: true,
       customer: true,
       vendor: true,

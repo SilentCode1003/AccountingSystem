@@ -41,7 +41,7 @@ export const getAccountTotal = async (req: Request, res: Response) => {
       .from(accounts)
       .where(
         and(
-          eq(accounts.accType, "EXPENSE"),
+          eq(accounts.accTypeId, "EXPENSE"),
           sql`month(acc_created_at) = month(${input.data.accCreatedAt})`,
           sql`year(acc_created_at) = year(${input.data.accCreatedAt})`
         )

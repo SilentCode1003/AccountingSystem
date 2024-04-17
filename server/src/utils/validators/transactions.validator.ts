@@ -45,7 +45,6 @@ export const createValidator = z.object({
     .string()
     .datetime()
     .transform((date) => new Date(date)),
-  tranAccType: z.enum(["PAYABLE", "RECEIVABLE", "REVENUE", "EXPENSE"]),
 });
 
 //validator for PUT /transactions inputs
