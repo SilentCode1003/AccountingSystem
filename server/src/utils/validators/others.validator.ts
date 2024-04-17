@@ -21,3 +21,8 @@ export const AccountTotalValidator = z.object({
     .datetime()
     .transform((date) => new Date(date)),
 });
+
+export const IncomeStatementByMonthValidator = z.object({
+  month: z.date(),
+  accTypes: z.array(z.string()),
+});

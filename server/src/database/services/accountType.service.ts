@@ -3,7 +3,11 @@ import db from "..";
 import accountTypes from "../schema/accountType.schema";
 
 export const getAllAccountTypes = async () => {
-  const accountTypes = await db.query.accountTypes.findMany();
+  const accountTypes = await db.query.accountTypes.findMany({
+    with: {
+      accounts: true,
+    },
+  });
   return accountTypes;
 };
 

@@ -5,8 +5,12 @@ import { getAllVendors } from "../database/services/vendors.service";
 import db from "../database";
 import { sum, eq, sql } from "drizzle-orm";
 import accounts from "../database/schema/accounts.schema";
-import { AccountTotalValidator } from "../utils/validators/others.validator";
+import {
+  AccountTotalValidator,
+  IncomeStatementByMonthValidator,
+} from "../utils/validators/others.validator";
 import { and } from "drizzle-orm";
+import { getIncomeStatement } from "../database/services/accounts.service";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -57,4 +61,23 @@ export const getAccountTotal = async (req: Request, res: Response) => {
       error: "Server error",
     });
   }
+};
+
+export const getIncomeStatementByMonth = async (
+  req: Request,
+  res: Response
+) => {
+  const input = IncomeStatementByMonthValidator.safeParse({
+    month: new Date(req.query.month as string),
+    accTypes: req.query.accTypes,
+  });
+
+  if (!input.success) return res.status(400).send({ error: input.error });
+
+  const accountByMonth = await getIncomeStatement(
+    input.data.month as Date,
+    input.data.accTypes
+  );
+
+  return res.send(accountByMonth);
 };

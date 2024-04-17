@@ -18,7 +18,9 @@ import transactions, {
 } from "./schema/transactions.schema";
 import users from "./schema/users.schema";
 import vendors from "./schema/vendors.schema";
-import accountTypes from "./schema/accountType.schema";
+import accountTypes, {
+  accountTypesAccountManyRelations,
+} from "./schema/accountType.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -58,6 +60,7 @@ const db = drizzle(connection, {
     transactionCustomerRelation,
     transactionEmployeeRelation,
     transactionVendorRelation,
+    accountTypesAccountManyRelations,
     payrollEmployeeRelation,
     payrollAccountRelation,
     accountTypeRelation,

@@ -1,6 +1,9 @@
+import { sql, sum } from "drizzle-orm";
 import db from "../index";
 import accounts from "../schema/accounts.schema";
 import { eq, not } from "drizzle-orm";
+import { and } from "drizzle-orm";
+import accountTypes from "../schema/accountType.schema";
 
 export const getAllAccounts = async () => {
   const accounts = await db.query.accounts.findMany({
@@ -19,6 +22,38 @@ export const getAccountByID = async (accId: string) => {
   });
 
   return account;
+};
+
+export const getIncomeStatement = async (month: Date, accTypes: string[]) => {
+  const accountsByMonth = Promise.all(
+    accTypes.map(async (accTypeId) => {
+      const accType = await db.query.accountTypes.findFirst({
+        where: eq(accountTypes.accTypeId, accTypeId),
+      });
+
+      const accs = await db
+        .select({
+          accName: accounts.accName,
+          amount: sum(accounts.accAmount),
+        })
+        .from(accounts)
+        .where(
+          and(
+            eq(accounts.accTypeId, accTypeId),
+            sql`month(acc_created_at) = month(${month})`,
+            sql`year(acc_created_at) = year(${month})`
+          )
+        )
+        .groupBy(accounts.accName, sql`monthname(acc_created_at)`);
+
+      return {
+        ...accType,
+        accounts: accs,
+      };
+    })
+  );
+
+  return accountsByMonth;
 };
 
 export const addAccount = async (input: {
