@@ -11,9 +11,15 @@ import { Button } from '../ui/button'
 import { text } from '../ui/text'
 import { ArrowUpDownIcon } from 'lucide-react'
 
+type AccountType = {
+  accTypeId: string
+  accTypeName: string
+}
+
 type Account = {
   accId: string
-  accType: 'PAYABLE' | 'RECEIVABLE' | 'REVENUE' | 'EXPENSE'
+  accTypeId: string
+  accountType: AccountType
   accAmount: number
   accDescription: string
   accIsActive: boolean
@@ -27,7 +33,7 @@ export type Cheques = {
   chqAmount: number
   chqIssueDate: string
   chqStatus: 'APPROVED' | 'PENDING' | 'REJECTED'
-  chqAccType: 'PAYABLE' | 'RECEIVABLE' | 'REVENUE' | 'EXPENSE'
+  chqAccTypeId: string
   chqCreatedAt: string
   chqUpdatedAt: string
   chqAccId: string

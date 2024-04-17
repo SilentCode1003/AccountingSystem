@@ -31,12 +31,13 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { chequeUpdateSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Input } from '../ui/input'
 import DatePicker from '../ui/DatePicker'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -63,7 +64,7 @@ export const CreatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
 export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return (
     <div className="flex justify-between">
-      <div>{row.original.account.accType}</div>
+      <div>{row.original.account.accountType.accTypeName}</div>
       <div>
         <Dialog>
           <DropdownMenu>
@@ -109,7 +110,7 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
                   Account Type
                 </Text>
                 <Text variant={'label'} className="flex-1">
-                  {row.original.account.accType}
+                  {row.original.account.accountType.accTypeName}
                 </Text>
               </div>
               <div className="flex flex-col sm:flex-row">
@@ -130,11 +131,29 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
 
 export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const accountTypes = useQuery({
+    queryKey: ['accountTypes'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
+        {
+          credentials: 'include',
+        },
+      )
+      const accountTypeData = response.json() as Promise<{
+        accountTypes: Array<{
+          accTypeId: string
+          accTypeName: string
+        }>
+      }>
+      return accountTypeData
+    },
+  })
   const form = useForm<z.infer<typeof chequeUpdateSchema>>({
     defaultValues: {
       chqId: row.original.chqId,
       newData: {
-        chqAccType: row.original.account.accType,
+        chqAccTypeId: row.original.account.accTypeId,
         chqAmount: Number.parseFloat(String(row.original.chqAmount)),
         chqIssueDate: new Date(row.original.chqIssueDate),
         chqPayeeName: row.original.chqPayeeName,
@@ -325,7 +344,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
-                      name="newData.chqAccType"
+                      name="newData.chqAccTypeId"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Account Type</FormLabel>
@@ -338,12 +357,20 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                                 <SelectValue placeholder="Select Account Type" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="EXPENSE">EXPENSE</SelectItem>
-                                <SelectItem value="REVENUE">REVENUE</SelectItem>
-                                <SelectItem value="RECEIVABLE">
-                                  RECEIVABLE
-                                </SelectItem>
-                                <SelectItem value="PAYABLE">PAYABLE</SelectItem>
+                                {accountTypes.isSuccess && (
+                                  <SelectGroup>
+                                    {accountTypes.data.accountTypes.map(
+                                      (accType) => (
+                                        <SelectItem
+                                          key={accType.accTypeId}
+                                          value={accType.accTypeId}
+                                        >
+                                          {accType.accTypeName}
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectGroup>
+                                )}
                               </SelectContent>
                             </Select>
                           </FormControl>

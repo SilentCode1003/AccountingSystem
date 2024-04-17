@@ -157,7 +157,7 @@ export const TransactionWithColumn = ({
   const [openUpdate, setOpenUpdate] = useState<boolean>(false)
 
   const accountTypes = useQuery({
-    queryKey: ['cccountTypes'],
+    queryKey: ['accountTypes'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/accountTypes`,

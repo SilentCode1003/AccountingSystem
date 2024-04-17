@@ -16,7 +16,7 @@ export const createChequeSchema = z.object({
     }),
   chqIssueDate: z.date(),
   chqStatus: z.enum(['APPROVED', 'PENDING', 'REJECTED']),
-  chqAccType: z.enum(['PAYABLE', 'RECEIVABLE', 'REVENUE', 'EXPENSE']),
+  chqAccTypeId: z.string(),
 })
 
 export const chequeUpdateSchema = z.object({
@@ -43,8 +43,6 @@ export const chequeUpdateSchema = z.object({
       }),
     chqIssueDate: z.optional(z.date()),
     chqStatus: z.optional(z.enum(['APPROVED', 'PENDING', 'REJECTED'])),
-    chqAccType: z
-      .enum(['PAYABLE', 'RECEIVABLE', 'REVENUE', 'EXPENSE'])
-      .optional(),
+    chqAccTypeId: z.string().optional(),
   }),
 })

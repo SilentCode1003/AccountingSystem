@@ -31,6 +31,7 @@ import {
 import { Text } from '@/components/ui/text'
 import { createChequeSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { SelectGroup } from '@radix-ui/react-select'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { ReceiptIcon } from 'lucide-react'
@@ -44,6 +45,24 @@ export const Route = createFileRoute('/_authenticated/_layout/cheques/')({
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
+  const accountTypes = useQuery({
+    queryKey: ['accountTypes'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
+        {
+          credentials: 'include',
+        },
+      )
+      const accountTypeData = response.json() as Promise<{
+        accountTypes: Array<{
+          accTypeId: string
+          accTypeName: string
+        }>
+      }>
+      return accountTypeData
+    },
+  })
   const queryClient = useQueryClient()
   const createCheque = useMutation({
     mutationFn: async (payload: z.infer<typeof createChequeSchema>) => {
@@ -74,7 +93,6 @@ const CrudComponents = () => {
 
   const form = useForm<z.infer<typeof createChequeSchema>>({
     defaultValues: {
-      chqAccType: 'EXPENSE',
       chqAmount: 0,
       chqPayeeName: '',
       chqStatus: 'PENDING',
@@ -171,7 +189,7 @@ const CrudComponents = () => {
               />
               <FormField
                 control={form.control}
-                name="chqAccType"
+                name="chqAccTypeId"
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
@@ -184,13 +202,23 @@ const CrudComponents = () => {
                         defaultValue={field.value}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a Type" />
+                          <SelectValue placeholder="Account type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="EXPENSE">Expense</SelectItem>
-                          <SelectItem value="REVENUE">Revenue</SelectItem>
-                          <SelectItem value="SALARY">Salary</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
+                          {accountTypes.isSuccess && (
+                            <SelectGroup>
+                              {accountTypes.data.accountTypes.map(
+                                (accountType) => (
+                                  <SelectItem
+                                    key={accountType.accTypeId}
+                                    value={accountType.accTypeId}
+                                  >
+                                    {accountType.accTypeName}
+                                  </SelectItem>
+                                ),
+                              )}
+                            </SelectGroup>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
