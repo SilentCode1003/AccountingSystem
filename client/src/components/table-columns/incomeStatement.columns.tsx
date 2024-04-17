@@ -8,18 +8,18 @@ import {
 } from '../table-components/incomeStatement.tblcomp'
 
 export type Revenue = {
-  type: string
+  accName: string
   amount: number
 }
 
 export type Expense = {
-  type: string
+  accName: string
   amount: number
 }
 
 export const RevenueColumns: ColumnDef<Revenue>[] = [
   {
-    accessorKey: 'type',
+    accessorKey: 'accName',
     header: ({ column }) => {
       return (
         <Button
@@ -55,7 +55,7 @@ export const RevenueColumns: ColumnDef<Revenue>[] = [
       const totalAmount = table
         .getFilteredRowModel()
         .rows.reduce(
-          (total, row) => total + (row.getValue('amount') as number),
+          (total, row) => total + parseFloat(String(row.getValue('amount'))),
           0,
         )
 
@@ -71,7 +71,7 @@ export const RevenueColumns: ColumnDef<Revenue>[] = [
 
 export const ExpenseColumns: ColumnDef<Expense>[] = [
   {
-    accessorKey: 'type',
+    accessorKey: 'accName',
     header: ({ column }) => {
       return (
         <Button
@@ -107,7 +107,7 @@ export const ExpenseColumns: ColumnDef<Expense>[] = [
       const totalAmount = table
         .getFilteredRowModel()
         .rows.reduce(
-          (total, row) => total + (row.getValue('amount') as number),
+          (total, row) => total + parseFloat(String(row.getValue('amount'))),
           0,
         )
 
