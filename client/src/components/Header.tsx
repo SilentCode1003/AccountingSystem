@@ -3,10 +3,10 @@ import {
   SheetClose,
   SheetContent,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Text } from "./ui/text";
-import { RxHamburgerMenu } from "react-icons/rx";
-import { Link, useNavigate } from "@tanstack/react-router";
+} from '@/components/ui/sheet'
+import { Text } from './ui/text'
+import { RxHamburgerMenu } from 'react-icons/rx'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ArchiveIcon,
   ArrowLeftRightIcon,
@@ -21,7 +21,7 @@ import {
   ReceiptIcon,
   SettingsIcon,
   UsersRoundIcon,
-} from "lucide-react";
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,40 +29,40 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { useTheme } from "./ui/theme.provider";
-import { Switch } from "./ui/switch";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+} from './ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { useTheme } from './ui/theme.provider'
+import { Switch } from './ui/switch'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "./ui/accordion";
+} from './ui/accordion'
 
 function Header() {
-  const { setTheme, theme } = useTheme();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { setTheme, theme } = useTheme()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const logout = useMutation({
-    mutationKey: ["logout"],
+    mutationKey: ['logout'],
     mutationFn: async () => {
       await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+        method: 'POST',
+        credentials: 'include',
+      })
     },
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["CurrentUser"] });
-      navigate({ to: "/login" });
+      await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
+      navigate({ to: '/login' })
     },
-  });
+  })
 
   const handleLogout = () => {
-    logout.mutate();
-  };
+    logout.mutate()
+  }
   return (
     <header className="h-[10vh] shadow-md bg-background max-w-screen  z-[10] p-4 top-0 sticky ">
       <Sheet>
@@ -74,7 +74,7 @@ function Header() {
               </div>
             </SheetTrigger>
             <Text
-              variant={"heading2bold"}
+              variant={'heading2bold'}
               className="max-w-32 h-fit line-clamp-1 xs:max-w-full xs:line-clamp-0"
             >
               5L Solutions
@@ -103,21 +103,23 @@ function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="flex gap-4 hover:cursor-pointer">
-                    <div>
-                      <SettingsIcon />
-                    </div>
-                    <div>Settings</div>
-                  </DropdownMenuItem>
+                  <Link to="/settings">
+                    <DropdownMenuItem className="flex gap-4 hover:cursor-pointer">
+                      <div>
+                        <SettingsIcon />
+                      </div>
+                      <div>Settings</div>
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem className="flex gap-4 hover:cursor-pointer">
                     <div>
                       <MoonIcon />
                     </div>
                     <div>
                       <Switch
-                        checked={theme === "dark" ? true : false}
+                        checked={theme === 'dark' ? true : false}
                         onCheckedChange={(w) => {
-                          w ? setTheme("dark") : setTheme("light");
+                          w ? setTheme('dark') : setTheme('light')
                         }}
                       />
                     </div>
@@ -139,12 +141,12 @@ function Header() {
           </div>
         </div>
 
-        <SheetContent side={"left"} className="flex flex-col justify-center">
+        <SheetContent side={'left'} className="flex flex-col justify-center">
           <Link to="/">
             <SheetClose>
               <Text
-                variant={"heading1"}
-                style={"underline"}
+                variant={'heading1'}
+                style={'underline'}
                 className="flex gap-4 items-center"
               >
                 <HomeIcon />
@@ -156,8 +158,8 @@ function Header() {
             <AccordionItem value="item-1" className="border-0">
               <AccordionTrigger hideArrow className="p-0 hover:no-underline">
                 <Text
-                  variant={"heading1"}
-                  style={"underline"}
+                  variant={'heading1'}
+                  style={'underline'}
                   className="flex gap-4 items-center"
                 >
                   <BookTextIcon />
@@ -168,8 +170,8 @@ function Header() {
                 <Link to="/income_statement">
                   <SheetClose>
                     <Text
-                      variant={"heading2"}
-                      style={"underline"}
+                      variant={'heading2'}
+                      style={'underline'}
                       className="flex gap-4 items-center"
                     >
                       <BookPlusIcon />
@@ -180,8 +182,8 @@ function Header() {
                 <Link to="/balance_sheet">
                   <SheetClose>
                     <Text
-                      variant={"heading2"}
-                      style={"underline"}
+                      variant={'heading2'}
+                      style={'underline'}
                       className="flex gap-4 items-center"
                     >
                       <BookPlusIcon />
@@ -192,8 +194,8 @@ function Header() {
                 <Link to="/cash_flow">
                   <SheetClose>
                     <Text
-                      variant={"heading2"}
-                      style={"underline"}
+                      variant={'heading2'}
+                      style={'underline'}
                       className="flex gap-4"
                     >
                       <BookMinusIcon />
@@ -208,8 +210,8 @@ function Header() {
           <Link to="/transactions">
             <SheetClose>
               <Text
-                variant={"heading1"}
-                style={"underline"}
+                variant={'heading1'}
+                style={'underline'}
                 className="flex gap-4"
               >
                 <ArrowLeftRightIcon />
@@ -220,8 +222,8 @@ function Header() {
           <Link to="/employees">
             <SheetClose>
               <Text
-                variant={"heading1"}
-                style={"underline"}
+                variant={'heading1'}
+                style={'underline'}
                 className="flex gap-4 items-center"
               >
                 <UsersRoundIcon />
@@ -232,8 +234,8 @@ function Header() {
           <Link to="/cheques">
             <SheetClose>
               <Text
-                variant={"heading1"}
-                style={"underline"}
+                variant={'heading1'}
+                style={'underline'}
                 className="flex gap-4 items-center"
               >
                 <ReceiptIcon />
@@ -244,8 +246,8 @@ function Header() {
           <Link to="/payrolls">
             <SheetClose>
               <Text
-                variant={"heading1"}
-                style={"underline"}
+                variant={'heading1'}
+                style={'underline'}
                 className="flex gap-4 items-center"
               >
                 <HandCoinsIcon />
@@ -256,8 +258,8 @@ function Header() {
           <Link to="/inventory">
             <SheetClose>
               <Text
-                variant={"heading1"}
-                style={"underline"}
+                variant={'heading1'}
+                style={'underline'}
                 className="flex gap-4 items-center"
               >
                 <ArchiveIcon />
@@ -268,8 +270,8 @@ function Header() {
           <Link to="/reports">
             <SheetClose>
               <Text
-                variant={"heading1"}
-                style={"underline"}
+                variant={'heading1'}
+                style={'underline'}
                 className="flex gap-4 items-center"
               >
                 <ClipboardListIcon />
@@ -280,7 +282,7 @@ function Header() {
         </SheetContent>
       </Sheet>
     </header>
-  );
+  )
 }
 
-export default Header;
+export default Header
