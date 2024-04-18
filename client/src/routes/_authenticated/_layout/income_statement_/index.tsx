@@ -23,10 +23,7 @@ export const Route = createFileRoute(
 function IncomeStatement() {
   const [date, setDate] = useState<Date>(new Date())
 
-  const [accTypes, setAccTypes] = useState<Array<string>>([
-    'accTypeId 972ee0ef-3a55-4c9a-9707-3c3fc08e367c',
-    'accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce',
-  ])
+  const [accTypes, setAccTypes] = useState<Array<string>>([])
 
   const accountTypes = useQuery({
     queryKey: ['accountTypes'],
@@ -41,8 +38,18 @@ function IncomeStatement() {
         accountTypes: Array<{
           accTypeId: string
           accTypeName: string
+          accTypeDefault: string
         }>
       }>
+
+      if (data) {
+        setAccTypes(
+          (await data).accountTypes
+            .filter((accType) => accType.accTypeDefault === 'INCOMESTATEMENT')
+            .map((accType) => accType.accTypeId),
+        )
+      }
+
       return data
     },
   })
@@ -124,7 +131,9 @@ function IncomeStatement() {
         </div>
       </div>
       <div className="w-full md:w-[70vw]">
-        {incomeStatement.isSuccess && incomeStatement.data.length > 0 ? (
+        {incomeStatement.isLoading ? (
+          <Text variant={'heading1bold'}>LOADING</Text>
+        ) : incomeStatement.isSuccess && incomeStatement.data.length > 0 ? (
           incomeStatement.data.map((incomeStatement) => (
             <div key={incomeStatement.accTypeId}>
               <div className="flex flex-col gap-4 items-center md:items-start">

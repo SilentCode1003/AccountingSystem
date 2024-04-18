@@ -8,18 +8,18 @@ import {
 } from '../table-components/balanceSheet.tblcomp'
 
 export type Asset = {
-  type: string
+  accName: string
   amount: number
 }
 
 export type Liability = {
-  type: string
+  accName: string
   amount: number
 }
 
 export const assetsColumn: ColumnDef<Asset>[] = [
   {
-    accessorKey: 'type',
+    accessorKey: 'accName',
     header: ({ column }) => {
       return (
         <Button
@@ -35,7 +35,7 @@ export const assetsColumn: ColumnDef<Asset>[] = [
     footer: () => {
       return <Text variant={'heading4bold'}>Total</Text>
     },
-    meta: 'type',
+    meta: 'accName',
   },
   {
     accessorKey: 'amount',
@@ -54,12 +54,11 @@ export const assetsColumn: ColumnDef<Asset>[] = [
     },
     cell: AssetAmountColumn,
     footer: ({ table }) => {
-      const totalAmount = table
-        .getFilteredRowModel()
-        .rows.reduce(
-          (total, row) => total + (row.getValue('amount') as number),
-          0,
-        )
+      const totalAmount = table.getFilteredRowModel().rows.reduce(
+        (total, row) => total + parseFloat(String(row.getValue('amount'))),
+
+        0,
+      )
 
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -73,7 +72,7 @@ export const assetsColumn: ColumnDef<Asset>[] = [
 
 export const liabilitiesColumn: ColumnDef<Liability>[] = [
   {
-    accessorKey: 'type',
+    accessorKey: 'accName',
     header: ({ column }) => {
       return (
         <Button
@@ -89,7 +88,7 @@ export const liabilitiesColumn: ColumnDef<Liability>[] = [
     footer: () => {
       return <Text variant={'heading4bold'}>Total</Text>
     },
-    meta: 'type',
+    meta: 'accName',
   },
   {
     accessorKey: 'amount',
@@ -111,7 +110,7 @@ export const liabilitiesColumn: ColumnDef<Liability>[] = [
       const totalAmount = table
         .getFilteredRowModel()
         .rows.reduce(
-          (total, row) => total + (row.getValue('amount') as number),
+          (total, row) => total + parseFloat(String(row.getValue('amount'))),
           0,
         )
 
