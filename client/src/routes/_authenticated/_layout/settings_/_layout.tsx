@@ -18,10 +18,10 @@ function SettingsLayout() {
 
   return (
     <div className="min-h-[85vh] flex flex-col items-center">
-      <div className="w-full md:w-[70vw] flex gap-4 h-screen">
+      <div className="w-full md:w-[70vw] flex flex-col items-center h-screen md:flex-row md:items-start">
         <nav
           className={cn(
-            'p-4  grid text-md text-muted-foreground w-[150px] h-fit',
+            'p-4  grid text-md text-muted-foreground w-[200px] h-fit',
           )}
         >
           <Link
@@ -65,8 +65,9 @@ function SettingsLayout() {
             Reports
           </Link>
         </nav>
-        <Separator orientation="vertical" />
-        <div className="p-4 ">
+        <Separator className="md:hidden" />
+        <Separator className="hidden md:block" orientation="vertical" />
+        <div className="p-4 w-full">
           <Outlet />
         </div>
       </div>
