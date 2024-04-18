@@ -10,7 +10,10 @@ import {
   IncomeStatementByMonthValidator,
 } from "../utils/validators/others.validator";
 import { and } from "drizzle-orm";
-import { getIncomeStatement } from "../database/services/accounts.service";
+import {
+  getBalanceSheet,
+  getIncomeStatement,
+} from "../database/services/accounts.service";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -76,6 +79,27 @@ export const getIncomeStatementByMonth = async (
     return res.status(400).send({ error: input.error.errors[0].message });
 
   const accountByMonth = await getIncomeStatement(
+    input.data.month as Date,
+    input.data.accTypes
+      ? typeof input.data.accTypes === "string"
+        ? [input.data.accTypes]
+        : input.data.accTypes
+      : []
+  );
+
+  return res.send(accountByMonth);
+};
+
+export const getBalanceSheetByMonth = async (req: Request, res: Response) => {
+  const input = IncomeStatementByMonthValidator.safeParse({
+    month: new Date(req.query.month as string),
+    accTypes: req.query.accTypes,
+  });
+
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
+
+  const accountByMonth = await getBalanceSheet(
     input.data.month as Date,
     input.data.accTypes
       ? typeof input.data.accTypes === "string"

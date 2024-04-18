@@ -24,6 +24,38 @@ export const getAccountByID = async (accId: string) => {
   return account;
 };
 
+export const getBalanceSheet = async (month: Date, accTypes: string[]) => {
+  const accountsByMonth = Promise.all(
+    accTypes.map(async (accTypeId) => {
+      const accType = await db.query.accountTypes.findFirst({
+        where: eq(accountTypes.accTypeId, accTypeId),
+      });
+
+      const accs = await db
+        .select({
+          accName: accounts.accName,
+          amount: sum(accounts.accAmount),
+        })
+        .from(accounts)
+        .where(
+          and(
+            eq(accounts.accTypeId, accTypeId),
+            sql`month(acc_created_at) = month(${month})`,
+            sql`year(acc_created_at) = year(${month})`
+          )
+        )
+        .groupBy(accounts.accName, sql`monthname(acc_created_at)`);
+
+      return {
+        ...accType,
+        accounts: accs,
+      };
+    })
+  );
+
+  return accountsByMonth;
+};
+
 export const getIncomeStatement = async (month: Date, accTypes: string[]) => {
   const accountsByMonth = Promise.all(
     accTypes.map(async (accTypeId) => {
