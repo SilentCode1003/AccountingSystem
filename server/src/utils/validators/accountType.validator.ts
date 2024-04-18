@@ -2,6 +2,7 @@ import z from "zod";
 
 export const createValidator = z.object({
   accTypeName: z.string(),
+  accTypeDefault: z.enum(["CASHFLOW", "BALANCESHEET", "INCOMESTATEMENT"]),
 });
 
 export const updateValidator = z.object({
@@ -21,6 +22,9 @@ export const updateValidator = z.object({
   }),
   newData: z.object({
     accTypeName: z.optional(z.string()),
+    accTypeDefault: z
+      .enum(["CASHFLOW", "BALANCESHEET", "INCOMESTATEMENT"])
+      .optional(),
   }),
 });
 

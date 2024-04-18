@@ -2,6 +2,16 @@ import { eq } from "drizzle-orm";
 import db from "..";
 import accountTypes from "../schema/accountType.schema";
 
+const ACCTYPE_DEFAULT = {
+  CASHFLOW: "CASHFLOW",
+  BALANCESHEET: "BALANCESHEET",
+  INCOMESTATEMENT: "INCOMESTATEMENT",
+} as const;
+
+type ObjectTypes<T> = T[keyof T];
+
+type AccountTypeDefault = ObjectTypes<typeof ACCTYPE_DEFAULT>;
+
 export const getAllAccountTypes = async () => {
   const accountTypes = await db.query.accountTypes.findMany({
     with: {
@@ -18,11 +28,15 @@ export const getAccountTypeById = async (input: { accTypeId: string }) => {
   return accountType;
 };
 
-export const addAccountType = async (input: { accTypeName: string }) => {
+export const addAccountType = async (input: {
+  accTypeName: string;
+  accTypeDefault: AccountTypeDefault;
+}) => {
   const newAccountTypeId = `accTypeId ${crypto.randomUUID()}`;
   await db.insert(accountTypes).values({
     accTypeId: newAccountTypeId,
     accTypeName: input.accTypeName,
+    accTypeDefault: input.accTypeDefault,
   });
 
   const newAccountType = await getAccountTypeById({
@@ -35,6 +49,7 @@ export const editAccountType = async (input: {
   accTypeId: string;
   newData: {
     accTypeName?: string;
+    accTypeDefault?: AccountTypeDefault;
   };
 }) => {
   await db
