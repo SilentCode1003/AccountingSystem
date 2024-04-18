@@ -13,7 +13,6 @@ import {
   BookMinusIcon,
   BookPlusIcon,
   BookTextIcon,
-  ClipboardListIcon,
   HandCoinsIcon,
   HomeIcon,
   LogOutIcon,
@@ -264,18 +263,6 @@ function Header() {
               >
                 <ArchiveIcon />
                 Inventory
-              </Text>
-            </SheetClose>
-          </Link>
-          <Link to="/reports">
-            <SheetClose>
-              <Text
-                variant={'heading1'}
-                style={'underline'}
-                className="flex gap-4 items-center"
-              >
-                <ClipboardListIcon />
-                Reports
               </Text>
             </SheetClose>
           </Link>
