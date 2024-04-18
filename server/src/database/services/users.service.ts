@@ -24,13 +24,21 @@ export const getUserById = async (input: { userId: string }) => {
     where: (user) => eq(user.userId, input.userId),
   });
 
-  return userData;
+  return {
+    userUsername: userData?.userUsername,
+    userContactNumber: userData?.userContactNumber,
+    userProfilePic: userData?.userContactNumber,
+    userFullName: userData?.userFullName,
+  };
 };
 
 export const addUser = async (input: {
   userType: UserType;
   userUsername: string;
   userPassword: string;
+  userFullName: string;
+  userContactNumber: string;
+  userProfilePic: string;
 }) => {
   const newUserId = `userId ${crypto.randomUUID()}`;
 
@@ -53,6 +61,9 @@ export const editUser = async (input: {
     userType?: UserType;
     userUsername?: string;
     userPassword?: string;
+    userFullName?: string;
+    userContactNumber?: string;
+    userProfilePic?: string;
   };
 }) => {
   await db
