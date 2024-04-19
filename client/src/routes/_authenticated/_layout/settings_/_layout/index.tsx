@@ -4,33 +4,30 @@ import { Text } from '@/components/ui/text'
 import { createFileRoute } from '@tanstack/react-router'
 import { EyeIcon, EyeOffIcon, UploadIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRef, useState } from 'react'
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export const Route = createFileRoute(
   '/_authenticated/_layout/settings/_layout/',
 )({
   component: Settings,
+  pendingComponent: LoadingComponent,
 })
 
 function Settings() {
   const [toggleEdit, setToggleEdit] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [userData, setUserData] = useState<{
-    fullName: string
-    username: string
-    password?: string
-    contactNumber: string
-  }>({
-    fullName: '',
-    username: '',
-    password: '',
-    contactNumber: '',
-  })
 
   const queryClient = useQueryClient()
 
-  const user = useQuery({
+  const imageRef = useRef<HTMLInputElement>(null)
+
+  const user = useSuspenseQuery({
     queryKey: ['userData'],
     queryFn: async () => {
       const userId = queryClient.getQueryData<{
@@ -54,21 +51,75 @@ function Settings() {
           userUsername: string
           userFullName: string
           userContactNumber: string
-          userProfielPic: string
+          userProfilePic: string
         }
       }>
 
-      if (data) {
-        const userD = (await data).user
-        setUserData((da) => ({
-          ...da,
-          fullName: userD.userFullName,
-          username: userD.userUsername,
-          contactNumber: userD.userContactNumber,
-        }))
-      }
-
       return data
+    },
+  })
+
+  const [userData, setUserData] = useState<{
+    fullName: string
+    username: string
+    password?: string
+    profilePic: string | File
+    contactNumber: string
+  }>({
+    fullName: user.data.user.userFullName,
+    username: user.data.user.userUsername,
+    password: '',
+    profilePic: user.data.user.userProfilePic,
+    contactNumber: user.data.user.userContactNumber,
+  })
+
+  const createUser = useMutation({
+    mutationKey: ['createUser'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users`, {
+        method: 'PUT',
+        credentials: 'include',
+        body: payload,
+      })
+      const data = (await response.json()) as Promise<{
+        user: {
+          userUsername: string
+          userFullName: string
+          userContactNumber: string
+          userProfilePic: string
+        }
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['userData'],
+        (old: {
+          user: {
+            userUsername: string
+            userFullName: string
+            userContactNumber: string
+            userProfilePic: string
+          }
+        }) => {
+          return {
+            user: {
+              userUsername: data.user.userUsername,
+              userFullName: data.user.userFullName,
+              userContactNumber: data.user.userContactNumber,
+              userProfilePic: data.user.userProfilePic,
+            },
+          }
+        },
+      )
+      setToggleEdit(!toggleEdit)
+      setUserData({
+        fullName: data.user.userFullName,
+        username: data.user.userUsername,
+        password: '',
+        profilePic: data.user.userProfilePic,
+        contactNumber: data.user.userContactNumber,
+      })
     },
   })
 
@@ -88,17 +139,39 @@ function Settings() {
     )
       return
 
-    setToggleEdit(!toggleEdit)
-    setUserData({
-      fullName: '',
-      username: '',
-      password: '',
-      contactNumber: '',
-    })
+    const user = queryClient.getQueryData<{
+      isLogged: boolean
+      user: {
+        userId: string
+        userType: string
+      }
+    }>(['CurrentUser'])
+
+    const fd = new FormData()
+
+    fd.append('userId', user?.user.userId as string)
+    fd.append('userUsername', userData.username)
+    fd.append('userFullName', userData.fullName)
+    fd.append('userContactNumber', userData.contactNumber)
+    fd.append('userProfilePic', userData.profilePic as File)
+
+    createUser.mutate(fd)
   }
 
   const handleToggleEdit = () => {
     setToggleEdit(!toggleEdit)
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return
+
+    if (!e.target.files[0]) return
+
+    setUserData({ ...userData!!, ['profilePic']: e.target.files[0] })
+  }
+
+  const handleImageClick = () => {
+    imageRef?.current?.click()
   }
 
   return (
@@ -108,18 +181,32 @@ function Settings() {
           <div className="relative">
             <div className="rounded-full overflow-hidden w-40 md:w-64 lg:w-80 aspect-square">
               <img
-                src="https://github.com/nestortion.png"
+                src={
+                  typeof userData.profilePic === 'string'
+                    ? `${import.meta.env.VITE_SERVER_URL}/profilepic/users/${user.data.user.userProfilePic}`
+                    : URL.createObjectURL(userData.profilePic as File)
+                }
                 className="w-40 md:w-64 lg:w-80 aspect-square object-fill"
-                alt=""
+                alt="https://avatars.githubusercontent.com/u/81360395?v=4"
               />
             </div>
             <Button
-              className="absolute z-10 bottom-5 -right-5 flex gap-4 scale-50 md:-right-3 md:scale-75 lg:right-0 lg:scale-100"
-              variant="secondary"
+              onClick={handleImageClick}
+              className="absolute z-10 bottom-5 -right-5 flex gap-4 scale-50 md:-right-3 md:scale-75 lg:right-0 lg:scale-100 w-32 "
+              variant={'secondary'}
             >
-              <UploadIcon />
-              Upload
+              Upload <UploadIcon />
             </Button>
+
+            <Input
+              type="file"
+              className="hidden"
+              name=""
+              ref={imageRef}
+              id=""
+              accept="image/jpg, image/jpeg, image/png"
+              onChange={handleImageChange}
+            />
           </div>
           <div className="flex flex-col gap-4 h-full justify-between">
             <div className="flex gap-4 min-h-[38px]">
@@ -130,13 +217,13 @@ function Settings() {
                 Full Name:
               </Text>
               <Text className={cn(toggleEdit && 'hidden')} variant={'heading2'}>
-                Nestor Gerona
+                {user.data.user.userFullName}
               </Text>
               <Input
                 name="fullName"
                 onChange={handleUserDataChange}
                 className={cn(!toggleEdit && 'hidden')}
-                value={userData?.fullName}
+                value={userData.fullName}
               />
             </div>
             <div className="flex gap-4 min-h-[38px]">
@@ -147,7 +234,7 @@ function Settings() {
                 Username:
               </Text>
               <Text className={cn(toggleEdit && 'hidden')} variant={'heading2'}>
-                Nestor Gerona
+                {user.data.user.userUsername}
               </Text>
               <Input
                 name="username"
@@ -164,7 +251,7 @@ function Settings() {
                 Password:
               </Text>
               <Text className={cn(toggleEdit && 'hidden')} variant={'heading2'}>
-                Nestor Gerona
+                ********
               </Text>
               <div className={cn('relative', !toggleEdit && 'hidden')}>
                 <Input
@@ -197,7 +284,7 @@ function Settings() {
                 Contact #:
               </Text>
               <Text className={cn(toggleEdit && 'hidden')} variant={'heading2'}>
-                Nestor Gerona
+                {user.data.user.userContactNumber}
               </Text>
               <Input
                 name="contactNumber"
@@ -231,6 +318,14 @@ function Settings() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function LoadingComponent() {
+  return (
+    <div>
+      <Skeleton className="" />
     </div>
   )
 }
