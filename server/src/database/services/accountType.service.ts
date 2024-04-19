@@ -24,6 +24,9 @@ export const getAllAccountTypes = async () => {
 export const getAccountTypeById = async (input: { accTypeId: string }) => {
   const accountType = await db.query.accountTypes.findFirst({
     where: (accType) => eq(accType.accTypeId, input.accTypeId),
+    with: {
+      accounts: true,
+    },
   });
   return accountType;
 };

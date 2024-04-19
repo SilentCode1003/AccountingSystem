@@ -70,7 +70,9 @@ export const deleteAccountType = async (req: Request, res: Response) => {
     await db
       .delete(accountTypes)
       .where(eq(accountTypes.accTypeId, input.data.accTypeId));
-    return res.status(200).send({ success: true });
+    return res
+      .status(200)
+      .send({ success: true, deletedAccountTypeId: input.data.accTypeId });
   } catch (error) {
     return res.status(500).send({
       error: "Server error",
