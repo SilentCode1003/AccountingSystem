@@ -8,22 +8,29 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import MonthPicker from '@/components/ui/month-picker'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Text } from '@/components/ui/text'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { FrownIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_authenticated/_layout/balance_sheet/')({
   component: BalanceSheet,
+  pendingComponent: () => (
+    <div className="p-4 min-h-[85vh] flex gap-4 flex-col items-center">
+      <div className="flex flex-col gap-4 items-center w-full md:w-[70vw] justify-between">
+        <LoadingComponent />
+        <LoadingComponent />
+      </div>
+    </div>
+  ),
 })
 
 function BalanceSheet() {
   const [date, setDate] = useState<Date>(new Date())
 
-  const [accTypes, setAccTypes] = useState<Array<string>>([])
-
-  const accountTypes = useQuery({
+  const accountTypes = useSuspenseQuery({
     queryKey: ['accountTypes'],
     queryFn: async () => {
       const response = await fetch(
@@ -44,17 +51,13 @@ function BalanceSheet() {
     },
   })
 
-  useEffect(() => {
-    if (accountTypes.isSuccess) {
-      setAccTypes(
-        accountTypes.data.accountTypes
-          .filter((accType) => accType.accTypeDefault === 'BALANCESHEET')
-          .map((accType) => accType.accTypeId),
-      )
-    }
-  }, [accountTypes.data])
+  const [accTypes, setAccTypes] = useState<Array<string>>(
+    accountTypes.data.accountTypes
+      .filter((accType) => accType.accTypeDefault === 'BALANCESHEET')
+      .map((accType) => accType.accTypeId),
+  )
 
-  const balanceSheet = useQuery({
+  const balanceSheet = useSuspenseQuery({
     queryKey: ['balanceSheet', { month: date.getMonth() }, { accTypes }],
 
     queryFn: async () => {
@@ -132,9 +135,7 @@ function BalanceSheet() {
         </div>
       </div>
       <div className="w-full md:w-[70vw]">
-        {balanceSheet.isLoading ? (
-          <Text variant={'heading1bold'}>LOADING</Text>
-        ) : balanceSheet.isSuccess && balanceSheet.data.length > 0 ? (
+        {balanceSheet.isSuccess && balanceSheet.data.length > 0 ? (
           balanceSheet.data.map((balanceSheet) => (
             <div key={balanceSheet.accTypeId}>
               <div className="flex flex-col gap-4 items-center md:items-start">
@@ -156,6 +157,15 @@ function BalanceSheet() {
           </Text>
         )}
       </div>
+    </div>
+  )
+}
+
+function LoadingComponent() {
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <Skeleton className="h-[1.25rem] w-[150px] rounded-md" />
+      <Skeleton className="h-[218px] w-full rounded-md" />
     </div>
   )
 }
