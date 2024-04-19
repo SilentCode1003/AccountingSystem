@@ -27,7 +27,6 @@ function AccountsComponent() {
         accounts: Array<Accounts>
       }>
 
-      console.log(data)
       return data
     },
   })
