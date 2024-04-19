@@ -1,4 +1,5 @@
 import z from "zod";
+import { type UploadedFile } from "express-fileupload";
 
 //validator for POST /users inputs
 export const createValidator = z.object({
@@ -7,7 +8,23 @@ export const createValidator = z.object({
   userPassword: z.string(),
   userFullName: z.string(),
   userContactNumber: z.string(),
-  userProfilePic: z.string(),
+  userProfilePic: z
+    .custom<UploadedFile>()
+    .refine(
+      (file) => {
+        if (
+          file.mimetype === "image/png" ||
+          file.mimetype === "image/jpeg" ||
+          file.mimetype === "image/jpg"
+        )
+          return true;
+        return false;
+      },
+      {
+        message: "Only PNG files are allowed",
+      }
+    )
+    .transform((file) => file.name),
 });
 
 //validator for GET /users single user input
@@ -45,12 +62,28 @@ export const updateValidator = z.object({
     }
   }),
   newData: z.object({
-    userType: z.enum(["FINANCE", "HIGHER_DEPARTMENT"]),
+    userType: z.enum(["FINANCE", "HIGHER_DEPARTMENT"]).optional(),
     userUsername: z.string().optional(),
     userPassword: z.string().optional(),
     userFullName: z.string().optional(),
     userContactNumber: z.string().optional(),
-    userProfilePic: z.string().optional(),
+    userProfilePic: z
+      .custom<UploadedFile>()
+      .refine(
+        (file) => {
+          if (
+            file.mimetype === "image/png" ||
+            file.mimetype === "image/jpeg" ||
+            file.mimetype === "image/jpg"
+          )
+            return true;
+          return false;
+        },
+        {
+          message: "Only PNG files are allowed",
+        }
+      )
+      .transform((file) => file.name),
   }),
 });
 

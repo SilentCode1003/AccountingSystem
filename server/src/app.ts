@@ -18,6 +18,7 @@ import { getTransactionPartners } from "./controller/others.controllers";
 import accountTypeRouter from "./routes/accountType.routes";
 import authRouter from "./routes/auth.routes";
 import othersRouter from "./routes/others.routes";
+import fileUpload from "express-fileupload";
 
 declare module "express-session" {
   interface SessionData {
@@ -49,12 +50,15 @@ app.use(
         : undefined,
   })
 );
+app.use(fileUpload());
 
 app.use(express.json());
 
 app.use("/auth", authRouter);
 
 app.use(authMiddleware);
+
+app.use(express.static("files"));
 
 app.get("/login", currentUser);
 

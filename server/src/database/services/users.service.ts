@@ -27,7 +27,7 @@ export const getUserById = async (input: { userId: string }) => {
   return {
     userUsername: userData?.userUsername,
     userContactNumber: userData?.userContactNumber,
-    userProfilePic: userData?.userContactNumber,
+    userProfilePic: userData?.userProfilePic,
     userFullName: userData?.userFullName,
   };
 };
