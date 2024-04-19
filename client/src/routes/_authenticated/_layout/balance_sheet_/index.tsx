@@ -12,7 +12,7 @@ import { Text } from '@/components/ui/text'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { FrownIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/_authenticated/_layout/balance_sheet/')({
   component: BalanceSheet,
@@ -40,20 +40,22 @@ function BalanceSheet() {
         }>
       }>
 
-      if (data) {
-        setAccTypes(
-          (await data).accountTypes
-            .filter((accType) => accType.accTypeDefault === 'BALANCESHEET')
-            .map((accType) => accType.accTypeId),
-        )
-      }
-
       return data
     },
   })
 
+  useEffect(() => {
+    if (accountTypes.isSuccess) {
+      setAccTypes(
+        accountTypes.data.accountTypes
+          .filter((accType) => accType.accTypeDefault === 'BALANCESHEET')
+          .map((accType) => accType.accTypeId),
+      )
+    }
+  }, [accountTypes.data])
+
   const balanceSheet = useQuery({
-    queryKey: ['balanceSheet', { month: date }, { accTypes }],
+    queryKey: ['balanceSheet', { month: date.getMonth() }, { accTypes }],
 
     queryFn: async () => {
       let params = new URLSearchParams({
