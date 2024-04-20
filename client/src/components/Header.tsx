@@ -4,8 +4,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Text } from './ui/text'
-import { RxHamburgerMenu } from 'react-icons/rx'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
   ArchiveIcon,
@@ -21,6 +20,14 @@ import {
   SettingsIcon,
   UsersRoundIcon,
 } from 'lucide-react'
+import { RxHamburgerMenu } from 'react-icons/rx'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,21 +36,55 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { useTheme } from './ui/theme.provider'
+import { Skeleton } from './ui/skeleton'
 import { Switch } from './ui/switch'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from './ui/accordion'
+import { Text } from './ui/text'
+import { useTheme } from './ui/theme.provider'
+
+function LoadingComponent() {
+  return (
+    <div>
+      <Skeleton className="" />
+    </div>
+  )
+}
 
 function Header() {
   const { setTheme, theme } = useTheme()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  const user = useQuery({
+    queryKey: ['userData'],
+    queryFn: async () => {
+      const userId = queryClient.getQueryData<{
+        isLogged: boolean
+        user: {
+          userId: string
+          userType: string
+        }
+      }>(['CurrentUser'])
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/users/?` +
+          new URLSearchParams({ userId: userId?.user.userId as string }),
+        {
+          credentials: 'include',
+        },
+      )
+
+      const data = (await response.json()) as Promise<{
+        user: {
+          userUsername: string
+          userFullName: string
+          userContactNumber: string
+          userProfilePic: string
+        }
+      }>
+
+      return data
+    },
+  })
 
   const logout = useMutation({
     mutationKey: ['logout'],
@@ -62,6 +103,9 @@ function Header() {
   const handleLogout = () => {
     logout.mutate()
   }
+
+  if (user.isLoading) return <LoadingComponent />
+
   return (
     <header className="h-[10vh] shadow-md bg-background max-w-screen  z-[10] p-4 top-0 sticky ">
       <Sheet>
@@ -86,7 +130,9 @@ function Header() {
                 <DropdownMenuTrigger asChild>
                   <div className="hover:cursor-pointer">
                     <Avatar>
-                      <AvatarImage src="https://github.com/nestortion.png" />
+                      <AvatarImage
+                        src={`${import.meta.env.VITE_SERVER_URL}/profilepic/users/${user.data!.user.userProfilePic}`}
+                      />
                       <AvatarFallback>NG</AvatarFallback>
                     </Avatar>
                   </div>
@@ -95,10 +141,12 @@ function Header() {
                   <DropdownMenuLabel>
                     <div className="flex gap-4 items-center">
                       <Avatar>
-                        <AvatarImage src="https://github.com/nestortion.png" />
+                        <AvatarImage
+                          src={`${import.meta.env.VITE_SERVER_URL}/profilepic/users/${user.data!.user.userProfilePic}`}
+                        />
                         <AvatarFallback>NG</AvatarFallback>
                       </Avatar>
-                      <div>Nestor P. Gerona</div>
+                      <div>{user.data!.user.userFullName}</div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />

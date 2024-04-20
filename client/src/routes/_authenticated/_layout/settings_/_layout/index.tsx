@@ -63,11 +63,13 @@ function Settings() {
     fullName: string
     username: string
     password?: string
+    profileLink: string
     profilePic: string | File
     contactNumber: string
   }>({
     fullName: user.data.user.userFullName,
     username: user.data.user.userUsername,
+    profileLink: '',
     password: '',
     profilePic: user.data.user.userProfilePic,
     contactNumber: user.data.user.userContactNumber,
@@ -92,30 +94,21 @@ function Settings() {
       return data
     },
     onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['userData'],
-        (old: {
+      await queryClient.setQueryData(['userData'], () => {
+        return {
           user: {
-            userUsername: string
-            userFullName: string
-            userContactNumber: string
-            userProfilePic: string
-          }
-        }) => {
-          return {
-            user: {
-              userUsername: data.user.userUsername,
-              userFullName: data.user.userFullName,
-              userContactNumber: data.user.userContactNumber,
-              userProfilePic: data.user.userProfilePic,
-            },
-          }
-        },
-      )
+            userUsername: data.user.userUsername,
+            userFullName: data.user.userFullName,
+            userContactNumber: data.user.userContactNumber,
+            userProfilePic: data.user.userProfilePic,
+          },
+        }
+      })
       setToggleEdit(!toggleEdit)
       setUserData({
         fullName: data.user.userFullName,
         username: data.user.userUsername,
+        profileLink: '',
         password: '',
         profilePic: data.user.userProfilePic,
         contactNumber: data.user.userContactNumber,
@@ -132,7 +125,6 @@ function Settings() {
 
   const handleSubmit = () => {
     if (
-      userData.password === '' ||
       userData.fullName === '' ||
       userData.username === '' ||
       userData.contactNumber === ''
@@ -149,6 +141,8 @@ function Settings() {
 
     const fd = new FormData()
 
+    if (userData.password !== '')
+      fd.append('userPassword', userData.password as string)
     fd.append('userId', user?.user.userId as string)
     fd.append('userUsername', userData.username)
     fd.append('userFullName', userData.fullName)
@@ -167,7 +161,11 @@ function Settings() {
 
     if (!e.target.files[0]) return
 
-    setUserData({ ...userData!!, ['profilePic']: e.target.files[0] })
+    setUserData({
+      ...userData!!,
+      ['profilePic']: e.target.files[0],
+      ['profileLink']: URL.createObjectURL(e.target.files[0]),
+    })
   }
 
   const handleImageClick = () => {
@@ -184,7 +182,7 @@ function Settings() {
                 src={
                   typeof userData.profilePic === 'string'
                     ? `${import.meta.env.VITE_SERVER_URL}/profilepic/users/${user.data.user.userProfilePic}`
-                    : URL.createObjectURL(userData.profilePic as File)
+                    : userData.profileLink
                 }
                 className="w-40 md:w-64 lg:w-80 aspect-square object-fill"
                 alt="https://avatars.githubusercontent.com/u/81360395?v=4"
