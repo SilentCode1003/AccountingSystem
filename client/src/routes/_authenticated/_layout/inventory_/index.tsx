@@ -1,4 +1,5 @@
 import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
 import { inventoryColumns } from '@/components/table-columns/inventory.columns'
 import {
   AlertDialog,
@@ -24,6 +25,7 @@ import {
 } from '@/components/ui/select'
 import { useCreateInventory } from '@/hooks/mutations'
 import { useInventories } from '@/hooks/queries'
+import { inventoriesOptions } from '@/hooks/queries/options'
 import { createInventorySchema } from '@/validators/inventory.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -37,8 +39,22 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated/_layout/inventory/')({
+  loader: async ({ context }) => {
+    const inventories =
+      await context.queryClient.ensureQueryData(inventoriesOptions())
+    return { inventories }
+  },
   component: Inventory,
+  pendingComponent: LoadingComponent,
 })
+
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+    </div>
+  )
+}
 
 function CrudComponents() {
   const createInventory = useCreateInventory()

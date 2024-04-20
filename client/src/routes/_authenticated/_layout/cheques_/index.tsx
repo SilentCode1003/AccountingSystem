@@ -1,4 +1,5 @@
 import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
 import {
   chequeColumns,
   type Cheques,
@@ -31,6 +32,7 @@ import {
 import { Text } from '@/components/ui/text'
 import { useCreateCheque } from '@/hooks/mutations'
 import { useAccountTypes, useCheques } from '@/hooks/queries'
+import { chequesOptions } from '@/hooks/queries/options'
 import { createChequeSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SelectGroup } from '@radix-ui/react-select'
@@ -41,8 +43,21 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated/_layout/cheques/')({
+  loader: async ({ context }) => {
+    const cheques = await context.queryClient.ensureQueryData(chequesOptions())
+    return { cheques }
+  },
   component: Cheques,
+  pendingComponent: LoadingComponent,
 })
+
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+    </div>
+  )
+}
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)

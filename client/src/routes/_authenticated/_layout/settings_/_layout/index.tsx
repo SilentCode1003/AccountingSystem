@@ -138,7 +138,7 @@ function Settings() {
           <div className="flex flex-col gap-4 h-full justify-between">
             <div className="flex gap-4 min-h-[38px]">
               <Text
-                className="w-[150px] min-w-[150px]"
+                className="w-[200px] min-w-[150px]"
                 variant={'heading2bold'}
               >
                 Full Name:
@@ -155,7 +155,7 @@ function Settings() {
             </div>
             <div className="flex gap-4 min-h-[38px]">
               <Text
-                className="w-[150px] min-w-[150px]"
+                className="w-[200px] min-w-[150px]"
                 variant={'heading2bold'}
               >
                 Username:
@@ -172,7 +172,7 @@ function Settings() {
             </div>
             <div className="flex gap-4 min-h-[38px]">
               <Text
-                className="w-[150px] min-w-[150px]"
+                className="w-[200px] min-w-[150px]"
                 variant={'heading2bold'}
               >
                 Password:
@@ -205,7 +205,7 @@ function Settings() {
             </div>
             <div className="flex gap-4 min-h-[38px]">
               <Text
-                className="w-[150px] min-w-[150px]"
+                className="w-[200px] min-w-[150px]"
                 variant={'heading2bold'}
               >
                 Contact #:
@@ -251,8 +251,33 @@ function Settings() {
 
 function LoadingComponent() {
   return (
-    <div>
-      <Skeleton className=" w-80 h-80" />
+    <div className="flex justify-center lg:justify-start w-full ">
+      <div className="flex flex-col items-center gap-40 lg:gap-8 lg:items-start lg:flex-row w-fit">
+        <div className="rounded-full overflow-hidden min-w-40 md:min-w-64 lg:min-w-80 aspect-square">
+          <Skeleton className="min-w-40 md:min-w-64 lg:min-w-80 aspect-square object-fill" />
+        </div>
+        <div className="flex flex-col gap-4 h-80 justify-between">
+          <div className="flex gap-4 min-h-[38px]">
+            <Skeleton className="w-[200px] min-w-[150px]" />
+            <Skeleton className="w-[200px] min-w-[150px]" />
+          </div>
+          <div className="flex gap-4 min-h-[38px]">
+            <Skeleton className="w-[200px] min-w-[150px]" />
+            <Skeleton className="w-[200px] min-w-[150px]" />
+          </div>
+          <div className="flex gap-4 min-h-[38px]">
+            <Skeleton className="w-[200px] min-w-[150px]" />
+            <Skeleton className="w-[200px] min-w-[150px]" />
+          </div>
+          <div className="flex gap-4 min-h-[38px]">
+            <Skeleton className="w-[200px] min-w-[150px]" />
+            <Skeleton className="w-[200px] min-w-[150px]" />
+          </div>
+          <div className="flex gap-4 min-h-[38px]">
+            <Skeleton className="w-full" />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

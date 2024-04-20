@@ -1,4 +1,5 @@
 import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
 import { accountTypeColumn } from '@/components/table-columns/accountTypes.column'
 import {
   AlertDialog,
@@ -26,6 +27,7 @@ import {
 import { Text } from '@/components/ui/text'
 import { useCreateAccountType } from '@/hooks/mutations'
 import { useAccountTypes } from '@/hooks/queries'
+import { accountTypesOptions } from '@/hooks/queries/options'
 import { createAccountTypeSchema } from '@/validators/accountTypes.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
@@ -37,8 +39,23 @@ import { z } from 'zod'
 export const Route = createFileRoute(
   '/_authenticated/_layout/settings/_layout/accountTypes',
 )({
+  loader: async ({ context }) => {
+    const accountTypes = await context.queryClient.ensureQueryData(
+      accountTypesOptions(),
+    )
+    return { accountTypes }
+  },
   component: AccountTypesComponent,
+  pendingComponent: LoadingComponent,
 })
+
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+    </div>
+  )
+}
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)

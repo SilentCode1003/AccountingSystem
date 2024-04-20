@@ -1,4 +1,5 @@
 import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
 import { transactionColumns } from '@/components/table-columns/transactions.columns'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -20,6 +21,7 @@ import {
   SelectSeparator,
   SelectTrigger,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateTransaction } from '@/hooks/mutations'
 import {
@@ -27,6 +29,10 @@ import {
   useTransactionPartners,
   useTransactions,
 } from '@/hooks/queries'
+import {
+  transactionPartnersOptions,
+  transactionsOptions,
+} from '@/hooks/queries/options'
 import { createTransactionSchema } from '@/validators/transactions.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SelectGroup, SelectValue } from '@radix-ui/react-select'
@@ -57,8 +63,34 @@ const toWords = new ToWords({
 })
 
 export const Route = createFileRoute('/_authenticated/_layout/transactions/')({
+  loader: async ({ context }) => {
+    const transactions = await context.queryClient.ensureQueryData(
+      transactionsOptions(),
+    )
+
+    const transactionPartners = await context.queryClient.ensureQueryData(
+      transactionPartnersOptions(),
+    )
+    return {
+      transactions,
+      transactionPartners,
+    }
+  },
   component: TransactionsComponent,
+  pendingComponent: LoadingComponent,
 })
+
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+      <div className="flex gap-4 items-center w-full md:w-[70vw] justify-between">
+        <Skeleton className="flex-1 h-80" />
+        <Skeleton className="flex-1 h-80" />
+      </div>
+    </div>
+  )
+}
 
 function TransactionsComponent() {
   const transactions = useTransactions()

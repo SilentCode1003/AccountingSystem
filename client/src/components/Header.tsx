@@ -44,8 +44,14 @@ import { useTheme } from './ui/theme.provider'
 
 function LoadingComponent() {
   return (
-    <div>
-      <Skeleton className="" />
+    <div className="h-[10vh] shadow-md bg-background max-w-screen  z-[10] p-4 top-0 sticky flex justify-between">
+      <div className="flex gap-4">
+        <Skeleton className="w-10 h-10" />
+        <Skeleton className="w-20 h-8" />
+      </div>
+      <div>
+        <Skeleton className="aspect-square w-10 rounded-full" />
+      </div>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
 import {
   employeeColumns,
   type Employees,
@@ -23,6 +24,7 @@ import { Input } from '@/components/ui/input'
 import { Text } from '@/components/ui/text'
 import { useCreateEmployee } from '@/hooks/mutations'
 import { useEmployees } from '@/hooks/queries'
+import { employeesOptions } from '@/hooks/queries/options'
 import { createEmployeeSchema } from '@/validators/employees.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute } from '@tanstack/react-router'
@@ -32,9 +34,22 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated/_layout/employees/')({
+  loader: async ({ context }) => {
+    const employees =
+      await context.queryClient.ensureQueryData(employeesOptions())
+    return { employees }
+  },
   component: Employees,
+  pendingComponent: LoadingComponent,
 })
 
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+    </div>
+  )
+}
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
   const createEmployee = useCreateEmployee({ setOpen })
