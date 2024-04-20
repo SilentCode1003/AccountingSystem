@@ -45,7 +45,7 @@ if (!rootElement.innerHTML) {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <AuthApp />
-          <ReactQueryDevtools />
+          {import.meta.env.VITE_NODE_ENV !== 'PROD' && <ReactQueryDevtools />}
         </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>,

@@ -29,7 +29,7 @@ function RootComponent() {
   return (
     <>
       <Outlet />
-      <TanStackRouterDevtools />
+      {import.meta.env.VITE_NODE_ENV !== 'PROD' && <TanStackRouterDevtools />}
     </>
   )
 }
