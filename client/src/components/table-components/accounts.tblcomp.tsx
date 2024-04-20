@@ -1,5 +1,13 @@
+import { useToggleIsActiveAccount, useUpdateAccount } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
+import { updateAccountSchema } from '@/validators/accounts.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontalIcon, ShieldCheckIcon, ShieldXIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { Accounts } from '../table-columns/accounts.columns'
+import { Button } from '../ui/button'
 import {
   Dialog,
   DialogClose,
@@ -16,9 +24,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-import { Button } from '../ui/button'
-import { MoreHorizontalIcon, ShieldCheckIcon, ShieldXIcon } from 'lucide-react'
-import { Text } from '../ui/text'
 import {
   Form,
   FormControl,
@@ -28,11 +33,6 @@ import {
   FormMessage,
 } from '../ui/Form'
 import { Input } from '../ui/input'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { updateAccountSchema } from '@/validators/accounts.validator'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { z } from 'zod'
 import {
   Select,
   SelectContent,
@@ -41,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { AccountTypes } from '../table-columns/accountTypes.column'
+import { Text } from '../ui/text'
 
 export const AccountAmountColumn = ({
   row,
@@ -56,24 +56,7 @@ export const AccountAmountColumn = ({
 export const AccountIsActiveColumn = ({
   row,
 }: CellContext<Accounts, unknown>) => {
-  const queryClient = useQueryClient()
-
-  const accountTypes = useQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        accountTypes: Array<AccountTypes>
-      }>
-      return data
-    },
-  })
-
+  const accountTypes = useAccountTypes()
   const form = useForm({
     defaultValues: {
       accId: row.original.accId,
@@ -88,76 +71,9 @@ export const AccountIsActiveColumn = ({
     resolver: zodResolver(updateAccountSchema),
   })
 
-  const updateAccount = useMutation({
-    mutationKey: ['updateAccount'],
-    mutationFn: async (payload: z.infer<typeof updateAccountSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accounts`,
-        {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        },
-      )
+  const updateAccount = useUpdateAccount()
 
-      const data = (await response.json()) as Promise<{
-        account: Accounts
-      }>
-
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['accounts'],
-        (old: { accounts: Array<Accounts> }) => {
-          return {
-            accounts: old.accounts.map((account) => {
-              if (account.accId === data.account.accId) {
-                return data.account
-              }
-              return account
-            }),
-          }
-        },
-      )
-    },
-  })
-
-  const toggleAccountIsActive = useMutation({
-    mutationKey: ['toggleAccountIsActive'],
-    mutationFn: async (
-      payload: Pick<z.infer<typeof updateAccountSchema>, 'accId'>,
-    ) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accounts/${payload.accId}`,
-        {
-          method: 'PUT',
-          credentials: 'include',
-        },
-      )
-
-      const data = (await response.json()) as Promise<{ account: Accounts }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['accounts'],
-        (old: { accounts: Array<Accounts> }) => {
-          return {
-            accounts: old.accounts.map((account) => {
-              if (account.accId === data.account.accId) {
-                return data.account
-              }
-              return account
-            }),
-          }
-        },
-      )
-    },
-  })
+  const toggleAccountIsActive = useToggleIsActiveAccount()
 
   const handleSubmit = (values: z.infer<typeof updateAccountSchema>) => {
     updateAccount.mutate(values)

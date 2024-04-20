@@ -1,15 +1,15 @@
+import { useUpdateCheque } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
+import { chequeUpdateSchema } from '@/validators/cheques.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { CellContext } from '@tanstack/react-table'
-import { Cheques } from '../table-columns/cheques.columns'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { Button } from '../ui/button'
 import { MoreHorizontal, MoreHorizontalIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Cheques } from '../table-columns/cheques.columns'
+import { Button } from '../ui/button'
+import DatePicker from '../ui/DatePicker'
 import {
   Dialog,
   DialogClose,
@@ -18,7 +18,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog'
-import { Text } from '../ui/text'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -27,13 +34,7 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/Form'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { chequeUpdateSchema } from '@/validators/cheques.validator'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Input } from '../ui/input'
-import DatePicker from '../ui/DatePicker'
 import {
   Select,
   SelectContent,
@@ -42,7 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { useState } from 'react'
+import { Text } from '../ui/text'
 
 export const IssueDateColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return new Date(row.original.chqIssueDate).toLocaleDateString()
@@ -131,24 +132,7 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
 
 export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const accountTypes = useQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const accountTypeData = response.json() as Promise<{
-        accountTypes: Array<{
-          accTypeId: string
-          accTypeName: string
-        }>
-      }>
-      return accountTypeData
-    },
-  })
+  const accountTypes = useAccountTypes()
   const form = useForm<z.infer<typeof chequeUpdateSchema>>({
     defaultValues: {
       chqId: row.original.chqId,
@@ -163,49 +147,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
     resolver: zodResolver(chequeUpdateSchema),
   })
 
-  const queryClient = useQueryClient()
-
-  const updateCheque = useMutation({
-    mutationKey: ['updateCheque'],
-    mutationFn: async (
-      payload: z.infer<typeof chequeUpdateSchema> & { chqAccId: string },
-    ) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/cheques`,
-        {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        cheque: Cheques
-      }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['Cheques'],
-        (old: { cheques: Array<Cheques> }) => {
-          const newCheques = old.cheques.map((cheque) => {
-            if (cheque.chqId === row.original.chqId) {
-              return data.cheque
-            }
-            return cheque
-          })
-          return { cheques: newCheques }
-        },
-      )
-      setIsOpen(false)
-    },
-
-    onError: (error) => {
-      console.log(error)
-    },
-  })
+  const updateCheque = useUpdateCheque({ cell: { row }, setIsOpen })
 
   const handleSubmit = (values: z.infer<typeof chequeUpdateSchema>) => {
     updateCheque.mutate({ ...values, chqAccId: row.original.account.accId })

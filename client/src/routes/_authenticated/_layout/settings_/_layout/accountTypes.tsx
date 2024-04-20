@@ -1,8 +1,5 @@
 import DataTable from '@/components/DataTable'
-import {
-  accountTypeColumn,
-  AccountTypes,
-} from '@/components/table-columns/accountTypes.column'
+import { accountTypeColumn } from '@/components/table-columns/accountTypes.column'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -27,9 +24,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
+import { useCreateAccountType } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
 import { createAccountTypeSchema } from '@/validators/accountTypes.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { ListPlusIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -44,36 +42,8 @@ export const Route = createFileRoute(
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
-  const queryClient = useQueryClient()
 
-  const createAccountType = useMutation({
-    mutationFn: async (payload: z.infer<typeof createAccountTypeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        accountType: AccountTypes
-      }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['accountTypes'],
-        (old: { accountTypes: Array<AccountTypes> }) => {
-          return { accountTypes: [...old.accountTypes, data.accountType] }
-        },
-      )
-      setOpen(false)
-    },
-  })
+  const createAccountType = useCreateAccountType({ setOpen })
 
   const form = useForm<z.infer<typeof createAccountTypeSchema>>({
     defaultValues: {
@@ -178,22 +148,7 @@ const CrudComponents = () => {
 }
 
 function AccountTypesComponent() {
-  const accountTypes = useQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        accountTypes: Array<AccountTypes>
-      }>
-
-      return data
-    },
-  })
+  const accountTypes = useAccountTypes()
 
   return (
     <div>

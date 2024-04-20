@@ -1,5 +1,4 @@
 import DataTable from '@/components/DataTable'
-import { Employees } from '@/components/table-columns/employees.columns'
 import {
   payrollColumns,
   type Payrolls,
@@ -29,9 +28,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
+import { useCreatePayroll } from '@/hooks/mutations'
+import { useEmployees, usePayrolls } from '@/hooks/queries'
 import { createPayrollSchema } from '@/validators/payrolls.validators'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { HandCoinsIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -44,44 +44,8 @@ export const Route = createFileRoute('/_authenticated/_layout/payrolls/')({
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
-  const queryClient = useQueryClient()
-  const employees = useQuery({
-    queryKey: ['Employees'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/employees`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        employees: Array<Employees>
-      }>
-
-      return data
-    },
-  })
-  const createPayroll = useMutation({
-    mutationFn: async (payload: z.infer<typeof createPayrollSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/payrolls`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = await response.json()
-      return data
-    },
-    onSuccess: async () => {
-      setOpen(false)
-      await queryClient.refetchQueries({ queryKey: ['Payrolls'] })
-    },
-  })
+  const employees = useEmployees()
+  const createPayroll = useCreatePayroll({ setOpen })
 
   const form = useForm<z.infer<typeof createPayrollSchema>>({
     defaultValues: {
@@ -224,21 +188,7 @@ const CrudComponents = () => {
 }
 
 function Payrolls() {
-  const payrolls = useQuery({
-    queryKey: ['Payrolls'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/payrolls`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        payrolls: Array<Payrolls>
-      }>
-      return data
-    },
-  })
+  const payrolls = usePayrolls()
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       {payrolls.isSuccess && (

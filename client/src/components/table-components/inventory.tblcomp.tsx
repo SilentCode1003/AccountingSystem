@@ -1,3 +1,13 @@
+import { useUpdateInventory } from '@/hooks/mutations'
+import { cn } from '@/lib/utils'
+import { updateFormSchema } from '@/validators/inventory.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontalIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Inventories } from '../table-columns/inventory.columns'
+import { Button } from '../ui/button'
 import {
   Dialog,
   DialogClose,
@@ -5,6 +15,14 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '../ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -14,9 +32,6 @@ import {
   FormMessage,
 } from '../ui/Form'
 import { Input } from '../ui/input'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Select,
   SelectContent,
@@ -24,21 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { updateFormSchema } from '@/validators/inventory.validator'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { cn } from '@/lib/utils'
-import { Inventories } from '../table-columns/inventory.columns'
-import { Button } from '../ui/button'
-import { MoreHorizontalIcon } from 'lucide-react'
-import { CellContext } from '@tanstack/react-table'
 
 export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
   const form = useForm<z.infer<typeof updateFormSchema>>({
@@ -53,29 +53,7 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
     resolver: zodResolver(updateFormSchema),
   })
 
-  const queryClient = useQueryClient()
-
-  const updateInventory = useMutation({
-    mutationKey: ['updateInventory'],
-    mutationFn: (payload: z.infer<typeof updateFormSchema>) => {
-      return fetch(`${import.meta.env.VITE_SERVER_URL}/inventory`, {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          return data
-        })
-    },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['Inventories'] })
-    },
-  })
-
+  const updateInventory = useUpdateInventory()
   const handleSubmit = (values: z.infer<typeof updateFormSchema>) => {
     console.log('test')
     updateInventory.mutate(values)

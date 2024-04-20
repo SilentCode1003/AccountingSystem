@@ -1,17 +1,18 @@
 import { CellContext } from '@tanstack/react-table'
 import { Payrolls } from '../table-columns/payrolls.columns'
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { Button } from '../ui/button'
+import { useUpdatePayroll } from '@/hooks/mutations'
+import { updatePayrollSchema } from '@/validators/payrolls.validators'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { EyeOff, MoreHorizontal, MoreHorizontalIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Employees } from '../table-columns/employees.columns'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Button } from '../ui/button'
+import DatePicker from '../ui/DatePicker'
 import {
   Dialog,
   DialogClose,
@@ -21,7 +22,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog'
-import { Text } from '../ui/text'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -38,14 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import DatePicker from '../ui/DatePicker'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { updatePayrollSchema } from '@/validators/payrolls.validators'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Employees } from '../table-columns/employees.columns'
+import { Text } from '../ui/text'
 
 export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   return (
@@ -210,48 +211,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
     resolver: zodResolver(updatePayrollSchema),
   })
 
-  const queryClient = useQueryClient()
-
-  const updateCheque = useMutation({
-    mutationKey: ['updateCheque'],
-    mutationFn: async (payload: z.infer<typeof updatePayrollSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/payrolls`,
-        {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        payroll: Payrolls
-      }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['Payrolls'],
-        (old: { payrolls: Array<Payrolls> }) => {
-          const newPayrolls = old.payrolls.map((payroll) => {
-            if (payroll.prId === row.original.prId) {
-              return data.payroll
-            }
-            return payroll
-          })
-          return { payrolls: newPayrolls }
-        },
-      )
-      setIsOpen(false)
-    },
-
-    onError: (error) => {
-      console.log(error)
-    },
-  })
-
+  const updateCheque = useUpdatePayroll({ cell: { row }, setIsOpen })
   const handleSubmit = (values: z.infer<typeof updatePayrollSchema>) => {
     updateCheque.mutate(values)
   }

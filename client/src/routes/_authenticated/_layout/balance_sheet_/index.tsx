@@ -10,7 +10,10 @@ import {
 import MonthPicker from '@/components/ui/month-picker'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Text } from '@/components/ui/text'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useAccountTypesSuspense,
+  useBalanceSheetSuspense,
+} from '@/hooks/queries'
 import { createFileRoute } from '@tanstack/react-router'
 import { FrownIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -30,26 +33,7 @@ export const Route = createFileRoute('/_authenticated/_layout/balance_sheet/')({
 function BalanceSheet() {
   const [date, setDate] = useState<Date>(new Date())
 
-  const accountTypes = useSuspenseQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        accountTypes: Array<{
-          accTypeId: string
-          accTypeName: string
-          accTypeDefault: string
-        }>
-      }>
-
-      return data
-    },
-  })
+  const accountTypes = useAccountTypesSuspense()
 
   const [accTypes, setAccTypes] = useState<Array<string>>(
     accountTypes.data.accountTypes
@@ -57,39 +41,7 @@ function BalanceSheet() {
       .map((accType) => accType.accTypeId),
   )
 
-  const balanceSheet = useSuspenseQuery({
-    queryKey: ['balanceSheet', { month: date.getMonth() }, { accTypes }],
-
-    queryFn: async () => {
-      let params = new URLSearchParams({
-        month: date.toString(),
-      })
-
-      accTypes.map((accType) => {
-        params.append('accTypes', accType)
-      })
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/others/balanceSheet/?` + params,
-        {
-          credentials: 'include',
-        },
-      )
-
-      if (!response.ok) throw new Error()
-      const data = (await response.json()) as Promise<
-        Array<{
-          accTypeId: string
-          accTypeName: string
-          accounts: Array<{
-            accName: string
-            amount: number
-          }>
-        }>
-      >
-      return data
-    },
-  })
+  const balanceSheet = useBalanceSheetSuspense(date, accTypes)
 
   const handleAccTypeChange = (
     check: boolean,

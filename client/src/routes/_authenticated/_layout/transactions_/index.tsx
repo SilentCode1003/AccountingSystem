@@ -1,13 +1,16 @@
 import DataTable from '@/components/DataTable'
-import {
-  Customer,
-  transactionColumns,
-  Vendor,
-  type Transactions,
-} from '@/components/table-columns/transactions.columns'
+import { transactionColumns } from '@/components/table-columns/transactions.columns'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { ToWords } from 'to-words'
+import DatePicker from '@/components/ui/DatePicker'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -18,24 +21,20 @@ import {
   SelectTrigger,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useCreateTransaction } from '@/hooks/mutations'
+import {
+  useAccountTypes,
+  useTransactionPartners,
+  useTransactions,
+} from '@/hooks/queries'
+import { createTransactionSchema } from '@/validators/transactions.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { SelectGroup, SelectValue } from '@radix-ui/react-select'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import DatePicker from '@/components/ui/DatePicker'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Employees } from '@/components/table-columns/employees.columns'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { createTransactionSchema } from '@/validators/transactions.validator'
+import { ToWords } from 'to-words'
 import { z } from 'zod'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/Form'
 
 const toWords = new ToWords({
   localeCode: 'en-IN',
@@ -62,91 +61,11 @@ export const Route = createFileRoute('/_authenticated/_layout/transactions/')({
 })
 
 function TransactionsComponent() {
-  const transactions = useQuery({
-    queryKey: ['Transactions'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/transactions`,
-        {
-          credentials: 'include',
-        },
-      )
+  const transactions = useTransactions()
 
-      const transactionData = (await response.json()) as Promise<{
-        transactions: Array<Transactions>
-      }>
+  const accountTypes = useAccountTypes()
 
-      return transactionData
-    },
-  })
-
-  const accountTypes = useQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const accountTypeData = response.json() as Promise<{
-        accountTypes: Array<{
-          accTypeId: string
-          accTypeName: string
-        }>
-      }>
-      return accountTypeData
-    },
-  })
-
-  const queryClient = useQueryClient()
-  const createTransaction = useMutation({
-    mutationKey: ['createTransaction'],
-    mutationFn: async (payload: z.infer<typeof createTransactionSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/transactions`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = (await response.json()) as {
-        transaction: Transactions
-      }
-      return data
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(
-        ['Transactions'],
-        (old: { transactions: Array<Transactions> }) => {
-          return { transactions: [...old.transactions, data.transaction] }
-        },
-      )
-      form.reset()
-    },
-  })
-
-  const transactionPartners = useQuery({
-    queryKey: ['TransactionPartners'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/transactionPartners`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = response.json() as Promise<{
-        employees: Array<Employees>
-        customers: Array<Customer>
-        vendors: Array<Vendor>
-      }>
-      return data
-    },
-  })
+  const transactionPartners = useTransactionPartners()
 
   const [person, setPerson] = useState<string>('')
   const [amount, setAmount] = useState<number>(0.0)
@@ -160,6 +79,7 @@ function TransactionsComponent() {
     },
     resolver: zodResolver(createTransactionSchema),
   })
+  const createTransaction = useCreateTransaction(form)
 
   const handleSubmit = (values: z.infer<typeof createTransactionSchema>) => {
     createTransaction.mutate(values)

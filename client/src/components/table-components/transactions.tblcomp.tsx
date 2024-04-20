@@ -1,8 +1,4 @@
-import {
-  Customer,
-  Transactions,
-  Vendor,
-} from '@/components/table-columns/transactions.columns'
+import { Transactions } from '@/components/table-columns/transactions.columns'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -20,17 +16,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Text } from '@/components/ui/text'
-import { CellContext } from '@tanstack/react-table'
-import { MoreHorizontalIcon } from 'lucide-react'
-import {
-  MultiDialog,
-  MultiDialogContainer,
-  MultiDialogTrigger,
-} from '../ui/multi-dialog'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { useUpdateTransaction } from '@/hooks/mutations'
+import { useAccountTypes, useTransactionPartners } from '@/hooks/queries'
 import { updateTransactionSchema } from '@/validators/transactions.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontalIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import DatePicker from '../ui/DatePicker'
 import {
   Form,
   FormControl,
@@ -41,20 +36,21 @@ import {
 } from '../ui/Form'
 import { Input } from '../ui/input'
 import {
-  SelectItem,
+  MultiDialog,
+  MultiDialogContainer,
+  MultiDialogTrigger,
+} from '../ui/multi-dialog'
+import {
   Select,
   SelectContent,
   SelectGroup,
+  SelectItem,
   SelectLabel,
-  SelectValue,
-  SelectTrigger,
   SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 } from '../ui/select'
 import { Textarea } from '../ui/textarea'
-import { Employees } from '../table-columns/employees.columns'
-import DatePicker from '../ui/DatePicker'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
 
 export const TransactionIndexColumn = ({
   row,
@@ -156,24 +152,7 @@ export const TransactionWithColumn = ({
 }: CellContext<Transactions, unknown>) => {
   const [openUpdate, setOpenUpdate] = useState<boolean>(false)
 
-  const accountTypes = useQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const accountTypeData = response.json() as Promise<{
-        accountTypes: Array<{
-          accTypeId: string
-          accTypeName: string
-        }>
-      }>
-      return accountTypeData
-    },
-  })
+  const accountTypes = useAccountTypes()
   const form = useForm<z.infer<typeof updateTransactionSchema>>({
     defaultValues: {
       tranId: row.original.tranId,
@@ -191,60 +170,11 @@ export const TransactionWithColumn = ({
     },
     resolver: zodResolver(updateTransactionSchema),
   })
-  const transactionPartners = useQuery({
-    queryKey: ['TransactionPartners'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/transactionPartners`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = response.json() as Promise<{
-        employees: Array<Employees>
-        customers: Array<Customer>
-        vendors: Array<Vendor>
-      }>
-      return data
-    },
-  })
+  const transactionPartners = useTransactionPartners()
 
-  const queryClient = useQueryClient()
-
-  const updateTransaction = useMutation({
-    mutationKey: ['updateTransaction'],
-    mutationFn: async (payload: z.infer<typeof updateTransactionSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/transactions`,
-        {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = response.json() as Promise<{
-        transaction: Transactions
-      }>
-      return data
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(
-        ['Transactions'],
-        (old: { transactions: Array<Transactions> }) => {
-          const newTransactions = old.transactions.map((transaction) => {
-            if (transaction.tranId === row.original.tranId) {
-              return data.transaction
-            }
-            return transaction
-          })
-          return { transactions: newTransactions }
-        },
-      )
-      setOpenUpdate(false)
-    },
+  const updateTransaction = useUpdateTransaction({
+    setOpenUpdate,
+    cell: { row },
   })
 
   const handleSubmit = (values: z.infer<typeof updateTransactionSchema>) => {

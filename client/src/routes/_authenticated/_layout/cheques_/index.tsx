@@ -29,10 +29,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
+import { useCreateCheque } from '@/hooks/mutations'
+import { useAccountTypes, useCheques } from '@/hooks/queries'
 import { createChequeSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SelectGroup } from '@radix-ui/react-select'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { ReceiptIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -45,52 +46,8 @@ export const Route = createFileRoute('/_authenticated/_layout/cheques/')({
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
-  const accountTypes = useQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const accountTypeData = response.json() as Promise<{
-        accountTypes: Array<{
-          accTypeId: string
-          accTypeName: string
-        }>
-      }>
-      return accountTypeData
-    },
-  })
-  const queryClient = useQueryClient()
-  const createCheque = useMutation({
-    mutationFn: async (payload: z.infer<typeof createChequeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/cheques`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = await response.json()
-      return data
-    },
-    onSuccess: async (data) => {
-      setOpen(false)
-      await queryClient.setQueryData(
-        ['Cheques'],
-        (old: { cheques: Array<Cheques> }) => {
-          return { cheques: [...old.cheques, data.cheque] }
-        },
-      )
-    },
-  })
-
+  const accountTypes = useAccountTypes()
+  const createCheque = useCreateCheque({ setOpen })
   const form = useForm<z.infer<typeof createChequeSchema>>({
     defaultValues: {
       chqAmount: 0,
@@ -267,23 +224,7 @@ const CrudComponents = () => {
 }
 
 function Cheques() {
-  const cheques = useQuery({
-    queryKey: ['Cheques'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/cheques`,
-        {
-          credentials: 'include',
-        },
-      )
-
-      const data = (await response.json()) as Promise<{
-        cheques: Array<Cheques>
-      }>
-
-      return data
-    },
-  })
+  const cheques = useCheques()
 
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">

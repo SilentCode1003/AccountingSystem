@@ -21,9 +21,10 @@ import {
 } from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
 import { Text } from '@/components/ui/text'
+import { useCreateEmployee } from '@/hooks/mutations'
+import { useEmployees } from '@/hooks/queries'
 import { createEmployeeSchema } from '@/validators/employees.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { CircleUserIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -36,28 +37,7 @@ export const Route = createFileRoute('/_authenticated/_layout/employees/')({
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
-  const queryClient = useQueryClient()
-  const createEmployee = useMutation({
-    mutationFn: async (payload: z.infer<typeof createEmployeeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/employees`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = await response.json()
-      return data
-    },
-    onSuccess: async () => {
-      setOpen(false)
-      await queryClient.refetchQueries({ queryKey: ['Employees'] })
-    },
-  })
+  const createEmployee = useCreateEmployee({ setOpen })
 
   const form = useForm<z.infer<typeof createEmployeeSchema>>({
     defaultValues: {
@@ -246,23 +226,7 @@ const CrudComponents = () => {
 }
 
 function Employees() {
-  const employees = useQuery({
-    queryKey: ['Employees'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/employees`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        employees: Array<Employees>
-      }>
-
-      return data
-    },
-  })
-
+  const employees = useEmployees()
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       {employees.isSuccess && (

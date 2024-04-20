@@ -1,10 +1,13 @@
-import { CellContext } from '@tanstack/react-table'
-import { AccountTypes } from '../table-columns/accountTypes.column'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
+import { useDeleteAccountType, useUpdateAccountType } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
 import { updateAccountTypeSchema } from '@/validators/accountTypes.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontalIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { AccountTypes } from '../table-columns/accountTypes.column'
+import { Button } from '../ui/button'
 import {
   Dialog,
   DialogClose,
@@ -21,8 +24,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-import { Button } from '../ui/button'
-import { MoreHorizontalIcon } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -31,7 +32,6 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/Form'
-import { Text } from '../ui/text'
 import { Input } from '../ui/input'
 import {
   Select,
@@ -40,27 +40,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
+import { Text } from '../ui/text'
 
 export const AccountTypeAccountsColumn = ({
   row,
 }: CellContext<AccountTypes, unknown>) => {
-  const queryClient = useQueryClient()
-
-  const accountTypes = useQuery({
-    queryKey: ['accountTypes'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        accountTypes: Array<AccountTypes>
-      }>
-      return data
-    },
-  })
+  const accountTypes = useAccountTypes()
 
   const form = useForm({
     defaultValues: {
@@ -73,75 +58,9 @@ export const AccountTypeAccountsColumn = ({
     resolver: zodResolver(updateAccountTypeSchema),
   })
 
-  const updateAccountType = useMutation({
-    mutationKey: ['updateAccountType'],
-    mutationFn: async (payload: z.infer<typeof updateAccountTypeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes`,
-        {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        },
-      )
+  const updateAccountType = useUpdateAccountType()
 
-      const data = (await response.json()) as Promise<{
-        accountType: AccountTypes
-      }>
-
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['accountTypes'],
-        (old: { accountTypes: Array<AccountTypes> }) => {
-          return {
-            accountTypes: old.accountTypes.map((accType) => {
-              if (accType.accTypeId === data.accountType.accTypeId) {
-                return data.accountType
-              }
-              return accType
-            }),
-          }
-        },
-      )
-    },
-  })
-
-  const deleteAccountType = useMutation({
-    mutationKey: ['deleteAccountType'],
-    mutationFn: async (
-      payload: Pick<z.infer<typeof updateAccountTypeSchema>, 'accTypeId'>,
-    ) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/accountTypes/${payload.accTypeId}`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-        },
-      )
-
-      const data = (await response.json()) as Promise<{
-        deletedAccountTypeId: string
-      }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['accountTypes'],
-        (old: { accountTypes: Array<AccountTypes> }) => {
-          return {
-            accountTypes: old.accountTypes.filter(
-              (accType) => accType.accTypeId !== data.deletedAccountTypeId,
-            ),
-          }
-        },
-      )
-    },
-  })
+  const deleteAccountType = useDeleteAccountType()
 
   const handleSubmit = (values: z.infer<typeof updateAccountTypeSchema>) => {
     updateAccountType.mutate(values)

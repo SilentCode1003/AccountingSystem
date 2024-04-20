@@ -1,8 +1,20 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { useTerminateEmployee, useUpdateEmployee } from '@/hooks/mutations'
+import { updateEmployeeSchema } from '@/validators/employees.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontal, ShieldXIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Employees } from '../table-columns/employees.columns'
+import { Button } from '../ui/button'
+import DatePicker from '../ui/DatePicker'
 import {
   Dialog,
   DialogClose,
@@ -19,9 +31,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-import { Button } from '../ui/button'
-import { MoreHorizontal, ShieldXIcon } from 'lucide-react'
-import { Text } from '../ui/text'
 import {
   Form,
   FormControl,
@@ -31,19 +40,7 @@ import {
   FormMessage,
 } from '../ui/Form'
 import { Input } from '../ui/input'
-import DatePicker from '../ui/DatePicker'
-import { CellContext } from '@tanstack/react-table'
-import {
-  terminateEmployeeSchema,
-  updateEmployeeSchema,
-} from '@/validators/employees.validator'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Text } from '../ui/text'
 
 export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
   const form = useForm({
@@ -61,67 +58,10 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
     },
     resolver: zodResolver(updateEmployeeSchema),
   })
-  const queryClient = useQueryClient()
 
-  const terminateEmployee = useMutation({
-    mutationKey: ['terminateEmployee'],
-    mutationFn: async (payload: z.infer<typeof terminateEmployeeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/employees/${payload.empId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        employee: Employees
-      }>
-      return data
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(
-        ['Employees'],
-        (old: { employees: Array<Employees> }) => {
-          const newEmployees = old.employees.map((employee) => {
-            if (employee.empId === data.employee.empId) {
-              return data.employee
-            }
-            return employee
-          })
-          return { employees: newEmployees }
-        },
-      )
-    },
-  })
+  const terminateEmployee = useTerminateEmployee()
 
-  const updateEmployee = useMutation({
-    mutationKey: ['updateEmployee'],
-    mutationFn: async (payload: z.infer<typeof updateEmployeeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/employees`,
-        {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        employee: Employees
-      }>
-      return data
-    },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({
-        queryKey: ['Employees'],
-      })
-    },
-  })
+  const updateEmployee = useUpdateEmployee()
 
   const handleSubmit = (values: z.infer<typeof updateEmployeeSchema>) => {
     updateEmployee.mutate(values)

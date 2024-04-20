@@ -4,8 +4,9 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useLogout } from '@/hooks/mutations'
+import { useUser } from '@/hooks/queries'
+import { Link } from '@tanstack/react-router'
 import {
   ArchiveIcon,
   ArrowLeftRightIcon,
@@ -51,54 +52,10 @@ function LoadingComponent() {
 
 function Header() {
   const { setTheme, theme } = useTheme()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
-  const user = useQuery({
-    queryKey: ['userData'],
-    queryFn: async () => {
-      const userId = queryClient.getQueryData<{
-        isLogged: boolean
-        user: {
-          userId: string
-          userType: string
-        }
-      }>(['CurrentUser'])
+  const user = useUser()
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/users/?` +
-          new URLSearchParams({ userId: userId?.user.userId as string }),
-        {
-          credentials: 'include',
-        },
-      )
-
-      const data = (await response.json()) as Promise<{
-        user: {
-          userUsername: string
-          userFullName: string
-          userContactNumber: string
-          userProfilePic: string
-        }
-      }>
-
-      return data
-    },
-  })
-
-  const logout = useMutation({
-    mutationKey: ['logout'],
-    mutationFn: async () => {
-      await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-    },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
-      navigate({ to: '/login' })
-    },
-  })
+  const logout = useLogout()
 
   const handleLogout = () => {
     logout.mutate()

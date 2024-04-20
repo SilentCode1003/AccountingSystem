@@ -5,12 +5,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { EyeIcon, EyeOffIcon, UploadIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRef, useState } from 'react'
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useUserSuspense } from '@/hooks/queries'
+import { useUpdateUser } from '@/hooks/mutations'
+import { useQueryClient } from '@tanstack/react-query'
 
 export const Route = createFileRoute(
   '/_authenticated/_layout/settings/_layout/',
@@ -23,41 +21,11 @@ function Settings() {
   const [toggleEdit, setToggleEdit] = useState<boolean>(false)
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
-  const queryClient = useQueryClient()
-
   const imageRef = useRef<HTMLInputElement>(null)
 
-  const user = useSuspenseQuery({
-    queryKey: ['userData'],
-    queryFn: async () => {
-      const userId = queryClient.getQueryData<{
-        isLogged: boolean
-        user: {
-          userId: string
-          userType: string
-        }
-      }>(['CurrentUser'])
+  const queryClient = useQueryClient()
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/users/?` +
-          new URLSearchParams({ userId: userId?.user.userId as string }),
-        {
-          credentials: 'include',
-        },
-      )
-
-      const data = (await response.json()) as Promise<{
-        user: {
-          userUsername: string
-          userFullName: string
-          userContactNumber: string
-          userProfilePic: string
-        }
-      }>
-
-      return data
-    },
-  })
+  const user = useUserSuspense()
 
   const [userData, setUserData] = useState<{
     fullName: string
@@ -75,46 +43,7 @@ function Settings() {
     contactNumber: user.data.user.userContactNumber,
   })
 
-  const createUser = useMutation({
-    mutationKey: ['createUser'],
-    mutationFn: async (payload: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users`, {
-        method: 'PUT',
-        credentials: 'include',
-        body: payload,
-      })
-      const data = (await response.json()) as Promise<{
-        user: {
-          userUsername: string
-          userFullName: string
-          userContactNumber: string
-          userProfilePic: string
-        }
-      }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(['userData'], () => {
-        return {
-          user: {
-            userUsername: data.user.userUsername,
-            userFullName: data.user.userFullName,
-            userContactNumber: data.user.userContactNumber,
-            userProfilePic: data.user.userProfilePic,
-          },
-        }
-      })
-      setToggleEdit(!toggleEdit)
-      setUserData({
-        fullName: data.user.userFullName,
-        username: data.user.userUsername,
-        profileLink: '',
-        password: '',
-        profilePic: data.user.userProfilePic,
-        contactNumber: data.user.userContactNumber,
-      })
-    },
-  })
+  const updateUser = useUpdateUser({ setToggleEdit, setUserData })
 
   const handleUserDataChange = (e: any) => {
     setUserData({
@@ -149,7 +78,7 @@ function Settings() {
     fd.append('userContactNumber', userData.contactNumber)
     fd.append('userProfilePic', userData.profilePic as File)
 
-    createUser.mutate(fd)
+    updateUser.mutate(fd)
   }
 
   const handleToggleEdit = () => {
@@ -323,7 +252,7 @@ function Settings() {
 function LoadingComponent() {
   return (
     <div>
-      <Skeleton className="" />
+      <Skeleton className=" w-80 h-80" />
     </div>
   )
 }

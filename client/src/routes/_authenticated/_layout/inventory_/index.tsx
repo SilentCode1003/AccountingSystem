@@ -1,8 +1,10 @@
 import DataTable from '@/components/DataTable'
+import { inventoryColumns } from '@/components/table-columns/inventory.columns'
 import {
-  inventoryColumns,
-  type Inventories,
-} from '@/components/table-columns/inventory.columns'
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -20,54 +22,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useCreateInventory } from '@/hooks/mutations'
+import { useInventories } from '@/hooks/queries'
+import { createInventorySchema } from '@/validators/inventory.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-} from '@/components/ui/alert-dialog'
-import { PackagePlusIcon } from 'lucide-react'
 import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogTrigger,
 } from '@radix-ui/react-alert-dialog'
-import { createInventorySchema } from '@/validators/inventory.validator'
+import { createFileRoute } from '@tanstack/react-router'
+import { PackagePlusIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated/_layout/inventory/')({
   component: Inventory,
 })
 
 function CrudComponents() {
-  const queryClient = useQueryClient()
-  const createInventory = useMutation({
-    mutationKey: ['CreateInventory'],
-    mutationFn: async (payload: z.infer<typeof createInventorySchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/inventory`,
-        {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        inventory: Inventories
-      }>
-      return data
-    },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['Inventories'] })
-    },
-  })
-
+  const createInventory = useCreateInventory()
   const form = useForm<z.infer<typeof createInventorySchema>>({
     defaultValues: {
       invAssetName: '',
@@ -187,21 +161,7 @@ function CrudComponents() {
 }
 
 function Inventory() {
-  const Inventories = useQuery({
-    queryKey: ['Inventories'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/inventory`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        inventories: Array<Inventories>
-      }>
-      return data
-    },
-  })
+  const Inventories = useInventories()
 
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
