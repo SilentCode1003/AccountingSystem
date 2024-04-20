@@ -83,7 +83,8 @@ export const updateValidator = z.object({
           message: "Only PNG files are allowed",
         }
       )
-      .transform((file) => file.name),
+      .transform((file) => file.name)
+      .optional(),
   }),
 });
 

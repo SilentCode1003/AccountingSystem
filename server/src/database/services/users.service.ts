@@ -66,10 +66,18 @@ export const editUser = async (input: {
     userProfilePic?: string;
   };
 }) => {
-  await db
-    .update(users)
-    .set(input.newData)
-    .where(eq(users.userId, input.userId));
+  if (input.newData.userPassword) {
+    const hashPassword = await bcrypt.hash(input.newData.userPassword, 10);
+    await db
+      .update(users)
+      .set({ ...input.newData, userPassword: hashPassword })
+      .where(eq(users.userId, input.userId));
+  } else {
+    await db
+      .update(users)
+      .set({ ...input.newData })
+      .where(eq(users.userId, input.userId));
+  }
 
   const editedUser = await db.query.users.findFirst({
     where: (user) => eq(user.userId, input.userId),

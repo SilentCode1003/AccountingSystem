@@ -66,7 +66,9 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 export const updateUser = async (req: Request, res: Response) => {
-  const userProfilePic = req!.files!.userProfilePic as UploadedFile;
+  const userProfilePic = req.files
+    ? (req.files!.userProfilePic as UploadedFile)
+    : undefined;
   const input = updateValidator.safeParse({
     userId: req.body.userId,
     newData: {
@@ -74,31 +76,35 @@ export const updateUser = async (req: Request, res: Response) => {
       userFullName: req.body.userFullName,
       userPassword: req.body.userPassword,
       userContactNumber: req.body.userContactNumber,
-      userProfilePic,
+      userProfilePic: undefined,
     },
   });
   if (!input.success)
     return res.status(400).send({ error: input.error.errors[0].message });
 
-  userProfilePic.mv(
-    path.join(
-      __dirname,
-      "..",
-      "..",
-      "files/profilepic/users",
-      `${input.data.newData.userUsername}.${
-        userProfilePic.mimetype.split("/")[1]
-      }`
-    )
-  );
+  if (userProfilePic) {
+    userProfilePic?.mv(
+      path.join(
+        __dirname,
+        "..",
+        "..",
+        "files/profilepic/users",
+        `${input.data.newData.userUsername}.${
+          userProfilePic.mimetype.split("/")[1]
+        }`
+      )
+    );
+  }
 
   try {
     const updatedUser = await editUser({
       userId: input.data.userId,
       newData: {
-        userProfilePic: `${input.data.newData.userUsername}.${
-          userProfilePic.mimetype.split("/")[1]
-        }`,
+        userProfilePic:
+          userProfilePic &&
+          `${input.data.newData.userUsername}.${
+            userProfilePic?.mimetype.split("/")[1]
+          }`,
         userContactNumber: input.data.newData.userContactNumber,
         userFullName: input.data.newData.userFullName,
         userUsername: input.data.newData.userUsername,
