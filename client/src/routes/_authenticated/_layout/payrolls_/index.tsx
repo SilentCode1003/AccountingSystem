@@ -1,17 +1,18 @@
-import DataTable from '@/components/DataTable'
-import { LoadingTable } from '@/components/LoadingComponents'
+import DataTable from "@/components/DataTable";
+import { LoadingTable } from "@/components/LoadingComponents";
+import { PromptModal } from "@/components/PromptModal";
 import {
   payrollColumns,
   type Payrolls,
-} from '@/components/table-columns/payrolls.columns'
+} from "@/components/table-columns/payrolls.columns";
 import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import DatePicker from '@/components/ui/DatePicker'
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import DatePicker from "@/components/ui/DatePicker";
 import {
   Form,
   FormControl,
@@ -19,63 +20,63 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/Form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/Form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Text } from '@/components/ui/text'
-import { useCreatePayroll } from '@/hooks/mutations'
-import { useEmployees, usePayrolls } from '@/hooks/queries'
-import { employeesOptions, payrollsOptions } from '@/hooks/queries/options'
-import { createPayrollSchema } from '@/validators/payrolls.validators'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute } from '@tanstack/react-router'
-import { HandCoinsIcon } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+} from "@/components/ui/select";
+import { Text } from "@/components/ui/text";
+import { useCreatePayroll } from "@/hooks/mutations";
+import { useEmployees, usePayrolls } from "@/hooks/queries";
+import { employeesOptions, payrollsOptions } from "@/hooks/queries/options";
+import { createPayrollSchema } from "@/validators/payrolls.validators";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute } from "@tanstack/react-router";
+import { HandCoinsIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-export const Route = createFileRoute('/_authenticated/_layout/payrolls/')({
+export const Route = createFileRoute("/_authenticated/_layout/payrolls/")({
   loader: async ({ context }) => {
     const payrolls =
-      await context.queryClient.ensureQueryData(payrollsOptions())
+      await context.queryClient.ensureQueryData(payrollsOptions());
     const employees =
-      await context.queryClient.ensureQueryData(employeesOptions())
-    return { payrolls, employees }
+      await context.queryClient.ensureQueryData(employeesOptions());
+    return { payrolls, employees };
   },
   component: Payrolls,
   pendingComponent: LoadingComponent,
-})
+});
 
 function LoadingComponent() {
   return (
     <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
       <LoadingTable />
     </div>
-  )
+  );
 }
 
 const CrudComponents = () => {
-  const [open, setOpen] = useState<boolean>(false)
-  const employees = useEmployees()
-  const createPayroll = useCreatePayroll({ setOpen })
+  const [open, setOpen] = useState<boolean>(false);
+  const employees = useEmployees();
+  const createPayroll = useCreatePayroll({ setOpen });
 
   const form = useForm<z.infer<typeof createPayrollSchema>>({
     defaultValues: {
-      prEmployeeId: '',
+      prEmployeeId: "",
       prTotalDeduction: 0,
     },
     resolver: zodResolver(createPayrollSchema),
-  })
+  });
 
   const handleSubmit = (values: z.infer<typeof createPayrollSchema>) => {
-    createPayroll.mutate(values)
-  }
+    createPayroll.mutate(values);
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -84,7 +85,7 @@ const CrudComponents = () => {
       </Button>
       <AlertDialogContent className="scale-75 sm:scale-100">
         <AlertDialogHeader>
-          <Text variant={'heading3bold'}>Create Payroll</Text>
+          <Text variant={"heading3bold"}>Create Payroll</Text>
         </AlertDialogHeader>
         <Form {...form}>
           <form>
@@ -137,7 +138,7 @@ const CrudComponents = () => {
                         placeholder="Total Deduction"
                         step="0.01"
                         {...field}
-                        value={Number.isNaN(field.value) ? '' : field.value}
+                        value={Number.isNaN(field.value) ? "" : field.value}
                         onChange={(e) =>
                           field.onChange(parseFloat(e.target.value))
                         }
@@ -181,20 +182,19 @@ const CrudComponents = () => {
           </form>
         </Form>
         <div className="flex justify-between">
-          {/* <AlertDialogAction asChild> */}
-          <Button
-            onClick={() => form.handleSubmit(handleSubmit)()}
-            type="submit"
-          >
-            Create
-          </Button>
-          {/* </AlertDialogAction> */}
+          <PromptModal
+            dialogMessage="Continue?"
+            prompType="ADD"
+            dialogTitle="You are about to create a new payroll"
+            triggerText="Create"
+            callback={form.handleSubmit(handleSubmit)}
+          />
           <div className="flex gap-2 ">
-            <Button variant={'secondary'} onClick={() => form.clearErrors()}>
+            <Button variant={"secondary"} onClick={() => form.clearErrors()}>
               Clear
             </Button>
             <AlertDialogCancel asChild>
-              <Button variant={'outline'} className="mt-0">
+              <Button variant={"outline"} className="mt-0">
                 Cancel
               </Button>
             </AlertDialogCancel>
@@ -202,11 +202,11 @@ const CrudComponents = () => {
         </div>
       </AlertDialogContent>
     </AlertDialog>
-  )
-}
+  );
+};
 
 function Payrolls() {
-  const payrolls = usePayrolls()
+  const payrolls = usePayrolls();
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       {payrolls.isSuccess && (
@@ -218,28 +218,28 @@ function Payrolls() {
           data={payrolls.data.payrolls}
           filter={[
             {
-              filterColumn: 'prEmpName',
-              filterPlaceHolder: 'Filter employee name',
+              filterColumn: "prEmpName",
+              filterPlaceHolder: "Filter employee name",
             },
             {
-              filterColumn: 'prFinalAmount',
-              filterPlaceHolder: 'Filter total amount',
+              filterColumn: "prFinalAmount",
+              filterPlaceHolder: "Filter total amount",
             },
             {
-              filterColumn: 'prDateFrom',
-              filterPlaceHolder: 'Filter Date From',
+              filterColumn: "prDateFrom",
+              filterPlaceHolder: "Filter Date From",
               date: true,
             },
             {
-              filterColumn: 'prDateTo',
-              filterPlaceHolder: 'Filter Date To',
+              filterColumn: "prDateTo",
+              filterPlaceHolder: "Filter Date To",
               date: true,
             },
           ]}
         />
       )}
     </div>
-  )
+  );
 }
 
-export default Payrolls
+export default Payrolls;

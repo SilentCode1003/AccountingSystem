@@ -1,15 +1,15 @@
-import { useUpdateCheque } from '@/hooks/mutations'
-import { useAccountTypes } from '@/hooks/queries'
-import { chequeUpdateSchema } from '@/validators/cheques.validator'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { CellContext } from '@tanstack/react-table'
-import { MoreHorizontal, MoreHorizontalIcon } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { Cheques } from '../table-columns/cheques.columns'
-import { Button } from '../ui/button'
-import DatePicker from '../ui/DatePicker'
+import { useUpdateCheque } from "@/hooks/mutations";
+import { useAccountTypes } from "@/hooks/queries";
+import { chequeUpdateSchema } from "@/validators/cheques.validator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CellContext } from "@tanstack/react-table";
+import { MoreHorizontal, MoreHorizontalIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Cheques } from "../table-columns/cheques.columns";
+import { Button } from "../ui/button";
+import DatePicker from "../ui/DatePicker";
 import {
   Dialog,
   DialogClose,
@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog'
+} from "../ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
+} from "../ui/dropdown-menu";
 import {
   Form,
   FormControl,
@@ -33,8 +33,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/Form'
-import { Input } from '../ui/input'
+} from "../ui/Form";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
@@ -42,25 +42,26 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
-import { Text } from '../ui/text'
+} from "../ui/select";
+import { Text } from "../ui/text";
+import { PromptModal } from "../PromptModal";
 
 export const IssueDateColumn = ({ row }: CellContext<Cheques, unknown>) => {
-  return new Date(row.original.chqIssueDate).toLocaleDateString()
-}
+  return new Date(row.original.chqIssueDate).toLocaleDateString();
+};
 
 export const PayeeNameColumn = ({ row }: CellContext<Cheques, unknown>) => {
-  const formatted = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'PHP',
-  }).format(row.getValue('chqAmount'))
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "PHP",
+  }).format(row.getValue("chqAmount"));
 
-  return formatted
-}
+  return formatted;
+};
 
 export const CreatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
-  return new Date(row.original.chqCreatedAt).toLocaleDateString()
-}
+  return new Date(row.original.chqCreatedAt).toLocaleDateString();
+};
 
 export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return (
@@ -99,26 +100,26 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
 
             <div className="space-y-4 sm:space-y-0">
               <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={'body'}>
+                <Text className="w-full sm:w-[33%]" variant={"body"}>
                   Account ID
                 </Text>
-                <Text variant={'label'} className="flex-1">
+                <Text variant={"label"} className="flex-1">
                   {row.original.account.accId}
                 </Text>
               </div>
               <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={'body'}>
+                <Text className="w-full sm:w-[33%]" variant={"body"}>
                   Account Type
                 </Text>
-                <Text variant={'label'} className="flex-1">
+                <Text variant={"label"} className="flex-1">
                   {row.original.account.accountType.accTypeName}
                 </Text>
               </div>
               <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={'body'}>
+                <Text className="w-full sm:w-[33%]" variant={"body"}>
                   Description
                 </Text>
-                <Text variant={'label'} className="flex-1">
+                <Text variant={"label"} className="flex-1">
                   {row.original.account.accDescription}
                 </Text>
               </div>
@@ -127,12 +128,12 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
         </Dialog>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
-  const accountTypes = useAccountTypes()
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const accountTypes = useAccountTypes();
   const form = useForm<z.infer<typeof chequeUpdateSchema>>({
     defaultValues: {
       chqId: row.original.chqId,
@@ -145,13 +146,13 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
       },
     },
     resolver: zodResolver(chequeUpdateSchema),
-  })
+  });
 
-  const updateCheque = useUpdateCheque({ cell: { row }, setIsOpen })
+  const updateCheque = useUpdateCheque({ cell: { row }, setIsOpen });
 
   const handleSubmit = (values: z.infer<typeof chequeUpdateSchema>) => {
-    updateCheque.mutate({ ...values, chqAccId: row.original.account.accId })
-  }
+    updateCheque.mutate({ ...values, chqAccId: row.original.account.accId });
+  };
   return (
     <div className="flex justify-between">
       <div>{new Date(row.original.chqUpdatedAt).toLocaleDateString()}</div>
@@ -242,7 +243,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                               {...field}
                               value={
                                 Number.isNaN(field.value)
-                                  ? ''
+                                  ? ""
                                   : Number.parseFloat(String(field.value))
                               }
                               onChange={(e) =>
@@ -309,7 +310,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                                         >
                                           {accType.accTypeName}
                                         </SelectItem>
-                                      ),
+                                      )
                                     )}
                                   </SelectGroup>
                                 )}
@@ -342,26 +343,25 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                 </form>
               </Form>
               <div className="flex justify-between">
-                <DialogClose asChild>
-                  <Button
-                    onClick={form.handleSubmit(handleSubmit)}
-                    type="submit"
-                  >
-                    Update
-                  </Button>
-                </DialogClose>
+                <PromptModal
+                  dialogMessage="Continue?"
+                  prompType="UPDATE"
+                  dialogTitle="You are about to update this cheque"
+                  triggerText="Update"
+                  callback={form.handleSubmit(handleSubmit)}
+                />
                 <div className="flex gap-2">
                   <Button
-                    variant={'secondary'}
+                    variant={"secondary"}
                     onClick={() => {
-                      form.clearErrors()
-                      form.reset()
+                      form.clearErrors();
+                      form.reset();
                     }}
                   >
                     Clear
                   </Button>
                   <DialogClose asChild>
-                    <Button variant={'outline'}>Cancel</Button>
+                    <Button variant={"outline"}>Cancel</Button>
                   </DialogClose>
                 </div>
               </div>
@@ -370,5 +370,5 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
         </Dialog>
       </div>
     </div>
-  )
-}
+  );
+};
