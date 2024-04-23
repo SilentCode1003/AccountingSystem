@@ -5,6 +5,7 @@ import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
+import { toast } from '@/components/ui/use-toast'
 import { updateAccountSchema } from '@/validators/accounts.validator'
 import {
   createAccountTypeSchema,
@@ -34,6 +35,7 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { CellContext } from '@tanstack/react-table'
+import { CircleXIcon, PartyPopperIcon } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -62,7 +64,6 @@ export const useUpdateAccount = ({
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const queryClient = useQueryClient()
-
   return useMutation({
     mutationKey: ['updateAccount'],
     mutationFn: async (payload: z.infer<typeof updateAccountSchema>) => {
@@ -99,6 +100,27 @@ export const useUpdateAccount = ({
         },
       )
       setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Account was updated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update account',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -135,6 +157,27 @@ export const useToggleIsActiveAccount = () => {
           }
         },
       )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Account status was updated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update account status',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -181,6 +224,27 @@ export const useUpdateAccountType = ({
         },
       )
       setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Account type was updated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update account type',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -216,6 +280,29 @@ export const useDeleteAccountType = () => {
           }
         },
       )
+      toast({
+        title: (
+          <div>
+            <div className="flex gap-2 items-centers">
+              <PartyPopperIcon />
+              Success
+            </div>
+          </div>
+        ),
+        description: 'Account type was deleted successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to delete account type ',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -264,10 +351,28 @@ export const useUpdateCheque = ({
         },
       )
       setIsOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Cheque was updated successfully',
+      })
     },
 
-    onError: (error) => {
-      console.log(error)
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update cheque',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -305,6 +410,27 @@ export const useTerminateEmployee = () => {
           return { employees: newEmployees }
         },
       )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Employee was terminated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to terminate employee',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -339,6 +465,27 @@ export const useUpdateEmployee = ({
         queryKey: ['Employees'],
       })
       setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Employee was updated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update employee',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -368,6 +515,27 @@ export const useUpdateInventory = ({
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ['Inventories'] })
       setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Inventory was updated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update inventory',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -414,10 +582,28 @@ export const useUpdatePayroll = ({
         },
       )
       setIsOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Payroll was updated successfully',
+      })
     },
 
-    onError: (error) => {
-      console.log(error)
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update payroll',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -463,6 +649,27 @@ export const useUpdateTransaction = ({
         },
       )
       setOpenUpdate(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Transaction was updated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update transaction',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -497,6 +704,27 @@ export const useCreateCheque = ({
           return { cheques: [...old.cheques, data.cheque] }
         },
       )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Cheque was created successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to create cheque',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -526,6 +754,27 @@ export const useCreateEmployee = ({
     onSuccess: async () => {
       setOpen(false)
       await queryClient.refetchQueries({ queryKey: ['Employees'] })
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Employee was created successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to create employee',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -565,6 +814,27 @@ export const useCreateInventory = ({
         },
       )
       setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Inventory was created successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to create inventory',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -594,6 +864,27 @@ export const useCreatePayroll = ({
     onSuccess: async () => {
       setOpen(false)
       await queryClient.refetchQueries({ queryKey: ['Payrolls'] })
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Payroll was created successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to create payroll',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -630,6 +921,27 @@ export const useCreateAccountType = ({
         },
       )
       setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Account type was created successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to create account type',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -689,6 +1001,27 @@ export const useUpdateUser = ({
         profilePic: data.user.userProfilePic,
         contactNumber: data.user.userContactNumber,
       })
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Profile was updated successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to update profile',
+        variant: 'destructive',
+      })
     },
   })
 }
@@ -724,6 +1057,27 @@ export const useCreateTransaction = (
         },
       )
       form.reset()
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Transaction was created successfully',
+      })
+    },
+    onError: () => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: 'Failed to create transaction',
+        variant: 'destructive',
+      })
     },
   })
 }

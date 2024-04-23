@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/toaster'
 import { accountTypesOptions } from '@/hooks/queries/options'
 import { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
@@ -29,6 +30,7 @@ function RootComponent() {
   return (
     <>
       <Outlet />
+      <Toaster />
       {import.meta.env.VITE_NODE_ENV !== 'PROD' && <TanStackRouterDevtools />}
     </>
   )

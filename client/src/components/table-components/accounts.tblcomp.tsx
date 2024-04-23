@@ -79,7 +79,7 @@ export const AccountIsActiveColumn = ({
 
   const toggleAccountIsActive = useToggleIsActiveAccount()
 
-  const handleSubmit = (values: z.infer<typeof updateAccountSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof updateAccountSchema>) => {
     updateAccount.mutate(values)
   }
 
