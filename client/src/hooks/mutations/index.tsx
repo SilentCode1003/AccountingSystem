@@ -79,6 +79,8 @@ export const useUpdateAccount = ({
         },
       )
 
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         account: Accounts
       }>
@@ -110,7 +112,7 @@ export const useUpdateAccount = ({
         description: 'Account was updated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -118,7 +120,7 @@ export const useUpdateAccount = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update account',
+        description: error.message ?? 'Failed to update account',
         variant: 'destructive',
       })
     },
@@ -139,6 +141,7 @@ export const useToggleIsActiveAccount = () => {
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{ account: Accounts }>
       return data
@@ -167,7 +170,7 @@ export const useToggleIsActiveAccount = () => {
         description: 'Account status was updated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -175,7 +178,7 @@ export const useToggleIsActiveAccount = () => {
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update account status',
+        description: error.message ?? 'Failed to update account status',
         variant: 'destructive',
       })
     },
@@ -202,6 +205,7 @@ export const useUpdateAccountType = ({
           body: JSON.stringify(payload),
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
         accountType: AccountTypes
@@ -234,7 +238,7 @@ export const useUpdateAccountType = ({
         description: 'Account type was updated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -242,7 +246,7 @@ export const useUpdateAccountType = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update account type',
+        description: error.message ?? 'Failed to update account type',
         variant: 'destructive',
       })
     },
@@ -263,6 +267,8 @@ export const useDeleteAccountType = () => {
           credentials: 'include',
         },
       )
+
+      if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
         deletedAccountTypeId: string
@@ -292,7 +298,7 @@ export const useDeleteAccountType = () => {
         description: 'Account type was deleted successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -300,7 +306,7 @@ export const useDeleteAccountType = () => {
             Something went wrong!
           </div>
         ),
-        description: 'Failed to delete account type ',
+        description: error.message ?? 'Failed to delete account type ',
         variant: 'destructive',
       })
     },
@@ -332,6 +338,8 @@ export const useUpdateCheque = ({
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         cheque: Cheques
       }>
@@ -362,7 +370,7 @@ export const useUpdateCheque = ({
       })
     },
 
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -370,7 +378,7 @@ export const useUpdateCheque = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update cheque',
+        description: error.message ?? 'Failed to update cheque',
         variant: 'destructive',
       })
     },
@@ -392,6 +400,8 @@ export const useTerminateEmployee = () => {
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         employee: Employees
       }>
@@ -420,7 +430,7 @@ export const useTerminateEmployee = () => {
         description: 'Employee was terminated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -428,7 +438,7 @@ export const useTerminateEmployee = () => {
             Something went wrong!
           </div>
         ),
-        description: 'Failed to terminate employee',
+        description: error.message ?? 'Failed to terminate employee',
         variant: 'destructive',
       })
     },
@@ -455,6 +465,8 @@ export const useUpdateEmployee = ({
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         employee: Employees
       }>
@@ -475,7 +487,7 @@ export const useUpdateEmployee = ({
         description: 'Employee was updated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -483,7 +495,7 @@ export const useUpdateEmployee = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update employee',
+        description: error.message ?? 'Failed to update employee',
         variant: 'destructive',
       })
     },
@@ -498,19 +510,25 @@ export const useUpdateInventory = ({
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['updateInventory'],
-    mutationFn: (payload: z.infer<typeof updateFormSchema>) => {
-      return fetch(`${import.meta.env.VITE_SERVER_URL}/inventory`, {
-        method: 'PUT',
-        headers: {
-          'content-type': 'application/json',
+    mutationFn: async (payload: z.infer<typeof updateFormSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventory`,
+        {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          credentials: 'include',
         },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          return data
-        })
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        inventory: Inventories
+      }>
+
+      return data
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ['Inventories'] })
@@ -525,7 +543,7 @@ export const useUpdateInventory = ({
         description: 'Inventory was updated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -533,7 +551,7 @@ export const useUpdateInventory = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update inventory',
+        description: error.message ?? 'Failed to update inventory',
         variant: 'destructive',
       })
     },
@@ -563,6 +581,8 @@ export const useUpdatePayroll = ({
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         payroll: Payrolls
       }>
@@ -593,7 +613,7 @@ export const useUpdatePayroll = ({
       })
     },
 
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -601,7 +621,7 @@ export const useUpdatePayroll = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update payroll',
+        description: error.message ?? 'Failed to update payroll',
         variant: 'destructive',
       })
     },
@@ -630,6 +650,8 @@ export const useUpdateTransaction = ({
           body: JSON.stringify(payload),
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = response.json() as Promise<{
         transaction: Transactions
       }>
@@ -659,7 +681,7 @@ export const useUpdateTransaction = ({
         description: 'Transaction was updated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -667,7 +689,7 @@ export const useUpdateTransaction = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update transaction',
+        description: error.message ?? 'Failed to update transaction',
         variant: 'destructive',
       })
     },
@@ -693,7 +715,9 @@ export const useCreateCheque = ({
           body: JSON.stringify(payload),
         },
       )
-      const data = await response.json()
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{ cheque: Cheques }>
       return data
     },
     onSuccess: async (data) => {
@@ -714,7 +738,7 @@ export const useCreateCheque = ({
         description: 'Cheque was created successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -722,7 +746,7 @@ export const useCreateCheque = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to create cheque',
+        description: error.message ?? 'Failed to create cheque',
         variant: 'destructive',
       })
     },
@@ -748,7 +772,9 @@ export const useCreateEmployee = ({
           body: JSON.stringify(payload),
         },
       )
-      const data = await response.json()
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{ employee: Employees }>
       return data
     },
     onSuccess: async () => {
@@ -764,7 +790,7 @@ export const useCreateEmployee = ({
         description: 'Employee was created successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -772,7 +798,7 @@ export const useCreateEmployee = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to create employee',
+        description: error.message ?? 'Failed to create employee',
         variant: 'destructive',
       })
     },
@@ -799,6 +825,8 @@ export const useCreateInventory = ({
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         inventory: Inventories
       }>
@@ -824,7 +852,7 @@ export const useCreateInventory = ({
         description: 'Inventory was created successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -832,7 +860,7 @@ export const useCreateInventory = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to create inventory',
+        description: error.message ?? 'Failed to create inventory',
         variant: 'destructive',
       })
     },
@@ -858,7 +886,9 @@ export const useCreatePayroll = ({
           body: JSON.stringify(payload),
         },
       )
-      const data = await response.json()
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{ payroll: Payrolls }>
       return data
     },
     onSuccess: async () => {
@@ -874,7 +904,7 @@ export const useCreatePayroll = ({
         description: 'Payroll was created successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -882,7 +912,7 @@ export const useCreatePayroll = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to create payroll',
+        description: error.message ?? 'Failed to create payroll',
         variant: 'destructive',
       })
     },
@@ -908,6 +938,8 @@ export const useCreateAccountType = ({
           body: JSON.stringify(payload),
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         accountType: AccountTypes
       }>
@@ -931,7 +963,7 @@ export const useCreateAccountType = ({
         description: 'Account type was created successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -939,7 +971,7 @@ export const useCreateAccountType = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to create account type',
+        description: error.message ?? 'Failed to create account type',
         variant: 'destructive',
       })
     },
@@ -971,6 +1003,9 @@ export const useUpdateUser = ({
         credentials: 'include',
         body: payload,
       })
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<{
         user: {
           userUsername: string
@@ -1011,7 +1046,7 @@ export const useUpdateUser = ({
         description: 'Profile was updated successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -1019,7 +1054,7 @@ export const useUpdateUser = ({
             Something went wrong!
           </div>
         ),
-        description: 'Failed to update profile',
+        description: error.message ?? 'Failed to update profile',
         variant: 'destructive',
       })
     },
@@ -1049,8 +1084,8 @@ export const useCreateTransaction = (
       }
       return data
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
         ['Transactions'],
         (old: { transactions: Array<Transactions> }) => {
           return { transactions: [...old.transactions, data.transaction] }
@@ -1067,7 +1102,7 @@ export const useCreateTransaction = (
         description: 'Transaction was created successfully',
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -1075,7 +1110,7 @@ export const useCreateTransaction = (
             Something went wrong!
           </div>
         ),
-        description: 'Failed to create transaction',
+        description: error.message ?? 'Failed to create transaction',
         variant: 'destructive',
       })
     },
@@ -1092,18 +1127,34 @@ export const useLogin = () => {
   return useMutation({
     mutationKey: ['login'],
     mutationFn: async (payload: LoginPayload) => {
-      await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/login`,
+        {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          credentials: 'include',
         },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
     },
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
+      await queryClient.refetchQueries()
       navigate({ to: '/' })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to login',
+        variant: 'destructive',
+      })
     },
   })
 }
