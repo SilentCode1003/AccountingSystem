@@ -1,13 +1,13 @@
-import { useDeleteAccountType, useUpdateAccountType } from "@/hooks/mutations";
-import { useAccountTypes } from "@/hooks/queries";
-import { updateAccountTypeSchema } from "@/validators/accountTypes.validator";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CellContext } from "@tanstack/react-table";
-import { MoreHorizontalIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { AccountTypes } from "../table-columns/accountTypes.column";
-import { Button } from "../ui/button";
+import { useDeleteAccountType, useUpdateAccountType } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
+import { updateAccountTypeSchema } from '@/validators/accountTypes.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontalIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { AccountTypes } from '../table-columns/accountTypes.column'
+import { Button } from '../ui/button'
 import {
   Dialog,
   DialogClose,
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from '../ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +23,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -31,23 +31,25 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/Form";
-import { Input } from "../ui/input";
+} from '../ui/Form'
+import { Input } from '../ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Text } from "../ui/text";
-import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
-import { PromptModal } from "../PromptModal";
+} from '../ui/select'
+import { Text } from '../ui/text'
+import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
+import { PromptModal } from '../PromptModal'
+import { useState } from 'react'
 
 export const AccountTypeAccountsColumn = ({
   row,
 }: CellContext<AccountTypes, unknown>) => {
-  const accountTypes = useAccountTypes();
+  const [open, setOpen] = useState<boolean>(false)
+  const accountTypes = useAccountTypes()
 
   const form = useForm({
     defaultValues: {
@@ -58,15 +60,15 @@ export const AccountTypeAccountsColumn = ({
       },
     },
     resolver: zodResolver(updateAccountTypeSchema),
-  });
+  })
 
-  const updateAccountType = useUpdateAccountType();
+  const updateAccountType = useUpdateAccountType({ setOpen })
 
-  const deleteAccountType = useDeleteAccountType();
+  const deleteAccountType = useDeleteAccountType()
 
   const handleSubmit = (values: z.infer<typeof updateAccountTypeSchema>) => {
-    updateAccountType.mutate(values);
-  };
+    updateAccountType.mutate(values)
+  }
 
   return (
     <div className="flex justify-between">
@@ -82,7 +84,7 @@ export const AccountTypeAccountsColumn = ({
 
       <div>
         <AlertDialog>
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -119,7 +121,7 @@ export const AccountTypeAccountsColumn = ({
               nonButton
               dialogMessage="Continue?"
               prompType="DELETE"
-              dialogTitle="You are about to terminate this account type! Data loss may occur and cannot be undone!"
+              dialogTitle="You are about to DELETE this account type! Data loss may occur and cannot be undone!"
               triggerText="DELETE ACCOUNT TYPE"
             />
 
@@ -208,28 +210,25 @@ export const AccountTypeAccountsColumn = ({
                   </form>
                 </Form>
                 <div className="flex justify-between">
-                  <DialogClose asChild>
-                    <Button
-                      onClick={() => {
-                        form.handleSubmit(handleSubmit)();
-                      }}
-                      type="submit"
-                    >
-                      Update
-                    </Button>
-                  </DialogClose>
+                  <PromptModal
+                    dialogMessage="Continue?"
+                    prompType="UPDATE"
+                    dialogTitle="You are about to update this account type"
+                    triggerText="Update"
+                    callback={form.handleSubmit(handleSubmit)}
+                  />
                   <div className="flex gap-2">
                     <Button
-                      variant={"secondary"}
+                      variant={'secondary'}
                       onClick={() => {
-                        form.clearErrors();
-                        form.reset();
+                        form.clearErrors()
+                        form.reset()
                       }}
                     >
                       Clear
                     </Button>
                     <DialogClose asChild>
-                      <Button variant={"outline"}>Cancel</Button>
+                      <Button variant={'outline'}>Cancel</Button>
                     </DialogClose>
                   </div>
                 </div>
@@ -239,5 +238,5 @@ export const AccountTypeAccountsColumn = ({
         </AlertDialog>
       </div>
     </div>
-  );
-};
+  )
+}

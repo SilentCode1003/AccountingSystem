@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,9 +8,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "./ui/alert-dialog";
-import { Button } from "./ui/button";
-import { ShieldAlertIcon, ShieldQuestionIcon, SkullIcon } from "lucide-react";
+} from './ui/alert-dialog'
+import { Button } from './ui/button'
+import { ShieldAlertIcon, ShieldQuestionIcon, SkullIcon } from 'lucide-react'
 
 export const PromptModal = ({
   triggerText,
@@ -20,75 +20,75 @@ export const PromptModal = ({
   callback,
   nonButton,
 }: {
-  triggerText?: string;
-  prompType?: "ADD" | "UPDATE" | "DELETE" | "TOGGLE";
-  dialogTitle?: string;
-  dialogMessage?: string;
-  callback: Function;
-  nonButton?: boolean;
+  triggerText?: string
+  prompType?: 'ADD' | 'UPDATE' | 'DELETE' | 'TOGGLE'
+  dialogTitle?: string
+  dialogMessage?: string
+  callback: Function
+  nonButton?: boolean
 }) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false)
 
   if (nonButton)
     return (
-      <AlertDialogContent>
+      <AlertDialogContent className="scale-75 md:scale-100">
         <AlertDialogHeader>
           <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
           <AlertDialogDescription>{dialogMessage}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction onClick={() => callback()}>
-            Continue{" "}
-            {prompType === "ADD" ? (
+            Continue{' '}
+            {prompType === 'ADD' ? (
               <ShieldQuestionIcon />
-            ) : prompType === "UPDATE" ? (
+            ) : prompType === 'UPDATE' ? (
               <ShieldAlertIcon />
-            ) : prompType === "DELETE" ? (
+            ) : prompType === 'DELETE' ? (
               <SkullIcon />
-            ) : prompType === "TOGGLE" ? (
+            ) : prompType === 'TOGGLE' ? (
               <SkullIcon />
             ) : null}
           </AlertDialogAction>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
-    );
+    )
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <Button
         className="flex gap-2"
         onClick={() => {
-          setOpen(true);
+          setOpen(true)
         }}
       >
         {triggerText}
-        {prompType === "ADD" ? (
+        {prompType === 'ADD' ? (
           <ShieldQuestionIcon />
-        ) : prompType === "UPDATE" ? (
+        ) : prompType === 'UPDATE' ? (
           <ShieldAlertIcon />
-        ) : prompType === "DELETE" ? (
+        ) : prompType === 'DELETE' ? (
           <SkullIcon />
-        ) : prompType === "TOGGLE" ? (
+        ) : prompType === 'TOGGLE' ? (
           <SkullIcon />
         ) : null}
       </Button>
 
-      <AlertDialogContent>
+      <AlertDialogContent className="scale-75 md:scale-100">
         <AlertDialogHeader>
           <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
           <AlertDialogDescription>{dialogMessage}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction onClick={() => callback()}>
-            Continue{" "}
-            {prompType === "ADD" ? (
+            Continue{' '}
+            {prompType === 'ADD' ? (
               <ShieldQuestionIcon />
-            ) : prompType === "UPDATE" ? (
+            ) : prompType === 'UPDATE' ? (
               <ShieldAlertIcon />
-            ) : prompType === "DELETE" ? (
+            ) : prompType === 'DELETE' ? (
               <SkullIcon />
-            ) : prompType === "TOGGLE" ? (
+            ) : prompType === 'TOGGLE' ? (
               <SkullIcon />
             ) : null}
           </AlertDialogAction>
@@ -96,5 +96,5 @@ export const PromptModal = ({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
-};
+  )
+}

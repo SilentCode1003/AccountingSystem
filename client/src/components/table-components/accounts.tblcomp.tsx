@@ -1,13 +1,13 @@
-import { useToggleIsActiveAccount, useUpdateAccount } from "@/hooks/mutations";
-import { useAccountTypes } from "@/hooks/queries";
-import { updateAccountSchema } from "@/validators/accounts.validator";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CellContext } from "@tanstack/react-table";
-import { MoreHorizontalIcon, ShieldCheckIcon, ShieldXIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Accounts } from "../table-columns/accounts.columns";
-import { Button } from "../ui/button";
+import { useToggleIsActiveAccount, useUpdateAccount } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
+import { updateAccountSchema } from '@/validators/accounts.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontalIcon, ShieldCheckIcon, ShieldXIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Accounts } from '../table-columns/accounts.columns'
+import { Button } from '../ui/button'
 import {
   Dialog,
   DialogClose,
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from '../ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +23,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -31,8 +31,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/Form";
-import { Input } from "../ui/input";
+} from '../ui/Form'
+import { Input } from '../ui/input'
 import {
   Select,
   SelectContent,
@@ -40,25 +40,27 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Text } from "../ui/text";
-import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
-import { PromptModal } from "../PromptModal";
+} from '../ui/select'
+import { Text } from '../ui/text'
+import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
+import { PromptModal } from '../PromptModal'
+import { useState } from 'react'
 
 export const AccountAmountColumn = ({
   row,
 }: CellContext<Accounts, unknown>) => {
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "PHP",
-  }).format(row.original.accAmount);
-  return formatted;
-};
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'PHP',
+  }).format(row.original.accAmount)
+  return formatted
+}
 
 export const AccountIsActiveColumn = ({
   row,
 }: CellContext<Accounts, unknown>) => {
-  const accountTypes = useAccountTypes();
+  const accountTypes = useAccountTypes()
+  const [open, setOpen] = useState<boolean>(false)
   const form = useForm({
     defaultValues: {
       accId: row.original.accId,
@@ -71,24 +73,24 @@ export const AccountIsActiveColumn = ({
       },
     },
     resolver: zodResolver(updateAccountSchema),
-  });
+  })
 
-  const updateAccount = useUpdateAccount();
+  const updateAccount = useUpdateAccount({ setOpen })
 
-  const toggleAccountIsActive = useToggleIsActiveAccount();
+  const toggleAccountIsActive = useToggleIsActiveAccount()
 
   const handleSubmit = (values: z.infer<typeof updateAccountSchema>) => {
-    updateAccount.mutate(values);
-  };
+    updateAccount.mutate(values)
+  }
 
   return (
     <div className="flex justify-between">
       <div className="min-w-24">
-        {row.original.accIsActive ? "Active" : "Inactive"}
+        {row.original.accIsActive ? 'Active' : 'Inactive'}
       </div>
       <div>
         <AlertDialog>
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -113,7 +115,7 @@ export const AccountIsActiveColumn = ({
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem>
-                    Toggle Account Status{" "}
+                    Toggle Account Status{' '}
                     {row.original.accIsActive ? (
                       <ShieldCheckIcon />
                     ) : (
@@ -132,7 +134,7 @@ export const AccountIsActiveColumn = ({
               nonButton
               dialogMessage="Continue?"
               prompType="DELETE"
-              dialogTitle="You are about to terminate this account type! Data loss may occur and cannot be undone!"
+              dialogTitle="You are about to change the status of this account! Data loss may occur and cannot be undone!"
               triggerText="DELETE ACCOUNT TYPE"
             />
 
@@ -209,7 +211,7 @@ export const AccountIsActiveColumn = ({
                                               >
                                                 {accType.accTypeName}
                                               </SelectItem>
-                                            )
+                                            ),
                                           )}
                                         </SelectGroup>
                                       )}
@@ -258,7 +260,7 @@ export const AccountIsActiveColumn = ({
                                   {...field}
                                   value={
                                     Number.isNaN(field.value)
-                                      ? ""
+                                      ? ''
                                       : Number.parseFloat(String(field.value))
                                   }
                                   onChange={(e) =>
@@ -274,28 +276,25 @@ export const AccountIsActiveColumn = ({
                   </form>
                 </Form>
                 <div className="flex justify-between">
-                  <DialogClose asChild>
-                    <Button
-                      onClick={() => {
-                        form.handleSubmit(handleSubmit)();
-                      }}
-                      type="submit"
-                    >
-                      Update
-                    </Button>
-                  </DialogClose>
+                  <PromptModal
+                    dialogMessage="Continue?"
+                    prompType="UPDATE"
+                    dialogTitle="You are about to update this account"
+                    triggerText="Update"
+                    callback={form.handleSubmit(handleSubmit)}
+                  />
                   <div className="flex gap-2">
                     <Button
-                      variant={"secondary"}
+                      variant={'secondary'}
                       onClick={() => {
-                        form.clearErrors();
-                        form.reset();
+                        form.clearErrors()
+                        form.reset()
                       }}
                     >
                       Clear
                     </Button>
                     <DialogClose asChild>
-                      <Button variant={"outline"}>Cancel</Button>
+                      <Button variant={'outline'}>Cancel</Button>
                     </DialogClose>
                   </div>
                 </div>
@@ -305,5 +304,5 @@ export const AccountIsActiveColumn = ({
         </AlertDialog>
       </div>
     </div>
-  );
-};
+  )
+}
