@@ -7,6 +7,7 @@ import {
   getIncomeStatement,
 } from "../database/services/accounts.service";
 import {
+  getAccountTypeBarChartData,
   getAccountTypeById,
   getAccountTypeTotalPerMonthQuery,
 } from "../database/services/accountType.service";
@@ -15,6 +16,7 @@ import { getAllEmployees } from "../database/services/employees.service";
 import { getAllVendors } from "../database/services/vendors.service";
 import {
   AccountTotalValidator,
+  accounTypeIdValidator,
   getAccountTypeTotalPerMonthValidator,
   IncomeStatementByMonthValidator,
 } from "../utils/validators/others.validator";
@@ -140,6 +142,23 @@ export const getAccountTypeTotalPerMonth = async (
     return res.status(200).send({
       accountTypeName: accTypeName!.accTypeName,
       accounts,
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "Server error" });
+  }
+};
+
+export const AccountTypeBarChartData = async (req: Request, res: Response) => {
+  const input = accounTypeIdValidator.safeParse(req.query);
+
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
+
+  try {
+    const data = await getAccountTypeBarChartData(input.data);
+
+    return res.status(200).send({
+      data,
     });
   } catch (error) {
     return res.status(500).send({ error: "Server error" });

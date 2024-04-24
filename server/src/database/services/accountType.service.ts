@@ -93,3 +93,54 @@ export const getAccountTypeTotalPerMonthQuery = async (input: {
     .groupBy(accounts.accName);
   return data;
 };
+
+export const getAccountTypeBarChartData = async (input: {
+  accTypeId: string;
+}) => {
+  const currentMonth = new Date().getMonth();
+
+  let data: Array<any> = [];
+  let aKeys: Array<any> = [];
+  for (let i = 0; i < currentMonth + 1; i++) {
+    const d = await db
+      .select({
+        name: accounts.accName,
+        total: sum(accounts.accAmount),
+      })
+      .from(accounts)
+      .where(
+        and(
+          eq(
+            sql`month(acc_created_at)`,
+            sql`month(${new Date(new Date().getFullYear(), i)})`
+          ),
+          eq(
+            sql`year(acc_created_at)`,
+            sql`year(${new Date(new Date().getFullYear(), i)})`
+          ),
+          eq(accounts.accTypeId, input.accTypeId)
+        )
+      )
+      .groupBy(accounts.accName);
+
+    const dz: any = {};
+
+    d.map((item) => {
+      dz[item.name] = parseFloat(String(item.total));
+      aKeys.push(item.name);
+    });
+
+    data.push({
+      name: new Date(new Date().getFullYear(), i).toLocaleString("default", {
+        month: "long",
+      }),
+      ...dz,
+      total: d.reduce((acc, curr) => acc + parseFloat(String(curr.total)), 0),
+    });
+  }
+
+  return {
+    keys: Array.from(new Set(aKeys)),
+    data,
+  };
+};
