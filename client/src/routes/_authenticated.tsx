@@ -1,4 +1,5 @@
-import { redirect } from '@tanstack/react-router'
+import ErrorComponent from '@/components/ErrorComponent'
+import { redirect, useRouter } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated')({
@@ -38,5 +39,15 @@ export const Route = createFileRoute('/_authenticated')({
         },
       })
     }
+  },
+  errorComponent: ({ error, reset }) => {
+    const router = useRouter()
+    return (
+      <ErrorComponent
+        error={error}
+        resetErrorBoundary={reset}
+        router={router}
+      />
+    )
   },
 })

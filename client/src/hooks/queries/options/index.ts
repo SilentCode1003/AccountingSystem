@@ -48,7 +48,6 @@ export const userOptions = (queryClient: QueryClient) => {
           userType: string
         }
       }>(['CurrentUser'])
-
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/users/?` +
           new URLSearchParams({ userId: userId?.user.userId as string }),
@@ -56,6 +55,7 @@ export const userOptions = (queryClient: QueryClient) => {
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
         user: {
@@ -81,6 +81,7 @@ export const transactionPartnersOptions = () => {
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = response.json() as Promise<{
         employees: Array<Employees>
         customers: Array<Customer>
@@ -102,6 +103,7 @@ export const transactionsOptions = () =>
         },
       )
 
+      if (!response.ok) throw new Error((await response.json()).error)
       const transactionData = (await response.json()) as Promise<{
         transactions: Array<Transactions>
       }>
@@ -120,6 +122,7 @@ export const accountTypesOptions = () =>
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         accountTypes: Array<AccountTypes>
       }>
@@ -138,6 +141,7 @@ export const chequesOptions = () =>
         },
       )
 
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         cheques: Array<Cheques>
       }>
@@ -156,6 +160,7 @@ export const employeesOptions = () =>
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         employees: Array<Employees>
       }>
@@ -174,6 +179,7 @@ export const inventoriesOptions = () =>
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         inventories: Array<Inventories>
       }>
@@ -191,6 +197,7 @@ export const payrollsOptions = () =>
           credentials: 'include',
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         payrolls: Array<Payrolls>
       }>
@@ -209,6 +216,7 @@ export const accountsOptions = () =>
         },
       )
 
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         accounts: Array<Accounts>
       }>
@@ -237,7 +245,7 @@ export const balanceSheetOptions = (date: Date, accTypes: Array<string>) =>
         },
       )
 
-      if (!response.ok) throw new Error()
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<
         Array<{
           accTypeId: string
@@ -277,7 +285,8 @@ export const incomeStatementOptions = (date: Date, accTypes: Array<string>) =>
         },
       )
 
-      if (!response.ok) throw new Error()
+      if (!response.ok) throw new Error((await response.json()).error)
+
       const data = (await response.json()) as Promise<
         Array<{
           accTypeId: string
