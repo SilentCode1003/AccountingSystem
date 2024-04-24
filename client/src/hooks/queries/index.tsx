@@ -5,7 +5,9 @@ import {
 } from '@tanstack/react-query'
 import {
   accountsOptions,
+  accountTypeBarChartDataOptions,
   accountTypesOptions,
+  accountTypeTotalPerMonthOptions,
   balanceSheetOptions,
   chequesOptions,
   currentUserOptions,
@@ -65,3 +67,9 @@ export const useBalanceSheetSuspense = (date: Date, accTypes: string[]) =>
 
 export const useIncomeStatementSuspense = (date: Date, accTypes: string[]) =>
   useSuspenseQuery(incomeStatementOptions(date, accTypes))
+
+export const useAccountTypeTotalPerMonth = (date: Date, accTypeId: string) =>
+  useQuery(accountTypeTotalPerMonthOptions(date, accTypeId))
+
+export const useAccountTypeBarChartData = (accTypeId: string) =>
+  useQuery(accountTypeBarChartDataOptions(accTypeId))

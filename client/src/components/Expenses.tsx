@@ -1,96 +1,92 @@
-import { text, Text } from './ui/text'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select'
+import { Text } from './ui/text'
+
 import PieChart from './PieChart'
 import randomColor from 'randomcolor'
 import { RxDotFilled } from 'react-icons/rx'
 import { useState } from 'react'
 import { Card } from './ui/card'
+import { useAccountTypeTotalPerMonth } from '@/hooks/queries'
+import MonthPicker from './ui/month-picker'
 
-const expenseData = {
-  'Current Month': [
-    { name: 'Rent', value: 4000 },
-    { name: 'Payables', value: 3000 },
-    { name: 'Electricity', value: 3000 },
-    { name: 'Payroll', value: 2000 },
-  ],
-  'Last Month': [
-    { name: 'Rent', value: 5000 },
-    { name: 'Payables', value: 2000 },
-    { name: 'Electricity', value: 8000 },
-    { name: 'Payroll', value: 1000 },
-  ],
-}
+function Expenses({ accTypeId }: { accTypeId: string }) {
+  const [month, setMonth] = useState<Date>(new Date())
 
-function Expenses() {
-  const [month, setMonth] = useState<string>('Current Month')
+  const accountTypeTotal = useAccountTypeTotalPerMonth(month, accTypeId)
+
   return (
-    <Card className="p-4 ">
-      <div className="flex justify-between w-full">
-        <Text variant={'heading3bold'}>EXPENSES</Text>
-        <div className="flex items-center">
-          <Select value={month} onValueChange={setMonth}>
-            <SelectTrigger className={`${text({ variant: 'heading3ghost' })}`}>
-              <SelectValue placeholder="Current Month" />
-            </SelectTrigger>
-
-            <SelectContent className={`${text({ variant: 'heading3ghost' })}`}>
-              <SelectItem value="Current Month">Current Month</SelectItem>
-              <SelectItem value="Last Month">Last Month</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="flex gap-4s">
-        <div className="flex flex-col justify-start">
-          <div className="w-fit">
-            <Text variant={'heading3bold'}>
-              ₱
-              {expenseData[month as keyof typeof expenseData].reduce(
-                (acc, val) => acc + val.value,
-                0,
-              )}
-            </Text>
-            <Text variant={'heading3ghost'}>Current Month</Text>
-          </div>
-          <div>
-            <PieChart
-              data={expenseData[month as keyof typeof expenseData].map((d) => {
-                return {
-                  ...d,
-                  color: randomColor({ hue: 'red', luminosity: 'light' }),
-                }
-              })}
-            />
-          </div>
-        </div>
-        <div className="mt-8">
-          {expenseData[month as keyof typeof expenseData]
-            .map((d) => {
-              return {
-                ...d,
-                color: randomColor({ hue: 'red', luminosity: 'light' }),
-              }
-            })
-            .map((d, index) => (
-              <div key={index} className="flex flex-col">
-                <div className="flex items-center">
-                  <RxDotFilled size={20} color={d.color} />
-                  <Text variant={'heading4bold'}>₱{d.value}</Text>
-                </div>
-                <Text className="ml-4" variant={'body'}>
-                  {d.name}
-                </Text>
+    <>
+      <Card className="p-4 min-h-[310px]">
+        {accountTypeTotal.isSuccess && (
+          <>
+            <div className="flex justify-between w-full">
+              <Text variant={'heading3bold'}>
+                {accountTypeTotal.data.accountTypeName
+                  .concat('s')
+                  .toUpperCase()}
+              </Text>
+              <div className="flex items-center">
+                <MonthPicker currentMonth={month} onMonthChange={setMonth} />
               </div>
-            ))}
-        </div>
-      </div>
-    </Card>
+            </div>
+            {accountTypeTotal.data.accounts.length > 0 ? (
+              <div className="flex gap-4s">
+                <div className="flex flex-col justify-start">
+                  <div className="w-fit">
+                    <Text variant={'heading3bold'}>
+                      ₱
+                      {accountTypeTotal.data.accounts.reduce(
+                        (acc, val) => acc + parseFloat(String(val.total)),
+                        0,
+                      )}
+                    </Text>
+                    <Text variant={'heading3ghost'}>Current Month</Text>
+                  </div>
+                  <div>
+                    <PieChart
+                      data={accountTypeTotal.data.accounts.map((d) => {
+                        return {
+                          name: d.name,
+                          value: parseFloat(String(d.total)),
+                          color: randomColor({
+                            hue: 'red',
+                            luminosity: 'light',
+                          }),
+                        }
+                      })}
+                    />
+                  </div>
+                </div>
+                <div className="mt-8">
+                  {accountTypeTotal.data.accounts
+                    .map((d) => {
+                      return {
+                        name: d.name,
+                        value: d.total,
+                        color: randomColor({ hue: 'red', luminosity: 'light' }),
+                      }
+                    })
+                    .map((d, index) => (
+                      <div key={index} className="flex flex-col">
+                        <div className="flex items-center">
+                          <RxDotFilled size={20} color={d.color} />
+                          <Text variant={'heading4bold'}>₱{d.value}</Text>
+                        </div>
+                        <Text className="ml-4" variant={'body'}>
+                          {d.name}
+                        </Text>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            ) : (
+              <Text className="text-center w-full h-full " variant={'heading2'}>
+                No Data Available
+              </Text>
+            )}
+          </>
+        )}
+      </Card>
+    </>
   )
 }
 

@@ -300,3 +300,63 @@ export const incomeStatementOptions = (date: Date, accTypes: Array<string>) =>
       return data
     },
   })
+
+export const accountTypeBarChartDataOptions = (accTypeId: string) =>
+  queryOptions({
+    queryKey: ['AccountTypeBarChartData', { accTypeId }],
+    queryFn: async () => {
+      let params = new URLSearchParams({
+        accTypeId,
+      })
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/others/AccountTypeBarChartData?` +
+          params,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        data: {
+          keys: Array<string>
+          data: Array<any>
+        }
+      }>
+      return data
+    },
+  })
+
+export const accountTypeTotalPerMonthOptions = (
+  date: Date,
+  accTypeId: string,
+) =>
+  queryOptions({
+    queryKey: [
+      'AccountTypeTotalPerMonth',
+      { date: date.getMonth() },
+      { accTypeId },
+    ],
+    queryFn: async () => {
+      let params = new URLSearchParams({
+        date: date.toISOString(),
+        accTypeId,
+      })
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/others/accountTypeTotal/?` + params,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        accountTypeName: string
+        accounts: Array<{
+          name: string
+          total: number
+        }>
+      }>
+      return data
+    },
+  })
