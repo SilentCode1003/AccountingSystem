@@ -19,6 +19,7 @@ import accountTypeRouter from "./routes/accountType.routes";
 import authRouter from "./routes/auth.routes";
 import othersRouter from "./routes/others.routes";
 import fileUpload from "express-fileupload";
+import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 
 declare module "express-session" {
   interface SessionData {
@@ -95,5 +96,8 @@ app.use("/transactions", transactionRouter);
 
 //route for all vendor actions
 app.use("/vendors", vendorRouter);
+
+//route for uncatched error
+app.use(errorHandler);
 
 export default app;
