@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getAccountTotal,
+  getAccountTypeTotalPerMonth,
   getBalanceSheetByMonth,
   getIncomeStatementByMonth,
 } from "../controller/others.controllers";
@@ -15,5 +16,8 @@ othersRouter.get("/incomeStatement", getIncomeStatementByMonth);
 
 //get balance sheet data per month
 othersRouter.get("/balanceSheet", getBalanceSheetByMonth);
+
+//get account type total per month
+othersRouter.get("/accountTypeTotal", getAccountTypeTotalPerMonth);
 
 export default othersRouter;

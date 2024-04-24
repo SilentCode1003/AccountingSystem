@@ -65,6 +65,7 @@ app.get("/login", currentUser);
 
 app.get("/transactionPartners", getTransactionPartners);
 
+//route for all other actions
 app.use("/others", othersRouter);
 
 //route for all account actions

@@ -1,6 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq, sql, sum } from "drizzle-orm";
 import db from "..";
 import accountTypes from "../schema/accountType.schema";
+import accounts from "../schema/accounts.schema";
 
 const ACCTYPE_DEFAULT = {
   CASHFLOW: "CASHFLOW",
@@ -70,4 +71,25 @@ export const removeAccountType = async (input: { accTypeId: string }) => {
   await db
     .delete(accountTypes)
     .where(eq(accountTypes.accTypeId, input.accTypeId));
+};
+
+export const getAccountTypeTotalPerMonthQuery = async (input: {
+  accTypeId: string;
+  date: Date;
+}) => {
+  const data = await db
+    .select({
+      name: accounts.accName,
+      total: sum(accounts.accAmount),
+    })
+    .from(accounts)
+    .where(
+      and(
+        eq(sql`month(acc_created_at)`, sql`month(${input.date})`),
+        eq(sql`year(acc_created_at)`, sql`year(${input.date})`),
+        eq(accounts.accTypeId, input.accTypeId)
+      )
+    )
+    .groupBy(accounts.accName);
+  return data;
 };

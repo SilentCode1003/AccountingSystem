@@ -1,19 +1,23 @@
+import { and, eq, sql, sum } from "drizzle-orm";
 import { Request, Response } from "express";
-import { getAllEmployees } from "../database/services/employees.service";
-import { getAllCustomers } from "../database/services/customers.service";
-import { getAllVendors } from "../database/services/vendors.service";
 import db from "../database";
-import { sum, eq, sql } from "drizzle-orm";
 import accounts from "../database/schema/accounts.schema";
-import {
-  AccountTotalValidator,
-  IncomeStatementByMonthValidator,
-} from "../utils/validators/others.validator";
-import { and } from "drizzle-orm";
 import {
   getBalanceSheet,
   getIncomeStatement,
 } from "../database/services/accounts.service";
+import {
+  getAccountTypeById,
+  getAccountTypeTotalPerMonthQuery,
+} from "../database/services/accountType.service";
+import { getAllCustomers } from "../database/services/customers.service";
+import { getAllEmployees } from "../database/services/employees.service";
+import { getAllVendors } from "../database/services/vendors.service";
+import {
+  AccountTotalValidator,
+  getAccountTypeTotalPerMonthValidator,
+  IncomeStatementByMonthValidator,
+} from "../utils/validators/others.validator";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -109,4 +113,35 @@ export const getBalanceSheetByMonth = async (req: Request, res: Response) => {
   );
 
   return res.send(accountByMonth);
+};
+
+export const getAccountTypeTotalPerMonth = async (
+  req: Request,
+  res: Response
+) => {
+  const input = getAccountTypeTotalPerMonthValidator.safeParse({
+    date: new Date(req.query.date as string),
+    accTypeId: req.query.accTypeId,
+  });
+
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
+
+  try {
+    const accTypeName = await getAccountTypeById({
+      accTypeId: input.data.accTypeId,
+    });
+
+    const accounts = await getAccountTypeTotalPerMonthQuery({
+      accTypeId: input.data.accTypeId,
+      date: input.data.date,
+    });
+
+    return res.status(200).send({
+      accountTypeName: accTypeName!.accTypeName,
+      accounts,
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "Server error" });
+  }
 };
