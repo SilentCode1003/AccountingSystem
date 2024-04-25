@@ -69,11 +69,13 @@ export const useBalanceSheetSuspense = (date: Date, accTypes: string[]) =>
 export const useIncomeStatementSuspense = (date: Date, accTypes: string[]) =>
   useSuspenseQuery(incomeStatementOptions(date, accTypes))
 
-export const useAccountTypeTotalPerMonth = (date: Date, accTypeId: string) =>
-  useQuery(accountTypeTotalPerMonthOptions(date, accTypeId))
+export const useSuspenseAccountTypeTotalPerMonth = (
+  date: Date,
+  accTypeId: string,
+) => useSuspenseQuery(accountTypeTotalPerMonthOptions(date, accTypeId))
 
 export const useAccountTypeBarChartData = (accTypeId: string) =>
   useQuery(accountTypeBarChartDataOptions(accTypeId))
 
-export const useCashFlowBarChartData = () =>
-  useQuery(cashFlowBarChartDataOptions())
+export const useSuspenseCashFlowBarChartData = () =>
+  useSuspenseQuery(cashFlowBarChartDataOptions())

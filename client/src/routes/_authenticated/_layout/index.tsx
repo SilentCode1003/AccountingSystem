@@ -3,17 +3,39 @@ import AccountTypeTotalCard from '@/components/AccountTypeTotalCard'
 import RecentTransactions from '@/components/RecentTransactions'
 import { recentTransactionsColumns } from '@/components/table-columns/transactions.columns'
 import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Text } from '@/components/ui/text'
 import { useAccountTypes, useTransactions } from '@/hooks/queries'
+import { transactionsOptions } from '@/hooks/queries/options'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/_layout/')({
+  loader: async ({ context }) => {
+    const transactions = await context.queryClient.ensureQueryData(
+      transactionsOptions(),
+    )
+    return { transactions }
+  },
   component: Home,
   pendingComponent: LoadingComponent,
 })
 
 function LoadingComponent() {
-  return <></>
+  return (
+    <div className="p-4  flex flex-col gap-8 items-center min-h-[85vh]">
+      <div className="flex gap-4 w-full">
+        <Skeleton className="flex-1 h-[106px]" />
+        <Skeleton className="flex-1 h-[106px]" />
+        <Skeleton className="flex-1 h-[106px]" />
+      </div>
+      <div className="w-full">
+        <Skeleton className="h-[414px] w-full" />
+      </div>
+      <div className="w-full flex flex-col gap-4">
+        <Skeleton className=" w-full h-80" />
+      </div>
+    </div>
+  )
 }
 
 function Home() {
