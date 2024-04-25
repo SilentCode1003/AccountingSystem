@@ -1,13 +1,14 @@
-import DataTable from "@/components/DataTable";
-import { LoadingTable } from "@/components/LoadingComponents";
-import { PromptModal } from "@/components/PromptModal";
-import { inventoryColumns } from "@/components/table-columns/inventory.columns";
+import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
+import { PromptModal } from '@/components/PromptModal'
+import { inventoryColumns } from '@/components/table-columns/inventory.columns'
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -15,67 +16,67 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/Form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/Form'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useCreateInventory } from "@/hooks/mutations";
-import { useInventories } from "@/hooks/queries";
-import { inventoriesOptions } from "@/hooks/queries/options";
-import { createInventorySchema } from "@/validators/inventory.validator";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from '@/components/ui/select'
+import { useCreateInventory } from '@/hooks/mutations'
+import { useInventories } from '@/hooks/queries'
+import { inventoriesOptions } from '@/hooks/queries/options'
+import { createInventorySchema } from '@/validators/inventory.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   AlertDialogCancel,
   AlertDialogTrigger,
-} from "@radix-ui/react-alert-dialog";
-import { createFileRoute } from "@tanstack/react-router";
-import { PackagePlusIcon } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+} from '@radix-ui/react-alert-dialog'
+import { createFileRoute } from '@tanstack/react-router'
+import { PackagePlusIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-export const Route = createFileRoute("/_authenticated/_layout/inventory/")({
+export const Route = createFileRoute('/_authenticated/_layout/inventory/')({
   loader: async ({ context }) => {
     const inventories =
-      await context.queryClient.ensureQueryData(inventoriesOptions());
-    return { inventories };
+      await context.queryClient.ensureQueryData(inventoriesOptions())
+    return { inventories }
   },
   component: Inventory,
   pendingComponent: LoadingComponent,
-});
+})
 
 function LoadingComponent() {
   return (
     <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
       <LoadingTable />
     </div>
-  );
+  )
 }
 
 function CrudComponents() {
-  const [open, setOpen] = useState<boolean>(false);
-  const createInventory = useCreateInventory({ setOpen });
+  const [open, setOpen] = useState<boolean>(false)
+  const createInventory = useCreateInventory({ setOpen })
   const form = useForm<z.infer<typeof createInventorySchema>>({
     defaultValues: {
-      invAssetName: "",
+      invAssetName: '',
       invStocks: 0,
-      invStatus: "GOOD",
+      invStatus: 'GOOD',
     },
     resolver: zodResolver(createInventorySchema),
-  });
+  })
 
   const handleSubmit = (values: z.infer<typeof createInventorySchema>) => {
     createInventory.mutate({
       invAssetName: values.invAssetName,
       invStocks: values.invStocks,
       invStatus: values.invStatus,
-    });
-  };
+    })
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -146,9 +147,21 @@ function CrudComponents() {
                           <SelectValue placeholder="Select Status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="GOOD">GOOD</SelectItem>
-                          <SelectItem value="WARNING">WARNING</SelectItem>
-                          <SelectItem value="DEPLETED">DEPLETED</SelectItem>
+                          <SelectItem value="GOOD">
+                            <Badge className="bg-green-500 hover:bg-gray-500">
+                              GOOD
+                            </Badge>
+                          </SelectItem>
+                          <SelectItem value="WARNING">
+                            <Badge className="bg-yellow-500 hover:bg-gray-500">
+                              WARNING
+                            </Badge>
+                          </SelectItem>
+                          <SelectItem value="DEPLETED">
+                            <Badge className="bg-red-500 hover:bg-gray-500">
+                              DEPLETED
+                            </Badge>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -168,11 +181,11 @@ function CrudComponents() {
             callback={form.handleSubmit(handleSubmit)}
           />
           <div className="flex gap-2 ">
-            <Button variant={"secondary"} onClick={() => form.clearErrors()}>
+            <Button variant={'secondary'} onClick={() => form.clearErrors()}>
               Clear
             </Button>
             <AlertDialogCancel asChild>
-              <Button variant={"outline"} className="mt-0">
+              <Button variant={'outline'} className="mt-0">
                 Cancel
               </Button>
             </AlertDialogCancel>
@@ -180,11 +193,11 @@ function CrudComponents() {
         </div>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }
 
 function Inventory() {
-  const Inventories = useInventories();
+  const Inventories = useInventories()
 
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
@@ -197,20 +210,20 @@ function Inventory() {
           data={Inventories.data.inventories}
           filter={[
             {
-              filterColumn: "invAssetName",
-              filterPlaceHolder: "Filter by name",
+              filterColumn: 'invAssetName',
+              filterPlaceHolder: 'Filter by name',
             },
             {
-              filterColumn: "invStatus",
-              filterPlaceHolder: "Filter by status",
-              filterValues: ["GOOD", "WARNING", "DEPLETED"],
+              filterColumn: 'invStatus',
+              filterPlaceHolder: 'Filter by status',
+              filterValues: ['GOOD', 'WARNING', 'DEPLETED'],
             },
           ]}
           CrudComponents={CrudComponents}
         />
       )}
     </div>
-  );
+  )
 }
 
-export default Inventory;
+export default Inventory

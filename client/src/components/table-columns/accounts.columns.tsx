@@ -3,8 +3,10 @@ import { Button } from '../ui/button'
 import { text } from '../ui/text'
 import { ArrowUpDownIcon } from 'lucide-react'
 import {
+  AccountAccountTypeColumn,
   AccountAmountColumn,
   AccountIsActiveColumn,
+  AccountNameColumn,
 } from '../table-components/accounts.tblcomp'
 
 export type Accounts = {
@@ -39,6 +41,7 @@ export const accountsColumns: ColumnDef<Accounts>[] = [
         </Button>
       )
     },
+    cell: AccountNameColumn,
   },
   {
     accessorKey: 'accAmount',
@@ -73,6 +76,7 @@ export const accountsColumns: ColumnDef<Accounts>[] = [
         </Button>
       )
     },
+    cell: AccountAccountTypeColumn,
   },
   {
     accessorKey: 'accDescription',

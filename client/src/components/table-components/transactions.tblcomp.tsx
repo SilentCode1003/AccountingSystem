@@ -1,5 +1,5 @@
-import { Transactions } from "@/components/table-columns/transactions.columns";
-import { Button } from "@/components/ui/button";
+import { Transactions } from '@/components/table-columns/transactions.columns'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -7,24 +7,24 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Text } from "@/components/ui/text";
-import { useUpdateTransaction } from "@/hooks/mutations";
-import { useAccountTypes, useTransactionPartners } from "@/hooks/queries";
-import { updateTransactionSchema } from "@/validators/transactions.validator";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CellContext, Row } from "@tanstack/react-table";
-import { MoreHorizontalIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import DatePicker from "../ui/DatePicker";
+} from '@/components/ui/dropdown-menu'
+import { Text } from '@/components/ui/text'
+import { useUpdateTransaction } from '@/hooks/mutations'
+import { useAccountTypes, useTransactionPartners } from '@/hooks/queries'
+import { updateTransactionSchema } from '@/validators/transactions.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CellContext, Row } from '@tanstack/react-table'
+import { MoreHorizontalIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import DatePicker from '../ui/DatePicker'
 import {
   Form,
   FormControl,
@@ -32,14 +32,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/Form";
-import { Input } from "../ui/input";
+} from '../ui/Form'
+import { Input } from '../ui/input'
 import {
   MultiDialog,
   MultiDialogContainer,
   MultiDialogTrigger,
   useMultiDialog,
-} from "../ui/multi-dialog";
+} from '../ui/multi-dialog'
 import {
   Select,
   SelectContent,
@@ -49,23 +49,24 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import { DialogProps } from "@radix-ui/react-dialog";
-import { PromptModal } from "../PromptModal";
+} from '../ui/select'
+import { Textarea } from '../ui/textarea'
+import { DialogProps } from '@radix-ui/react-dialog'
+import { PromptModal } from '../PromptModal'
+import { Badge } from '../ui/badge'
 
 export const TransactionIndexColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
-  return row.index + 1;
-};
+  return row.index + 1
+}
 
 export const TransactionAccountIDColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
   return (
     <div className="flex justify-between">
-      <div>{row.original.account.accountType.accTypeName}</div>
+      <Badge variant={'outline'}>{row.original.account.accName}</Badge>
       <div>
         <Dialog>
           <DropdownMenu>
@@ -99,26 +100,26 @@ export const TransactionAccountIDColumn = ({
 
             <div className="space-y-4 sm:space-y-0">
               <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={"body"}>
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Account ID
                 </Text>
-                <Text variant={"label"} className="flex-1">
+                <Text variant={'label'} className="flex-1">
                   {row.original.account.accId}
                 </Text>
               </div>
               <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={"body"}>
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Account Type
                 </Text>
-                <Text variant={"label"} className="flex-1">
+                <Badge variant={'secondary'}>
                   {row.original.account.accountType.accTypeName}
-                </Text>
+                </Badge>
               </div>
               <div className="flex flex-col sm:flex-row">
-                <Text className="w-full sm:w-[33%]" variant={"body"}>
+                <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Description
                 </Text>
-                <Text variant={"label"} className="flex-1">
+                <Text variant={'label'} className="flex-1">
                   {row.original.account.accDescription}
                 </Text>
               </div>
@@ -127,67 +128,67 @@ export const TransactionAccountIDColumn = ({
         </Dialog>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export const TransactionAmountColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
-  const amount = parseFloat(row.getValue("tranAmount"));
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "PHP",
-  }).format(amount);
-  return formatted;
-};
+  const amount = parseFloat(row.getValue('tranAmount'))
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'PHP',
+  }).format(amount)
+  return formatted
+}
 
 export const TransactionDate = ({
   row,
 }: CellContext<Transactions, unknown>) => {
-  const date = new Date(row.original.tranTransactionDate);
+  const date = new Date(row.original.tranTransactionDate)
 
-  return date.toLocaleDateString();
-};
+  return date.toLocaleDateString()
+}
 
 export const TransactionWithColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
   let data: {
-    id: string;
-    type: string;
-    name: string;
-    contactInfo: string;
-    email: string;
-    isActive?: string;
-    dateHired?: string;
-    address?: string;
-  };
+    id: string
+    type: string
+    name: string
+    contactInfo: string
+    email: string
+    isActive?: string
+    dateHired?: string
+    address?: string
+  }
   if (row.original.tranEmpId) {
     data = {
       id: row.original.employee.empId,
-      type: "employee",
+      type: 'employee',
       name: row.original.employee.empName,
       contactInfo: row.original.employee.empContactInfo,
       email: row.original.employee.empEmail,
       address: row.original.employee.empAddress,
-    };
+    }
   } else if (row.original.tranCustId) {
     data = {
       id: row.original.customer.custId,
-      type: "customer",
+      type: 'customer',
       name: row.original.customer.custName,
       contactInfo: row.original.customer.custContactInfo,
       email: row.original.customer.custEmail,
       address: row.original.customer.custAddress,
-    };
+    }
   } else {
     data = {
       id: row.original.vendor.vdId,
-      type: "vendor",
+      type: 'vendor',
       name: row.original.vendor.vdName,
       contactInfo: row.original.vendor.vdContactInfo,
       email: row.original.vendor.vdEmail,
-    };
+    }
   }
   return (
     <div className="flex justify-between">
@@ -227,43 +228,43 @@ export const TransactionWithColumn = ({
               <DialogContent className="rounded-md sm:max-w-[500px]">
                 <DialogHeader>
                   <DialogTitle>
-                    {(data.type === "employee" && "Employee Details") ||
-                      (data.type === "customer" && "Customer Details") ||
-                      (data.type === "vendor" && "Vendor Details")}
+                    {(data.type === 'employee' && 'Employee Details') ||
+                      (data.type === 'customer' && 'Customer Details') ||
+                      (data.type === 'vendor' && 'Vendor Details')}
                   </DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4 sm:space-y-0">
                   <div className="flex flex-col sm:flex-row">
-                    <Text className="w-full sm:w-[33%]" variant={"body"}>
+                    <Text className="w-full sm:w-[33%]" variant={'body'}>
                       Name
                     </Text>
-                    <Text variant={"label"} className="flex-1">
+                    <Text variant={'label'} className="flex-1">
                       {data.name}
                     </Text>
                   </div>
                   <div className="flex flex-col sm:flex-row">
-                    <Text className="w-full sm:w-[33%]" variant={"body"}>
+                    <Text className="w-full sm:w-[33%]" variant={'body'}>
                       Email
                     </Text>
-                    <Text variant={"label"} className="flex-1">
+                    <Text variant={'label'} className="flex-1">
                       {data.email}
                     </Text>
                   </div>
                   <div className="flex flex-col sm:flex-row">
-                    <Text className="w-full sm:w-[33%]" variant={"body"}>
+                    <Text className="w-full sm:w-[33%]" variant={'body'}>
                       Contact Info
                     </Text>
-                    <Text variant={"label"} className="flex-1">
+                    <Text variant={'label'} className="flex-1">
                       {data.contactInfo}
                     </Text>
                   </div>
                   {data.address && (
                     <div className="flex flex-col sm:flex-row">
-                      <Text className="w-full sm:w-[33%]" variant={"body"}>
+                      <Text className="w-full sm:w-[33%]" variant={'body'}>
                         Address
                       </Text>
-                      <Text variant={"label"} className="flex-1">
+                      <Text variant={'label'} className="flex-1">
                         {data.address}
                       </Text>
                     </div>
@@ -278,12 +279,12 @@ export const TransactionWithColumn = ({
         </MultiDialog>
       </div>
     </div>
-  );
-};
+  )
+}
 
 function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
-  const [, setOpen] = useMultiDialog("updateTransaction");
-  const accountTypes = useAccountTypes();
+  const [, setOpen] = useMultiDialog('updateTransaction')
+  const accountTypes = useAccountTypes()
   const form = useForm<z.infer<typeof updateTransactionSchema>>({
     defaultValues: {
       tranId: props.row.original.tranId,
@@ -300,17 +301,17 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
       },
     },
     resolver: zodResolver(updateTransactionSchema),
-  });
-  const transactionPartners = useTransactionPartners();
+  })
+  const transactionPartners = useTransactionPartners()
 
   const updateTransaction = useUpdateTransaction({
     setOpenUpdate: setOpen,
     cell: { row: props.row },
-  });
+  })
 
   const handleSubmit = (values: z.infer<typeof updateTransactionSchema>) => {
-    updateTransaction.mutate(values);
-  };
+    updateTransaction.mutate(values)
+  }
   return (
     <Dialog {...props}>
       <DialogContent>
@@ -358,7 +359,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                             {...field}
                             value={
                               Number.isNaN(field.value)
-                                ? ""
+                                ? ''
                                 : Number.parseFloat(String(field.value))
                             }
                             onChange={(e) =>
@@ -388,7 +389,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                             />
                           </FormControl>
                         </FormItem>
-                      );
+                      )
                     }}
                   />
                 </div>
@@ -422,7 +423,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                                     >
                                       {emp.empName} | Employee
                                     </SelectItem>
-                                  )
+                                  ),
                                 )}
                               </SelectGroup>
                               <SelectSeparator />
@@ -436,7 +437,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                                     >
                                       {cust.custName} | Customers
                                     </SelectItem>
-                                  )
+                                  ),
                                 )}
                               </SelectGroup>
                               <SelectSeparator />
@@ -482,9 +483,11 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                                         key={accType.accTypeId}
                                         value={accType.accTypeId}
                                       >
-                                        {accType.accTypeName}
+                                        <Badge variant={'secondary'}>
+                                          {accType.accTypeName}
+                                        </Badge>
                                       </SelectItem>
-                                    )
+                                    ),
                                   )}
                                 </SelectGroup>
                               )}
@@ -531,21 +534,21 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
             />
             <div className="flex gap-2">
               <Button
-                variant={"secondary"}
+                variant={'secondary'}
                 onClick={() => {
-                  form.clearErrors();
-                  form.reset();
+                  form.clearErrors()
+                  form.reset()
                 }}
               >
                 Clear
               </Button>
               <DialogClose asChild>
-                <Button variant={"outline"}>Cancel</Button>
+                <Button variant={'outline'}>Cancel</Button>
               </DialogClose>
             </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

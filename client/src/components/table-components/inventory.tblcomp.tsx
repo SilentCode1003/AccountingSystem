@@ -1,20 +1,20 @@
-import { useUpdateInventory } from "@/hooks/mutations";
-import { cn } from "@/lib/utils";
-import { updateFormSchema } from "@/validators/inventory.validator";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CellContext } from "@tanstack/react-table";
-import { MoreHorizontalIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Inventories } from "../table-columns/inventory.columns";
-import { Button } from "../ui/button";
+import { useUpdateInventory } from '@/hooks/mutations'
+import { cn } from '@/lib/utils'
+import { updateFormSchema } from '@/validators/inventory.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontalIcon } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Inventories } from '../table-columns/inventory.columns'
+import { Button } from '../ui/button'
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogHeader,
   DialogTrigger,
-} from "../ui/dialog";
+} from '../ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +22,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -30,20 +30,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/Form";
-import { Input } from "../ui/input";
+} from '../ui/Form'
+import { Input } from '../ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { PromptModal } from "../PromptModal";
-import { useState } from "react";
+} from '../ui/select'
+import { PromptModal } from '../PromptModal'
+import { useState } from 'react'
+import { Badge } from '../ui/badge'
 
 export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false)
   const form = useForm<z.infer<typeof updateFormSchema>>({
     defaultValues: {
       invId: row.original.invId,
@@ -54,25 +55,28 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
       },
     },
     resolver: zodResolver(updateFormSchema),
-  });
+  })
 
-  const updateInventory = useUpdateInventory({ setOpen });
+  const updateInventory = useUpdateInventory({ setOpen })
   const handleSubmit = (values: z.infer<typeof updateFormSchema>) => {
-    updateInventory.mutate(values);
-  };
+    updateInventory.mutate(values)
+  }
 
   return (
     <div className="flex justify-between ">
       <div className="flex gap-4 items-center">
-        <div
-          className={cn([
-            "w-10 h-10 rounded-full",
-            row.original.invStatus === "WARNING" && "bg-yellow-500",
-            row.original.invStatus === "GOOD" && "bg-emerald-500",
-            row.original.invStatus === "DEPLETED" && "bg-red-500 ",
-          ])}
-        ></div>
-        <div>{row.original.invStatus}</div>
+        <Badge
+          className={cn(
+            [
+              row.original.invStatus === 'WARNING' && 'bg-yellow-500',
+              row.original.invStatus === 'GOOD' && 'bg-emerald-500',
+              row.original.invStatus === 'DEPLETED' && 'bg-red-500 ',
+            ],
+            'hover:bg-gray-500',
+          )}
+        >
+          {row.original.invStatus}
+        </Badge>
       </div>
       <div>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -178,10 +182,20 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
                                 <SelectValue placeholder="Select Status" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="GOOD">GOOD</SelectItem>
-                                <SelectItem value="WARNING">WARNING</SelectItem>
+                                <SelectItem value="GOOD">
+                                  <Badge className="hover:bg-gray-500 bg-emerald-500">
+                                    GOOD
+                                  </Badge>
+                                </SelectItem>
+                                <SelectItem value="WARNING">
+                                  <Badge className="hover:bg-gray-500 bg-yellow-500">
+                                    WARNING
+                                  </Badge>
+                                </SelectItem>
                                 <SelectItem value="DEPLETED">
-                                  DEPLETED
+                                  <Badge className="hover:bg-gray-500 bg-red-500">
+                                    DEPLETED
+                                  </Badge>
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -202,11 +216,11 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
                   callback={form.handleSubmit(handleSubmit)}
                 />
                 <div className="flex gap-2">
-                  <Button variant={"secondary"} onClick={() => form.reset()}>
+                  <Button variant={'secondary'} onClick={() => form.reset()}>
                     Clear
                   </Button>
                   <DialogClose asChild>
-                    <Button variant={"outline"}>Cancel</Button>
+                    <Button variant={'outline'}>Cancel</Button>
                   </DialogClose>
                 </div>
               </div>
@@ -215,5 +229,5 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
         </Dialog>
       </div>
     </div>
-  );
-};
+  )
+}

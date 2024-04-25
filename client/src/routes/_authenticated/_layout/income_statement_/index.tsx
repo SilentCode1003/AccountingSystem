@@ -1,5 +1,6 @@
 import DataTable from '@/components/DataTable'
 import { RevenueColumns } from '@/components/table-columns/incomeStatement.columns'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -80,7 +81,7 @@ function IncomeStatement() {
                       handleAccTypeChange(check, accType)
                     }
                   >
-                    {accType.accTypeName}
+                    <Badge variant={'secondary'}>{accType.accTypeName}</Badge>
                   </DropdownMenuCheckboxItem>
                 ))}
             </DropdownMenuContent>

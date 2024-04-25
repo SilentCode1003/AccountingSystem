@@ -20,6 +20,7 @@ type AccountType = {
 
 type Account = {
   accId: string
+  accName: string
   accTypeId: string
   accountType: AccountType
   accAmount: number

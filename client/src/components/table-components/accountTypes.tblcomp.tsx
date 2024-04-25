@@ -44,6 +44,13 @@ import { Text } from '../ui/text'
 import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
 import { PromptModal } from '../PromptModal'
 import { useState } from 'react'
+import { Badge } from '../ui/badge'
+
+export const AccountTypeNameColumn = ({
+  row,
+}: CellContext<AccountTypes, unknown>) => {
+  return <Badge variant={'secondary'}>{row.original.accTypeName}</Badge>
+}
 
 export const AccountTypeAccountsColumn = ({
   row,
@@ -75,7 +82,9 @@ export const AccountTypeAccountsColumn = ({
       <div className="flex flex-col gap-4">
         {row.original.accounts.length > 0 ? (
           row.original.accounts.map((acc) => (
-            <div key={acc.accId}>{acc.accName}</div>
+            <Badge variant={'outline'} key={acc.accId}>
+              {acc.accName}
+            </Badge>
           ))
         ) : (
           <div>No Accounts</div>

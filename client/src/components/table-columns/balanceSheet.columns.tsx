@@ -4,6 +4,7 @@ import { Text, text } from '../ui/text'
 import { ArrowUpDownIcon } from 'lucide-react'
 import {
   AssetAmountColumn,
+  BalanceSheetAccountNameColumn,
   LiabilityAmountColumn,
 } from '../table-components/balanceSheet.tblcomp'
 
@@ -32,6 +33,7 @@ export const assetsColumn: ColumnDef<Asset>[] = [
         </Button>
       )
     },
+    cell: BalanceSheetAccountNameColumn,
     footer: () => {
       return <Text variant={'heading4bold'}>Total</Text>
     },
@@ -85,6 +87,7 @@ export const liabilitiesColumn: ColumnDef<Liability>[] = [
         </Button>
       )
     },
+    cell: BalanceSheetAccountNameColumn,
     footer: () => {
       return <Text variant={'heading4bold'}>Total</Text>
     },

@@ -45,6 +45,8 @@ import { Text } from '../ui/text'
 import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
 import { PromptModal } from '../PromptModal'
 import { useState } from 'react'
+import { Badge } from '../ui/badge'
+import { cn } from '@/lib/utils'
 
 export const AccountAmountColumn = ({
   row,
@@ -54,6 +56,18 @@ export const AccountAmountColumn = ({
     currency: 'PHP',
   }).format(row.original.accAmount)
   return formatted
+}
+
+export const AccountNameColumn = ({ row }: CellContext<Accounts, unknown>) => {
+  return <Badge variant={'outline'}>{row.original.accName}</Badge>
+}
+
+export const AccountAccountTypeColumn = ({
+  row,
+}: CellContext<Accounts, unknown>) => {
+  return (
+    <Badge variant={'secondary'}>{row.original.accountType.accTypeName}</Badge>
+  )
 }
 
 export const AccountIsActiveColumn = ({
@@ -86,7 +100,14 @@ export const AccountIsActiveColumn = ({
   return (
     <div className="flex justify-between">
       <div className="min-w-24">
-        {row.original.accIsActive ? 'Active' : 'Inactive'}
+        <Badge
+          className={cn(
+            row.original.accIsActive ? 'bg-emerald-500' : 'bg-red-500',
+            'hover:bg-gray-500',
+          )}
+        >
+          {row.original.accIsActive ? 'Active' : 'Inactive'}
+        </Badge>
       </div>
       <div>
         <AlertDialog>
@@ -209,7 +230,9 @@ export const AccountIsActiveColumn = ({
                                                 key={accType.accTypeId}
                                                 value={accType.accTypeId}
                                               >
-                                                {accType.accTypeName}
+                                                <Badge variant={'secondary'}>
+                                                  {accType.accTypeName}
+                                                </Badge>
                                               </SelectItem>
                                             ),
                                           )}

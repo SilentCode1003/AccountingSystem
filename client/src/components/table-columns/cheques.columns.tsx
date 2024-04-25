@@ -2,6 +2,7 @@ import { ColumnDef } from '@tanstack/react-table'
 
 import {
   AccountColumn,
+  ChequeStatusColumn,
   CreatedAtColumn,
   IssueDateColumn,
   PayeeNameColumn,
@@ -18,6 +19,7 @@ type AccountType = {
 
 type Account = {
   accId: string
+  accName: string
   accTypeId: string
   accountType: AccountType
   accAmount: number
@@ -127,6 +129,7 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         </Button>
       )
     },
+    cell: ChequeStatusColumn,
   },
   {
     accessorKey: 'chqCreatedAt',

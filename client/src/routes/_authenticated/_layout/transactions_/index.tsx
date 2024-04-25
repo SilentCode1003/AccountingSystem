@@ -1,10 +1,11 @@
-import DataTable from "@/components/DataTable";
-import { LoadingTable } from "@/components/LoadingComponents";
-import { PromptModal } from "@/components/PromptModal";
-import { transactionColumns } from "@/components/table-columns/transactions.columns";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import DatePicker from "@/components/ui/DatePicker";
+import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
+import { PromptModal } from '@/components/PromptModal'
+import { transactionColumns } from '@/components/table-columns/transactions.columns'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import DatePicker from '@/components/ui/DatePicker'
 import {
   Form,
   FormControl,
@@ -12,8 +13,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/Form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/Form'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -21,65 +22,65 @@ import {
   SelectLabel,
   SelectSeparator,
   SelectTrigger,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
-import { useCreateTransaction } from "@/hooks/mutations";
+} from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Textarea } from '@/components/ui/textarea'
+import { useCreateTransaction } from '@/hooks/mutations'
 import {
   useAccountTypes,
   useTransactionPartners,
   useTransactions,
-} from "@/hooks/queries";
+} from '@/hooks/queries'
 import {
   transactionPartnersOptions,
   transactionsOptions,
-} from "@/hooks/queries/options";
-import { createTransactionSchema } from "@/validators/transactions.validator";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SelectGroup, SelectValue } from "@radix-ui/react-select";
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { ToWords } from "to-words";
-import { z } from "zod";
+} from '@/hooks/queries/options'
+import { createTransactionSchema } from '@/validators/transactions.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { SelectGroup, SelectValue } from '@radix-ui/react-select'
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { ToWords } from 'to-words'
+import { z } from 'zod'
 
 const toWords = new ToWords({
-  localeCode: "en-IN",
+  localeCode: 'en-IN',
   converterOptions: {
     currency: true,
     ignoreDecimal: false,
     ignoreZeroCurrency: false,
     doNotAddOnly: true,
     currencyOptions: {
-      name: "Pesos",
-      plural: "Pesos",
-      symbol: "₱",
+      name: 'Pesos',
+      plural: 'Pesos',
+      symbol: '₱',
       fractionalUnit: {
-        name: "Centavo",
-        plural: "Centavos",
-        symbol: "",
+        name: 'Centavo',
+        plural: 'Centavos',
+        symbol: '',
       },
     },
   },
-});
+})
 
-export const Route = createFileRoute("/_authenticated/_layout/transactions/")({
+export const Route = createFileRoute('/_authenticated/_layout/transactions/')({
   loader: async ({ context }) => {
     const transactions = await context.queryClient.ensureQueryData(
-      transactionsOptions()
-    );
+      transactionsOptions(),
+    )
 
     const transactionPartners = await context.queryClient.ensureQueryData(
-      transactionPartnersOptions()
-    );
+      transactionPartnersOptions(),
+    )
     return {
       transactions,
       transactionPartners,
-    };
+    }
   },
   component: TransactionsComponent,
   pendingComponent: LoadingComponent,
-});
+})
 
 function LoadingComponent() {
   return (
@@ -90,33 +91,33 @@ function LoadingComponent() {
         <Skeleton className="flex-1 h-80" />
       </div>
     </div>
-  );
+  )
 }
 
 function TransactionsComponent() {
-  const transactions = useTransactions();
+  const transactions = useTransactions()
 
-  const accountTypes = useAccountTypes();
+  const accountTypes = useAccountTypes()
 
-  const transactionPartners = useTransactionPartners();
+  const transactionPartners = useTransactionPartners()
 
-  const [person, setPerson] = useState<string>("");
-  const [amount, setAmount] = useState<number>(0.0);
-  const [date, setDate] = useState<Date>();
+  const [person, setPerson] = useState<string>('')
+  const [amount, setAmount] = useState<number>(0.0)
+  const [date, setDate] = useState<Date>()
 
   const form = useForm<z.infer<typeof createTransactionSchema>>({
     defaultValues: {
       tranAmount: 0,
-      tranDescription: "",
-      tranPartner: "",
+      tranDescription: '',
+      tranPartner: '',
     },
     resolver: zodResolver(createTransactionSchema),
-  });
-  const createTransaction = useCreateTransaction(form);
+  })
+  const createTransaction = useCreateTransaction(form)
 
   const handleSubmit = (values: z.infer<typeof createTransactionSchema>) => {
-    createTransaction.mutate(values);
-  };
+    createTransaction.mutate(values)
+  }
 
   return (
     <div className="p-4  flex flex-col gap-8 items-center min-h-[85vh]">
@@ -129,16 +130,16 @@ function TransactionsComponent() {
           data={transactions.data.transactions}
           filter={[
             {
-              filterColumn: "tranAmount",
-              filterPlaceHolder: "Filter by Transaction Amount",
+              filterColumn: 'tranAmount',
+              filterPlaceHolder: 'Filter by Transaction Amount',
             },
             {
-              filterColumn: "tranPartner",
-              filterPlaceHolder: "Filter by Transaction Partner",
+              filterColumn: 'tranPartner',
+              filterPlaceHolder: 'Filter by Transaction Partner',
             },
             {
-              filterColumn: "tranTransactionDate",
-              filterPlaceHolder: "Filter Transac Date",
+              filterColumn: 'tranTransactionDate',
+              filterPlaceHolder: 'Filter Transac Date',
               date: true,
             },
           ]}
@@ -180,25 +181,25 @@ function TransactionsComponent() {
                 <div className="flex-1 flex flex-col h-40">
                   <div>
                     {!Number.isNaN(amount)
-                      ? new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: "PHP",
+                      ? new Intl.NumberFormat('en-US', {
+                          style: 'currency',
+                          currency: 'PHP',
                         }).format(amount)
                       : 0}
                   </div>
                   <div>
-                    Received by:{" "}
-                    {(person.startsWith("emp") &&
+                    Received by:{' '}
+                    {(person.startsWith('emp') &&
                       transactionPartners.data?.employees.filter(
-                        (e) => e.empId === person
+                        (e) => e.empId === person,
                       )[0].empName) ||
-                      (person.startsWith("cust") &&
+                      (person.startsWith('cust') &&
                         transactionPartners.data?.customers.filter(
-                          (e) => e.custId === person
+                          (e) => e.custId === person,
                         )[0].custName) ||
-                      (person.startsWith("vd") &&
+                      (person.startsWith('vd') &&
                         transactionPartners.data?.vendors.filter(
-                          (e) => e.vdId === person
+                          (e) => e.vdId === person,
                         )[0].vdName)}
                     <div>___________________</div>
                     <div>Signature Over Printed Name</div>
@@ -233,15 +234,15 @@ function TransactionsComponent() {
                               step="0.01"
                               {...field}
                               value={
-                                Number.isNaN(field.value) ? "" : field.value
+                                Number.isNaN(field.value) ? '' : field.value
                               }
                               onChange={(e) => {
                                 setAmount(
                                   Number.isNaN(parseFloat(e.target.value))
                                     ? 0
-                                    : (e.target.value as unknown as number)
-                                );
-                                field.onChange(parseFloat(e.target.value));
+                                    : (e.target.value as unknown as number),
+                                )
+                                field.onChange(parseFloat(e.target.value))
                               }}
                             />
                           </FormControl>
@@ -264,13 +265,13 @@ function TransactionsComponent() {
                               <DatePicker
                                 date={field.value}
                                 setDate={(value: Date) => {
-                                  setDate(value);
-                                  field.onChange(value);
+                                  setDate(value)
+                                  field.onChange(value)
                                 }}
                               />
                             </FormControl>
                           </FormItem>
-                        );
+                        )
                       }}
                     />
                   </div>
@@ -289,8 +290,8 @@ function TransactionsComponent() {
                             <Select
                               defaultValue={field.value}
                               onValueChange={(value) => {
-                                setPerson(value);
-                                field.onChange(value);
+                                setPerson(value)
+                                field.onChange(value)
                               }}
                             >
                               <SelectTrigger>
@@ -307,7 +308,7 @@ function TransactionsComponent() {
                                       >
                                         {emp.empName} | Employee
                                       </SelectItem>
-                                    )
+                                    ),
                                   )}
                                 </SelectGroup>
                                 <SelectSeparator />
@@ -321,7 +322,7 @@ function TransactionsComponent() {
                                       >
                                         {cust.custName} | Customers
                                       </SelectItem>
-                                    )
+                                    ),
                                   )}
                                 </SelectGroup>
                                 <SelectSeparator />
@@ -332,7 +333,7 @@ function TransactionsComponent() {
                                       <SelectItem key={vd.vdId} value={vd.vdId}>
                                         {vd.vdName} | Vendor
                                       </SelectItem>
-                                    )
+                                    ),
                                   )}
                                 </SelectGroup>
                               </SelectContent>
@@ -369,9 +370,11 @@ function TransactionsComponent() {
                                           key={accType.accTypeId}
                                           value={accType.accTypeId}
                                         >
-                                          {accType.accTypeName}
+                                          <Badge variant={'secondary'}>
+                                            {accType.accTypeName}
+                                          </Badge>
                                         </SelectItem>
-                                      )
+                                      ),
                                     )}
                                   </SelectGroup>
                                 )}
@@ -418,11 +421,11 @@ function TransactionsComponent() {
               />
               <Button
                 onClick={() => {
-                  form.clearErrors();
-                  form.reset();
+                  form.clearErrors()
+                  form.reset()
                 }}
                 className="flex-1"
-                variant={"outline"}
+                variant={'outline'}
               >
                 Clear
               </Button>
@@ -431,7 +434,7 @@ function TransactionsComponent() {
         </Card>
       </div>
     </div>
-  );
+  )
 }
 
-export default TransactionsComponent;
+export default TransactionsComponent

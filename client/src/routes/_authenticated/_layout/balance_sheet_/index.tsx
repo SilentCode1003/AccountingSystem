@@ -1,5 +1,6 @@
 import DataTable from '@/components/DataTable'
 import { assetsColumn } from '@/components/table-columns/balanceSheet.columns'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -78,7 +79,7 @@ function BalanceSheet() {
                       handleAccTypeChange(check, accType)
                     }
                   >
-                    {accType.accTypeName}
+                    <Badge variant={'secondary'}>{accType.accTypeName}</Badge>
                   </DropdownMenuCheckboxItem>
                 ))}
             </DropdownMenuContent>

@@ -3,7 +3,10 @@ import { Button } from '../ui/button'
 import { text } from '../ui/text'
 import { ArrowUpDownIcon } from 'lucide-react'
 import { Accounts } from './accounts.columns'
-import { AccountTypeAccountsColumn } from '../table-components/accountTypes.tblcomp'
+import {
+  AccountTypeAccountsColumn,
+  AccountTypeNameColumn,
+} from '../table-components/accountTypes.tblcomp'
 
 export type AccountTypes = {
   accTypeId: string
@@ -27,6 +30,7 @@ export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
         </Button>
       )
     },
+    cell: AccountTypeNameColumn,
     meta: 'accTypeName',
   },
   {
