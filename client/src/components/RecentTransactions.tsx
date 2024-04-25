@@ -34,16 +34,20 @@ import {
 } from './ui/select'
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { ChevronDownIcon, FilterIcon } from 'lucide-react'
+import {
+  ChevronDownIcon,
+  FilterIcon,
+  SquareArrowUpRightIcon,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import DatePicker from './ui/DatePicker'
 import { Popover, PopoverContent } from './ui/popover'
 import { PopoverTrigger } from '@radix-ui/react-popover'
+import { Link } from '@tanstack/react-router'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -95,7 +99,7 @@ function Filters<TData>({
   }>
 }) {
   return (
-    <div className="flex flex-col gap-2 sm:grid sm:grid-cols-[repeat(2,minmax(200px,1fr))] sm:gap-4">
+    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-4">
       {filter.map(
         ({ filterColumn, filterPlaceHolder, filterValues, date }, index) => {
           if (!date) {
@@ -154,7 +158,7 @@ function Filters<TData>({
                     variant={'outline'}
                     className={cn(
                       text({ variant: 'label' }),
-                      'w-full',
+                      'w-full sm:w-fit',
                       'justify-between',
                     )}
                   >
@@ -162,7 +166,7 @@ function Filters<TData>({
                     <ChevronDownIcon />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="space-y-2">
+                <PopoverContent className="space-y-2 ">
                   <DatePicker
                     triggerLabel="Start Date"
                     date={
@@ -220,7 +224,7 @@ function Filters<TData>({
   )
 }
 
-function DataTable<TData, TValue>({
+function RecentTransactions<TData, TValue>({
   columns,
   data,
   pageSize,
@@ -269,38 +273,10 @@ function DataTable<TData, TValue>({
           <div />
         )}
         <div className={cn('flex gap-4', !showVisibility ? 'hidden' : '')}>
-          <div className="self-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto">
-                  Columns
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => {
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={column.id}
-                        className="capitalize"
-                        checked={column.getIsVisible()}
-                        onCheckedChange={(value) =>
-                          column.toggleVisibility(!!value)
-                        }
-                      >
-                        <>{column.columnDef.meta}</>
-                      </DropdownMenuCheckboxItem>
-                    )
-                  })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
           {filter && (
             <div className="flex justify-end lg:hidden ">
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button variant="secondary">
                     <FilterIcon />
                   </Button>
@@ -318,6 +294,11 @@ function DataTable<TData, TValue>({
               <Filters table={table} filter={filter} />
             </div>
           )}
+          <Button variant={'secondary'}>
+            <Link to="/transactions">
+              <SquareArrowUpRightIcon />
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -391,26 +372,8 @@ function DataTable<TData, TValue>({
           )}
         </Table>
       </div>
-      <div className="flex items-center justify-center space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
     </div>
   )
 }
 
-export default DataTable
+export default RecentTransactions

@@ -157,3 +157,81 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
     cell: TransactionWithColumn,
   },
 ]
+
+export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
+  {
+    accessorKey: 'tranAccId',
+    meta: 'Account',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Account
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: TransactionAccountIDColumn,
+  },
+  {
+    accessorKey: 'tranAmount',
+    meta: 'Transaction Amount',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Transaction Amount
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: TransactionAmountColumn,
+  },
+  {
+    accessorKey: 'tranTransactionDate',
+    meta: 'Transaction Date',
+    filterFn: 'dateBetweenFilter',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Transaction Date
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: TransactionDate,
+  },
+  {
+    accessorKey: 'tranPartner',
+    accessorFn: (row) => {
+      if (row.tranEmpId) return row.employee.empName
+      else if (row.tranCustId) return row.customer.custName
+      else return row.vendor.vdName
+    },
+    meta: 'Transaction Partner',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Transaction Partner
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+
+    cell: (c) => TransactionWithColumn({ ...c, dashboard: true }),
+  },
+]

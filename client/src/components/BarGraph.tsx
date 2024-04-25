@@ -10,21 +10,23 @@ import {
   YAxis,
 } from 'recharts'
 
-const rndColor = randomColor({ luminosity: 'light', hue: 'red' })
-const salesColor = randomColor({ luminosity: 'light', hue: 'red' })
+const colors: any = {
+  REVENUE: '#10b981',
+  EXPENSE: '#f43f5e',
+}
 const totalColor = randomColor({ luminosity: 'light', hue: 'red' })
 
 function BarGraph({
-  data,
+  BarChartData,
 }: {
-  data: {
-    keys: Array<string>
+  BarChartData: {
+    dataKeys: Array<string>
     data: Array<any>
   }
 }) {
   return (
-    <ResponsiveContainer className="py-4" width="100%" height="100%">
-      <ComposedChart data={data.data} width={350} height={414}>
+    <ResponsiveContainer className="py-4 px-4" width="100%" height="100%">
+      <ComposedChart data={BarChartData.data} width={350} height={414}>
         <XAxis
           dataKey="name"
           fontSize={12}
@@ -48,11 +50,13 @@ function BarGraph({
                     {payload.map((data, index) => (
                       <div className="flex flex-col" key={index}>
                         <span
-                          className={`text-[0.70rem] uppercase text-[${rndColor}]`}
+                          className={`text-[0.70rem] uppercase text-[${colors[data.name as string]}]`}
                         >
                           {data.name}
                         </span>
-                        <span className={`font-bold text-[${rndColor}]`}>
+                        <span
+                          className={`font-bold text-[${colors[data.name as string]}]`}
+                        >
                           {data.value}
                         </span>
                       </div>
@@ -67,14 +71,14 @@ function BarGraph({
         />
         <Legend />
 
-        {data.keys.map((data, index) => {
+        {BarChartData.dataKeys.map((data, index) => {
+          console.log(data)
           return (
             <Bar
               dataKey={data}
-              maxBarSize={40}
+              maxBarSize={80}
               radius={[4, 4, 0, 0]}
-              stackId={'a'}
-              fill={salesColor}
+              fill={colors[data]}
               key={index}
             />
           )

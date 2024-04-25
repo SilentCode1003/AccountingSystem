@@ -151,8 +151,9 @@ export const TransactionDate = ({
 }
 
 export const TransactionWithColumn = ({
+  dashboard,
   row,
-}: CellContext<Transactions, unknown>) => {
+}: CellContext<Transactions, unknown> & { dashboard?: boolean }) => {
   let data: {
     id: string
     type: string
@@ -215,11 +216,13 @@ export const TransactionWithColumn = ({
                   View Details
                 </DropdownMenuItem>
               </MultiDialogTrigger>
-              <MultiDialogTrigger value="updateTransaction">
-                <DropdownMenuItem className="hover:cursor-pointer">
-                  Update Transaction
-                </DropdownMenuItem>
-              </MultiDialogTrigger>
+              {!dashboard && (
+                <MultiDialogTrigger value="updateTransaction">
+                  <DropdownMenuItem className="hover:cursor-pointer">
+                    Update Transaction
+                  </DropdownMenuItem>
+                </MultiDialogTrigger>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -273,9 +276,11 @@ export const TransactionWithColumn = ({
               </DialogContent>
             </Dialog>
           </MultiDialogContainer>
-          <MultiDialogContainer value="updateTransaction">
-            <UpdateFormDialog row={row} />
-          </MultiDialogContainer>
+          {!dashboard && (
+            <MultiDialogContainer value="updateTransaction">
+              <UpdateFormDialog row={row} />
+            </MultiDialogContainer>
+          )}
         </MultiDialog>
       </div>
     </div>
