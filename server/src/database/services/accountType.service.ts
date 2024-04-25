@@ -79,7 +79,6 @@ export const getAccountTypeTotalPerMonthQuery = async (input: {
 }) => {
   const data = await db
     .select({
-      name: accounts.accName,
       total: sum(accounts.accAmount),
     })
     .from(accounts)
@@ -89,9 +88,8 @@ export const getAccountTypeTotalPerMonthQuery = async (input: {
         eq(sql`year(acc_created_at)`, sql`year(${input.date})`),
         eq(accounts.accTypeId, input.accTypeId)
       )
-    )
-    .groupBy(accounts.accName);
-  return data;
+    );
+  return data[0].total;
 };
 
 export const getAccountTypeBarChartData = async (input: {

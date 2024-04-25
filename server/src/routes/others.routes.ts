@@ -4,6 +4,7 @@ import {
   getAccountTotal,
   getAccountTypeTotalPerMonth,
   getBalanceSheetByMonth,
+  getBarChartCashFlowData,
   getIncomeStatementByMonth,
 } from "../controller/others.controllers";
 
@@ -23,5 +24,8 @@ othersRouter.get("/accountTypeTotal", getAccountTypeTotalPerMonth);
 
 //get BarChartData of Account Type
 othersRouter.get("/AccountTypeBarChartData", AccountTypeBarChartData);
+
+//get Cash Flow barchart data
+othersRouter.get("/cashFlowBarChart", getBarChartCashFlowData);
 
 export default othersRouter;

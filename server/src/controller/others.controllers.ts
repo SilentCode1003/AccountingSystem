@@ -1,4 +1,4 @@
-import { and, eq, sql, sum } from "drizzle-orm";
+import { and, eq, inArray, sql, sum } from "drizzle-orm";
 import { Request, Response } from "express";
 import db from "../database";
 import accounts from "../database/schema/accounts.schema";
@@ -134,14 +134,32 @@ export const getAccountTypeTotalPerMonth = async (
       accTypeId: input.data.accTypeId,
     });
 
-    const accounts = await getAccountTypeTotalPerMonthQuery({
+    const total = await getAccountTypeTotalPerMonthQuery({
       accTypeId: input.data.accTypeId,
       date: input.data.date,
     });
 
+    const prevMonthTotal = await getAccountTypeTotalPerMonthQuery({
+      accTypeId: input.data.accTypeId,
+      date: new Date(
+        input.data.date.getFullYear(),
+        input.data.date.getMonth() - 1
+      ),
+    });
+
     return res.status(200).send({
       accountTypeName: accTypeName!.accTypeName,
-      accounts,
+      total,
+      percentAgainstPrevMonth:
+        Number(total) > Number(prevMonthTotal)
+          ? (parseFloat(String(prevMonthTotal ?? 0)) /
+              parseFloat(String(total ?? 0))) *
+            100
+          : -(
+              (parseFloat(String(prevMonthTotal ?? 0)) /
+                parseFloat(String(total ?? 0))) *
+              100
+            ),
     });
   } catch (error) {
     return res.status(500).send({ error: "Server error" });
@@ -163,4 +181,68 @@ export const AccountTypeBarChartData = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({ error: "Server error" });
   }
+};
+
+export const getBarChartCashFlowData = async (req: Request, res: Response) => {
+  const currentMonth = new Date().getMonth();
+
+  let data: Array<any> = [];
+  let aKeys: Array<any> = [];
+
+  for (let i = 0; i < currentMonth + 1; i++) {
+    const d = await db
+      .select({
+        total: sum(accounts.accAmount),
+        accTypeId: accounts.accTypeId,
+      })
+      .from(accounts)
+      .where(
+        and(
+          eq(
+            sql`month(acc_created_at)`,
+            sql`month(${new Date(new Date().getFullYear(), i)})`
+          ),
+          eq(
+            sql`year(acc_created_at)`,
+            sql`year(${new Date(new Date().getFullYear(), i)})`
+          ),
+          inArray(accounts.accTypeId, [
+            "accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce",
+            "accTypeId 972ee0ef-3a55-4c9a-9707-3c3fc08e367c",
+          ])
+        )
+      )
+      .groupBy(accounts.accTypeId);
+
+    const dz: any = {};
+
+    await Promise.all(
+      d.map(async (item) => {
+        const accTypeName = await db.query.accountTypes.findFirst({
+          where: eq(accounts.accTypeId, item.accTypeId),
+        });
+
+        dz[accTypeName!.accTypeName] = parseFloat(String(item.total));
+        aKeys.push(accTypeName?.accTypeName);
+      })
+    );
+
+    data.push({
+      name: new Date(new Date().getFullYear(), i).toLocaleString("default", {
+        month: "long",
+      }),
+      ...dz,
+      total: d.reduce(
+        (acc, curr) =>
+          curr.accTypeId === "accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce"
+            ? acc - parseFloat(String(curr.total))
+            : acc + parseFloat(String(curr.total)),
+        0
+      ),
+    });
+  }
+  return res.send({
+    dataKeys: Array.from(new Set(aKeys)),
+    data,
+  });
 };

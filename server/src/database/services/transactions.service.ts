@@ -1,11 +1,11 @@
 import db from "../index";
 import crypto from "crypto";
-import transactions from "../schema/transactions.schema";
-import { eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { addAccount, editAccount } from "./accounts.service";
+import transactions from "../schema/transactions.schema";
 
 export const getAllTransactions = async () => {
-  const transactions = await db.query.transactions.findMany({
+  const allTransactions = await db.query.transactions.findMany({
     with: {
       account: {
         with: {
@@ -16,9 +16,10 @@ export const getAllTransactions = async () => {
       customer: true,
       vendor: true,
     },
+    orderBy: desc(transactions.tranTransactionDate),
   });
 
-  return transactions;
+  return allTransactions;
 };
 
 export const addTransaction = async (input: {
