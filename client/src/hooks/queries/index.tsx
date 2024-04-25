@@ -9,6 +9,7 @@ import {
   accountTypesOptions,
   accountTypeTotalPerMonthOptions,
   balanceSheetOptions,
+  cashFlowBarChartDataOptions,
   chequesOptions,
   currentUserOptions,
   employeesOptions,
@@ -73,3 +74,6 @@ export const useAccountTypeTotalPerMonth = (date: Date, accTypeId: string) =>
 
 export const useAccountTypeBarChartData = (accTypeId: string) =>
   useQuery(accountTypeBarChartDataOptions(accTypeId))
+
+export const useCashFlowBarChartData = () =>
+  useQuery(cashFlowBarChartDataOptions())

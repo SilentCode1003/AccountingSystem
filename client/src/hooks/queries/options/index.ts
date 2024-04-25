@@ -352,11 +352,29 @@ export const accountTypeTotalPerMonthOptions = (
       if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         accountTypeName: string
-        accounts: Array<{
-          name: string
-          total: number
-        }>
+        total: number
+        percentAgainstPrevMonth: number
       }>
+      return data
+    },
+  })
+
+export const cashFlowBarChartDataOptions = () =>
+  queryOptions({
+    queryKey: ['cashFlowBarChart'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/others/cashFlowBarChart`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        dataKeys: Array<string>
+        data: Array<any>
+      }>
+
       return data
     },
   })
