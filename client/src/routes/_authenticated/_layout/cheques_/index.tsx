@@ -69,6 +69,7 @@ const CrudComponents = () => {
       chqAmount: 0,
       chqPayeeName: '',
       chqStatus: 'PENDING',
+      chqNumber: '',
     },
     resolver: zodResolver(createChequeSchema),
   })
@@ -102,6 +103,25 @@ const CrudComponents = () => {
                       <Input
                         className="w-full"
                         placeholder="Payee Name"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="chqNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Cheque Number</FormLabel>
+                      <FormMessage />
+                    </div>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        placeholder="Cheque Number"
                         {...field}
                       />
                     </FormControl>

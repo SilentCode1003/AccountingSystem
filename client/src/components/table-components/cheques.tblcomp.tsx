@@ -142,10 +142,12 @@ export const ChequeStatusColumn = ({ row }: CellContext<Cheques, unknown>) => {
           row.original.chqStatus === 'APPROVED' && 'bg-emerald-500',
           row.original.chqStatus === 'REJECTED' && 'bg-red-500 ',
         ],
-        'hover:bg-gray-500',
+        'hover:bg-gray-500 text-center',
       )}
     >
-      {row.original.chqStatus}
+      {row.original.chqStatus === 'REJECTED'
+        ? row.original.chqStatus
+        : `${row.original.chqStatus} ${row.original.chqApprovalCount}/3`}
     </Badge>
   )
 }
@@ -161,6 +163,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
         chqAmount: Number.parseFloat(String(row.original.chqAmount)),
         chqIssueDate: new Date(row.original.chqIssueDate),
         chqPayeeName: row.original.chqPayeeName,
+        chqNumber: row.original.chqNumber,
         chqStatus: row.original.chqStatus,
       },
     },
@@ -246,6 +249,25 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
+                      name="newData.chqNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Cheque Number</FormLabel>
+                            <FormMessage />
+                          </div>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              placeholder="Cheque Number"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
                       name="newData.chqAmount"
                       render={({ field }) => (
                         <FormItem>
@@ -303,7 +325,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                                 </SelectItem>
                                 <SelectItem value="REJECTED">
                                   <Badge className="bg-red-500 hover:bg-gray-500">
-                                    APPROVED
+                                    REJECTED
                                   </Badge>
                                 </SelectItem>
                               </SelectContent>
