@@ -1,8 +1,8 @@
+import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
 import { transactionColumns } from '@/components/table-columns/transactions.columns'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import DatePicker from '@/components/ui/DatePicker'
@@ -15,14 +15,6 @@ import {
   FormMessage,
 } from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateTransaction } from '@/hooks/mutations'
@@ -37,7 +29,6 @@ import {
 } from '@/hooks/queries/options'
 import { createTransactionSchema } from '@/validators/transactions.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SelectGroup, SelectValue } from '@radix-ui/react-select'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -101,7 +92,7 @@ function TransactionsComponent() {
 
   const transactionPartners = useTransactionPartners()
 
-  const [person, setPerson] = useState<string>('')
+  const [person] = useState<string>('')
   const [amount, setAmount] = useState<number>(0.0)
   const [date, setDate] = useState<Date>()
 
@@ -287,57 +278,42 @@ function TransactionsComponent() {
                         </div>
                         <FormControl>
                           {transactionPartners.isSuccess && (
-                            <Select
-                              defaultValue={field.value}
-                              onValueChange={(value) => {
-                                setPerson(value)
-                                field.onChange(value)
-                              }}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Pick One" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectLabel>Employees</SelectLabel>
-                                  {transactionPartners.data.employees.map(
-                                    (emp) => (
-                                      <SelectItem
-                                        key={emp.empId}
-                                        value={emp.empId}
-                                      >
-                                        {emp.empName} | Employee
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectGroup>
-                                <SelectSeparator />
-                                <SelectGroup>
-                                  <SelectLabel>Customers</SelectLabel>
-                                  {transactionPartners.data.customers.map(
-                                    (cust) => (
-                                      <SelectItem
-                                        key={cust.custId}
-                                        value={cust.custId}
-                                      >
-                                        {cust.custName} | Customers
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectGroup>
-                                <SelectSeparator />
-                                <SelectGroup>
-                                  <SelectLabel>Vendors</SelectLabel>
-                                  {transactionPartners.data.vendors.map(
-                                    (vd) => (
-                                      <SelectItem key={vd.vdId} value={vd.vdId}>
-                                        {vd.vdName} | Vendor
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
+                            <ComboBox
+                              data={transactionPartners.data.customers
+                                .map((c) => ({
+                                  label: `${c.custName} | Customer`,
+                                  value: c.custId,
+                                }))
+                                .concat([
+                                  {
+                                    label: 'separator',
+                                    value: 'separator',
+                                  },
+                                ])
+                                .concat(
+                                  transactionPartners.data.employees.map(
+                                    (e) => ({
+                                      label: `${e.empName} | Employee`,
+                                      value: e.empId,
+                                    }),
+                                  ),
+                                )
+                                .concat([
+                                  {
+                                    label: 'separator',
+                                    value: 'separator',
+                                  },
+                                ])
+                                .concat(
+                                  transactionPartners.data.vendors.map((v) => ({
+                                    label: `${v.vdName} | Vendor`,
+                                    value: v.vdId,
+                                  })),
+                                )}
+                              emptyLabel="Nothing Selected"
+                              value={field.value}
+                              setValue={field.onChange}
+                            />
                           )}
                         </FormControl>
                         <FormMessage />
@@ -353,33 +329,16 @@ function TransactionsComponent() {
                           <FormLabel>Account Type</FormLabel>
                         </div>
                         <FormControl>
-                          {transactionPartners.isSuccess && (
-                            <Select
-                              defaultValue={field.value}
-                              onValueChange={field.onChange}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Account type" />
-                              </SelectTrigger>
-                              <SelectContent className="flex-1">
-                                {accountTypes.isSuccess && (
-                                  <SelectGroup>
-                                    {accountTypes.data.accountTypes.map(
-                                      (accType) => (
-                                        <SelectItem
-                                          key={accType.accTypeId}
-                                          value={accType.accTypeId}
-                                        >
-                                          <Badge variant={'secondary'}>
-                                            {accType.accTypeName}
-                                          </Badge>
-                                        </SelectItem>
-                                      ),
-                                    )}
-                                  </SelectGroup>
-                                )}
-                              </SelectContent>
-                            </Select>
+                          {accountTypes.isSuccess && (
+                            <ComboBox
+                              data={accountTypes.data.accountTypes.map((t) => ({
+                                label: t.accTypeName,
+                                value: t.accTypeId,
+                              }))}
+                              emptyLabel="Nothing Found"
+                              value={field.value}
+                              setValue={field.onChange}
+                            />
                           )}
                         </FormControl>
                         <FormMessage />

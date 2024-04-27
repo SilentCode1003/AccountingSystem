@@ -1,5 +1,6 @@
 import { useUpdateCheque } from '@/hooks/mutations'
 import { useAccountTypes } from '@/hooks/queries'
+import { cn } from '@/lib/utils'
 import { chequeUpdateSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CellContext } from '@tanstack/react-table'
@@ -7,7 +8,10 @@ import { MoreHorizontal, MoreHorizontalIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { ComboBox } from '../Combobox'
+import { PromptModal } from '../PromptModal'
 import { Cheques } from '../table-columns/cheques.columns'
+import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import DatePicker from '../ui/DatePicker'
 import {
@@ -38,15 +42,11 @@ import { Input } from '../ui/input'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
 import { Text } from '../ui/text'
-import { PromptModal } from '../PromptModal'
-import { cn } from '@/lib/utils'
-import { Badge } from '../ui/badge'
 
 export const IssueDateColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return new Date(row.original.chqIssueDate).toLocaleDateString()
@@ -319,32 +319,19 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                         <FormItem>
                           <FormLabel>Account Type</FormLabel>
                           <FormControl>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Account Type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {accountTypes.isSuccess && (
-                                  <SelectGroup>
-                                    {accountTypes.data.accountTypes.map(
-                                      (accType) => (
-                                        <SelectItem
-                                          key={accType.accTypeId}
-                                          value={accType.accTypeId}
-                                        >
-                                          <Badge variant={'secondary'}>
-                                            {accType.accTypeName}
-                                          </Badge>
-                                        </SelectItem>
-                                      ),
-                                    )}
-                                  </SelectGroup>
+                            {accountTypes.isSuccess && (
+                              <ComboBox
+                                data={accountTypes.data.accountTypes.map(
+                                  (t) => ({
+                                    label: t.accTypeName,
+                                    value: t.accTypeId,
+                                  }),
                                 )}
-                              </SelectContent>
-                            </Select>
+                                emptyLabel="Nothing Found"
+                                value={field.value as string}
+                                setValue={field.onChange}
+                              />
+                            )}
                           </FormControl>
                           <FormMessage />
                         </FormItem>
