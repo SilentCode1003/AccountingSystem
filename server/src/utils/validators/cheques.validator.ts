@@ -9,6 +9,7 @@ export const createValidator = z.object({
     .datetime()
     .transform((date) => new Date(date)),
   chqStatus: z.enum(["APPROVED", "PENDING", "REJECTED"]),
+  chqNumber: z.string().max(50),
   chqAccTypeId: z.string().superRefine((val, ctx) => {
     if (val.split(" ")[0] !== "accTypeId") {
       ctx.addIssue({
@@ -51,20 +52,24 @@ export const updateValidator = z.object({
         .transform((date) => new Date(date))
     ),
     chqStatus: z.optional(z.enum(["APPROVED", "PENDING", "REJECTED"])),
-    chqAccTypeId: z.string().superRefine((val, ctx) => {
-      if (val.split(" ")[0] !== "accTypeId") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an account type id.`,
-        });
-      }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        });
-      }
-    }),
+    chqNumber: z.string().max(50).optional(),
+    chqAccTypeId: z
+      .string()
+      .superRefine((val, ctx) => {
+        if (val.split(" ")[0] !== "accTypeId") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not an account type id.`,
+          });
+        }
+        if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not valid uuid.`,
+          });
+        }
+      })
+      .optional(),
     chqUpdatedAt: z.optional(
       z
         .string()
@@ -77,6 +82,23 @@ export const updateValidator = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not an account id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
+});
+
+export const approveChequeValidator = z.object({
+  chqId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "chqId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an cheque id.`,
       });
     }
     if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
