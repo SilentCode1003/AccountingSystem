@@ -18,7 +18,7 @@ function SettingsLayout() {
 
   return (
     <div className="min-h-[85vh] flex flex-col items-center">
-      <div className="w-full md:w-[70vw] flex flex-col items-center h-screen md:flex-row md:items-start">
+      <div className="w-full md:w-[70vw] flex flex-col items-center  md:flex-row md:items-start">
         <nav
           className={cn(
             'p-4  grid text-md text-muted-foreground w-[200px] h-fit',
