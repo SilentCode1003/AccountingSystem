@@ -13,9 +13,13 @@ import MongoStore from "connect-mongo";
 import session from "express-session";
 import "dotenv/config";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
-import { currentUser, login } from "./controller/login.controller";
-import { logout } from "./controller/logout.controller";
+import { currentUser } from "./controller/login.controller";
 import { getTransactionPartners } from "./controller/others.controllers";
+import accountTypeRouter from "./routes/accountType.routes";
+import authRouter from "./routes/auth.routes";
+import othersRouter from "./routes/others.routes";
+import fileUpload from "express-fileupload";
+import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 
 declare module "express-session" {
   interface SessionData {
@@ -47,21 +51,28 @@ app.use(
         : undefined,
   })
 );
+app.use(fileUpload());
 
 app.use(express.json());
 
-app.post("/login", login);
-
-app.post("/logout", logout);
+app.use("/auth", authRouter);
 
 app.use(authMiddleware);
+
+app.use(express.static("files"));
 
 app.get("/login", currentUser);
 
 app.get("/transactionPartners", getTransactionPartners);
 
+//route for all other actions
+app.use("/others", othersRouter);
+
 //route for all account actions
 app.use("/accounts", accountRouter);
+
+//route for all account type actions
+app.use("/accountTypes", accountTypeRouter);
 
 //route for all employee actions
 app.use("/employees", employeesRouter);
@@ -86,5 +97,8 @@ app.use("/transactions", transactionRouter);
 
 //route for all vendor actions
 app.use("/vendors", vendorRouter);
+
+//route for uncatched error
+app.use(errorHandler);
 
 export default app;

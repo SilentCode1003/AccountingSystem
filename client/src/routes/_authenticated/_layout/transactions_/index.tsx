@@ -1,15 +1,20 @@
 import DataTable from '@/components/DataTable'
-import {
-  Customer,
-  transactionColumns,
-  Vendor,
-  type Transactions,
-} from '@/components/table-columns/transactions.columns'
+import { LoadingTable } from '@/components/LoadingComponents'
+import { PromptModal } from '@/components/PromptModal'
+import { transactionColumns } from '@/components/table-columns/transactions.columns'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { ToWords } from 'to-words'
+import DatePicker from '@/components/ui/DatePicker'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -18,13 +23,26 @@ import {
   SelectSeparator,
   SelectTrigger,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { useCreateTransaction } from '@/hooks/mutations'
+import {
+  useAccountTypes,
+  useTransactionPartners,
+  useTransactions,
+} from '@/hooks/queries'
+import {
+  transactionPartnersOptions,
+  transactionsOptions,
+} from '@/hooks/queries/options'
+import { createTransactionSchema } from '@/validators/transactions.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { SelectGroup, SelectValue } from '@radix-ui/react-select'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import DatePicker from '@/components/ui/DatePicker'
-import { useQuery } from '@tanstack/react-query'
-import { Employees } from '@/components/table-columns/employees.columns'
+import { useForm } from 'react-hook-form'
+import { ToWords } from 'to-words'
+import { z } from 'zod'
 
 const toWords = new ToWords({
   localeCode: 'en-IN',
@@ -47,54 +65,65 @@ const toWords = new ToWords({
 })
 
 export const Route = createFileRoute('/_authenticated/_layout/transactions/')({
+  loader: async ({ context }) => {
+    const transactions = await context.queryClient.ensureQueryData(
+      transactionsOptions(),
+    )
+
+    const transactionPartners = await context.queryClient.ensureQueryData(
+      transactionPartnersOptions(),
+    )
+    return {
+      transactions,
+      transactionPartners,
+    }
+  },
   component: TransactionsComponent,
+  pendingComponent: LoadingComponent,
 })
 
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+      <div className="flex gap-4 items-center w-full md:w-[70vw] justify-between">
+        <Skeleton className="flex-1 h-80" />
+        <Skeleton className="flex-1 h-80" />
+      </div>
+    </div>
+  )
+}
+
 function TransactionsComponent() {
-  const transactions = useQuery({
-    queryKey: ['Transactions'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/transactions`,
-        {
-          credentials: 'include',
-        },
-      )
+  const transactions = useTransactions()
 
-      const transactionData = (await response.json()) as Promise<{
-        transactions: Array<Transactions>
-      }>
+  const accountTypes = useAccountTypes()
 
-      return transactionData
-    },
-  })
-
-  const transactionPartners = useQuery({
-    queryKey: ['TransactionPartners'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/transactionPartners`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = response.json() as Promise<{
-        employees: Array<Employees>
-        customers: Array<Customer>
-        vendors: Array<Vendor>
-      }>
-      return data
-    },
-  })
+  const transactionPartners = useTransactionPartners()
 
   const [person, setPerson] = useState<string>('')
   const [amount, setAmount] = useState<number>(0.0)
   const [date, setDate] = useState<Date>()
 
+  const form = useForm<z.infer<typeof createTransactionSchema>>({
+    defaultValues: {
+      tranAmount: 0,
+      tranDescription: '',
+      tranPartner: '',
+    },
+    resolver: zodResolver(createTransactionSchema),
+  })
+  const createTransaction = useCreateTransaction(form)
+
+  const handleSubmit = (values: z.infer<typeof createTransactionSchema>) => {
+    createTransaction.mutate(values)
+  }
+
   return (
     <div className="p-4  flex flex-col gap-8 items-center min-h-[85vh]">
       {transactions.isSuccess && (
         <DataTable
+          showVisibility
           pageSize={5}
           className="w-full md:w-[70vw]"
           columns={transactionColumns}
@@ -184,68 +213,220 @@ function TransactionsComponent() {
         <Card className="flex-1">
           <CardHeader>Create Transaction</CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label>Amount</Label>
-                <Input
-                  className="w-full"
-                  type="number"
-                  placeholder="Amount"
-                  step="0.01"
-                  value={String(!Number.isNaN(amount) ? amount : 0)}
-                  onChange={(e) => setAmount(parseFloat(e.target.value))}
-                />
-              </div>
-              <div className="flex-1 flex flex-col">
-                <Label>Transaction Date</Label>
-                <DatePicker date={date} setDate={setDate} />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <Label>Person Transacting with</Label>
-              {transactionPartners.isSuccess && (
-                <Select value={person} onValueChange={setPerson}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pick One" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Employees</SelectLabel>
-                      {transactionPartners.data.employees.map((emp) => (
-                        <SelectItem key={emp.empId} value={emp.empId}>
-                          {emp.empName} | Employee
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectSeparator />
-                    <SelectGroup>
-                      <SelectLabel>Customers</SelectLabel>
-                      {transactionPartners.data.customers.map((cust) => (
-                        <SelectItem key={cust.custId} value={cust.custId}>
-                          {cust.custName} | Customers
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectSeparator />
-                    <SelectGroup>
-                      <SelectLabel>Vendors</SelectLabel>
-                      {transactionPartners.data.vendors.map((vd) => (
-                        <SelectItem key={vd.vdId} value={vd.vdId}>
-                          {vd.vdName} | Vendor
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-            <div className="flex flex-col">
-              <Label>Transaction Description</Label>
-              <Textarea placeholder="Transaction Description" />
-            </div>
+            <Form {...form}>
+              <form className="flex flex-col gap-4">
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <FormField
+                      name="tranAmount"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Amount</FormLabel>
+                            <FormMessage />
+                          </div>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              type="number"
+                              placeholder="Total Deduction"
+                              step="0.01"
+                              {...field}
+                              value={
+                                Number.isNaN(field.value) ? '' : field.value
+                              }
+                              onChange={(e) => {
+                                setAmount(
+                                  Number.isNaN(parseFloat(e.target.value))
+                                    ? 0
+                                    : (e.target.value as unknown as number),
+                                )
+                                field.onChange(parseFloat(e.target.value))
+                              }}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex-1 flex flex-col">
+                    <FormField
+                      name="tranTransactionDate"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
+                          <FormItem>
+                            <div className="flex items-center justify-between">
+                              <FormLabel>Transaction Date</FormLabel>
+                              <FormMessage />
+                            </div>
+                            <FormControl>
+                              <DatePicker
+                                date={field.value}
+                                setDate={(value: Date) => {
+                                  setDate(value)
+                                  field.onChange(value)
+                                }}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <FormField
+                    name="tranPartner"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <div className="flex flex-col justify-between">
+                          <FormLabel>Person Transacting with</FormLabel>
+                        </div>
+                        <FormControl>
+                          {transactionPartners.isSuccess && (
+                            <Select
+                              defaultValue={field.value}
+                              onValueChange={(value) => {
+                                setPerson(value)
+                                field.onChange(value)
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pick One" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Employees</SelectLabel>
+                                  {transactionPartners.data.employees.map(
+                                    (emp) => (
+                                      <SelectItem
+                                        key={emp.empId}
+                                        value={emp.empId}
+                                      >
+                                        {emp.empName} | Employee
+                                      </SelectItem>
+                                    ),
+                                  )}
+                                </SelectGroup>
+                                <SelectSeparator />
+                                <SelectGroup>
+                                  <SelectLabel>Customers</SelectLabel>
+                                  {transactionPartners.data.customers.map(
+                                    (cust) => (
+                                      <SelectItem
+                                        key={cust.custId}
+                                        value={cust.custId}
+                                      >
+                                        {cust.custName} | Customers
+                                      </SelectItem>
+                                    ),
+                                  )}
+                                </SelectGroup>
+                                <SelectSeparator />
+                                <SelectGroup>
+                                  <SelectLabel>Vendors</SelectLabel>
+                                  {transactionPartners.data.vendors.map(
+                                    (vd) => (
+                                      <SelectItem key={vd.vdId} value={vd.vdId}>
+                                        {vd.vdName} | Vendor
+                                      </SelectItem>
+                                    ),
+                                  )}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="tranAccTypeId"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Account Type</FormLabel>
+                        </div>
+                        <FormControl>
+                          {transactionPartners.isSuccess && (
+                            <Select
+                              defaultValue={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Account type" />
+                              </SelectTrigger>
+                              <SelectContent className="flex-1">
+                                {accountTypes.isSuccess && (
+                                  <SelectGroup>
+                                    {accountTypes.data.accountTypes.map(
+                                      (accType) => (
+                                        <SelectItem
+                                          key={accType.accTypeId}
+                                          value={accType.accTypeId}
+                                        >
+                                          <Badge variant={'secondary'}>
+                                            {accType.accTypeName}
+                                          </Badge>
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectGroup>
+                                )}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <FormField
+                    name="tranDescription"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Transaction Description</FormLabel>
+                          <FormMessage />
+                        </div>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="Transaction Description"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </form>
+            </Form>
             <div className="flex w-full gap-4">
-              <Button className="flex-1">Submit</Button>
-              <Button className="flex-1" variant={'outline'}>
+              <PromptModal
+                dialogMessage="Continue?"
+                prompType="ADD"
+                dialogTitle="You are about to create a new transaction"
+                triggerText="Create"
+                callback={form.handleSubmit(handleSubmit)}
+              />
+              <Button
+                onClick={() => {
+                  form.clearErrors()
+                  form.reset()
+                }}
+                className="flex-1"
+                variant={'outline'}
+              >
                 Clear
               </Button>
             </div>

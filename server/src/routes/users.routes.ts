@@ -4,12 +4,16 @@ import {
   getUsers,
   updateUser,
   toggleUserIsActive,
+  getSingleUserById,
 } from "../controller/users.controller";
 
 const usersRouter = Router();
 
 //get all users
 usersRouter.get("/", getUsers);
+
+//get user by id
+usersRouter.get("/", getSingleUserById);
 
 //create an users entry
 usersRouter.post("/", createUser);

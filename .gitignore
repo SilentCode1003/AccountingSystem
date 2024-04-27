@@ -16,6 +16,8 @@ pids
 *.seed
 *.pid.lock
 
+files
+
 client/src/routeTree.gen.ts
 
 
@@ -53,6 +55,8 @@ web_modules/
 
 # Optional npm cache directory
 .npm
+bun.lockb
+pnpm-lock.yaml
 
 # Optional eslint cache
 .eslintcache

@@ -4,14 +4,15 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Text } from './ui/text'
-import { RxHamburgerMenu } from 'react-icons/rx'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useLogout } from '@/hooks/mutations'
+import { useUser } from '@/hooks/queries'
+import { Link } from '@tanstack/react-router'
 import {
   ArchiveIcon,
   ArrowLeftRightIcon,
-  BadgeDollarSignIcon,
-  ClipboardListIcon,
+  BookMinusIcon,
+  BookPlusIcon,
+  BookTextIcon,
   HandCoinsIcon,
   HomeIcon,
   LogOutIcon,
@@ -20,6 +21,14 @@ import {
   SettingsIcon,
   UsersRoundIcon,
 } from 'lucide-react'
+import { RxHamburgerMenu } from 'react-icons/rx'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,33 +37,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { useTheme } from './ui/theme.provider'
+import { Skeleton } from './ui/skeleton'
 import { Switch } from './ui/switch'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Text } from './ui/text'
+import { useTheme } from './ui/theme.provider'
+
+function LoadingComponent() {
+  return (
+    <div className="h-[10vh] shadow-md bg-background max-w-screen  z-[10] p-4 top-0 sticky flex justify-between">
+      <div className="flex gap-4">
+        <Skeleton className="w-10 h-10" />
+        <Skeleton className="w-20 h-8" />
+      </div>
+      <div>
+        <Skeleton className="aspect-square w-10 rounded-full" />
+      </div>
+    </div>
+  )
+}
 
 function Header() {
   const { setTheme, theme } = useTheme()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
-  const logout = useMutation({
-    mutationKey: ['logout'],
-    mutationFn: async () => {
-      await fetch(`${import.meta.env.VITE_SERVER_URL}/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-    },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
-      navigate({ to: '/login' })
-    },
-  })
+  const user = useUser()
+
+  const logout = useLogout()
 
   const handleLogout = () => {
     logout.mutate()
   }
+
+  if (user.isLoading) return <LoadingComponent />
+
   return (
     <header className="h-[10vh] shadow-md bg-background max-w-screen  z-[10] p-4 top-0 sticky ">
       <Sheet>
@@ -79,7 +93,9 @@ function Header() {
                 <DropdownMenuTrigger asChild>
                   <div className="hover:cursor-pointer">
                     <Avatar>
-                      <AvatarImage src="https://github.com/nestortion.png" />
+                      <AvatarImage
+                        src={`${import.meta.env.VITE_SERVER_URL}/profilepic/users/${user.data!.user.userProfilePic}`}
+                      />
                       <AvatarFallback>NG</AvatarFallback>
                     </Avatar>
                   </div>
@@ -88,19 +104,23 @@ function Header() {
                   <DropdownMenuLabel>
                     <div className="flex gap-4 items-center">
                       <Avatar>
-                        <AvatarImage src="https://github.com/nestortion.png" />
+                        <AvatarImage
+                          src={`${import.meta.env.VITE_SERVER_URL}/profilepic/users/${user.data!.user.userProfilePic}`}
+                        />
                         <AvatarFallback>NG</AvatarFallback>
                       </Avatar>
-                      <div>Nestor P. Gerona</div>
+                      <div>{user.data!.user.userFullName}</div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="flex gap-4 hover:cursor-pointer">
-                    <div>
-                      <SettingsIcon />
-                    </div>
-                    <div>Settings</div>
-                  </DropdownMenuItem>
+                  <Link to="/settings">
+                    <DropdownMenuItem className="flex gap-4 hover:cursor-pointer">
+                      <div>
+                        <SettingsIcon />
+                      </div>
+                      <div>Settings</div>
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem className="flex gap-4 hover:cursor-pointer">
                     <div>
                       <MoonIcon />
@@ -144,18 +164,59 @@ function Header() {
               </Text>
             </SheetClose>
           </Link>
-          <Link to="/sales">
-            <SheetClose>
-              <Text
-                variant={'heading1'}
-                style={'underline'}
-                className="flex gap-4 items-center"
-              >
-                <BadgeDollarSignIcon />
-                Sales
-              </Text>
-            </SheetClose>
-          </Link>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1" className="border-0">
+              <AccordionTrigger hideArrow className="p-0 hover:no-underline">
+                <Text
+                  variant={'heading1'}
+                  style={'underline'}
+                  className="flex gap-4 items-center"
+                >
+                  <BookTextIcon />
+                  Statements
+                </Text>
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-4 ps-8 pt-4 pb-0">
+                <Link to="/income_statement">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4 items-center"
+                    >
+                      <BookPlusIcon />
+                      Income Statement
+                    </Text>
+                  </SheetClose>
+                </Link>
+                <Link to="/balance_sheet">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4 items-center"
+                    >
+                      <BookPlusIcon />
+                      Balance Sheet
+                    </Text>
+                  </SheetClose>
+                </Link>
+                <Link to="/cash_flow">
+                  <SheetClose>
+                    <Text
+                      variant={'heading2'}
+                      style={'underline'}
+                      className="flex gap-4"
+                    >
+                      <BookMinusIcon />
+                      Cash Flow
+                    </Text>
+                  </SheetClose>
+                </Link>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
           <Link to="/transactions">
             <SheetClose>
               <Text
@@ -213,18 +274,6 @@ function Header() {
               >
                 <ArchiveIcon />
                 Inventory
-              </Text>
-            </SheetClose>
-          </Link>
-          <Link to="/reports">
-            <SheetClose>
-              <Text
-                variant={'heading1'}
-                style={'underline'}
-                className="flex gap-4 items-center"
-              >
-                <ClipboardListIcon />
-                Reports
               </Text>
             </SheetClose>
           </Link>
