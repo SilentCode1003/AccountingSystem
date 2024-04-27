@@ -1,28 +1,34 @@
 import { ColumnDef } from '@tanstack/react-table'
-
-import {
-  PricePerUnitColumn,
-  TotalColumn,
-} from '../table-components/sales.tblcomp'
 import { Button } from '../ui/button'
 import { text } from '../ui/text'
 import { ArrowUpDownIcon } from 'lucide-react'
+import {
+  AccountAccountTypeColumn,
+  AccountAmountColumn,
+  AccountIsActiveColumn,
+  AccountNameColumn,
+} from '../table-components/accounts.tblcomp'
 
-export type Sales = {
-  id: string
-  productCode: string
-  productName: string
-  dateSold: string
-  unitsSold: number
-  pricePerUnit: number
-  total: number
+export type Accounts = {
+  accId: string
+  accName: string
+  accTypeId: string
+  accDescription: string
+  accAmount: number
+  accIsActive: boolean
+  accCreatedAt: string
+  accUpdatedAt: string
+  accountType: {
+    accTypeId: string
+    accTypeName: string
+    accTypeDefault: string
+  }
 }
 
-export const salesColumns: ColumnDef<Sales>[] = [
+export const accountsColumns: ColumnDef<Accounts>[] = [
   {
-    accessorKey: 'dateSold',
-    filterFn: 'dateBetweenFilter',
-    meta: 'Date Sold',
+    accessorKey: 'accName',
+    meta: 'accName',
     header: ({ column }) => {
       return (
         <Button
@@ -30,15 +36,67 @@ export const salesColumns: ColumnDef<Sales>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className={text({ variant: 'body', className: 'p-0' })}
         >
-          Date Sold
+          Account Name
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: AccountNameColumn,
+  },
+  {
+    accessorKey: 'accAmount',
+    meta: 'accAmount',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Amount
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: AccountAmountColumn,
+  },
+  {
+    accessorKey: 'accountType',
+    accessorFn: (row) => row.accountType.accTypeName,
+    meta: 'accountType',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Account Type
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: AccountAccountTypeColumn,
+  },
+  {
+    accessorKey: 'accDescription',
+    meta: 'accDescription',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Description
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
   },
   {
-    accessorKey: 'productCode',
-    meta: 'Product Code',
+    accessorKey: 'accIsActive',
+    meta: 'accIsActive',
     header: ({ column }) => {
       return (
         <Button
@@ -46,77 +104,11 @@ export const salesColumns: ColumnDef<Sales>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className={text({ variant: 'body', className: 'p-0' })}
         >
-          Product Code
+          Status
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-  },
-  {
-    accessorKey: 'productName',
-    meta: 'Product Name',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
-        >
-          Product Name
-          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-  {
-    accessorKey: 'pricePerUnit',
-    meta: 'Price Per Unit',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
-        >
-          Price Per Unit
-          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: PricePerUnitColumn,
-  },
-
-  {
-    accessorKey: 'unitsSold',
-    meta: 'Units Sold',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
-        >
-          Units Sold
-          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-  {
-    accessorKey: 'total',
-    meta: 'Total',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
-        >
-          Total
-          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: TotalColumn,
+    cell: AccountIsActiveColumn,
   },
 ]

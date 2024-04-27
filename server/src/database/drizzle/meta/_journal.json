@@ -5,8 +5,57 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1712544874578,
-      "tag": "0000_sweet_terrax",
+      "when": 1713169815083,
+      "tag": "0000_flawless_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1713244460017,
+      "tag": "0001_whole_green_goblin",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1713251371371,
+      "tag": "0002_panoramic_layla_miller",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1713402404326,
+      "tag": "0003_needy_red_skull",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1713403437265,
+      "tag": "0004_small_komodo",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1713423456403,
+      "tag": "0005_black_punisher",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1713423551804,
+      "tag": "0006_bitter_the_executioner",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1713423621295,
+      "tag": "0007_material_piledriver",
       "breakpoints": true
     }
   ]

@@ -1,15 +1,17 @@
 import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
+import { PromptModal } from '@/components/PromptModal'
 import {
   chequeColumns,
   type Cheques,
 } from '@/components/table-columns/cheques.columns'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
 } from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import DatePicker from '@/components/ui/DatePicker'
 import {
@@ -29,9 +31,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
+import { useCreateCheque } from '@/hooks/mutations'
+import { useAccountTypes, useCheques } from '@/hooks/queries'
+import { chequesOptions } from '@/hooks/queries/options'
 import { createChequeSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { SelectGroup } from '@radix-ui/react-select'
 import { createFileRoute } from '@tanstack/react-router'
 import { ReceiptIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -39,42 +44,28 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated/_layout/cheques/')({
+  loader: async ({ context }) => {
+    const cheques = await context.queryClient.ensureQueryData(chequesOptions())
+    return { cheques }
+  },
   component: Cheques,
+  pendingComponent: LoadingComponent,
 })
+
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+    </div>
+  )
+}
 
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
-  const queryClient = useQueryClient()
-  const createCheque = useMutation({
-    mutationFn: async (payload: z.infer<typeof createChequeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/cheques`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = await response.json()
-      return data
-    },
-    onSuccess: async (data) => {
-      setOpen(false)
-      await queryClient.setQueryData(
-        ['Cheques'],
-        (old: { cheques: Array<Cheques> }) => {
-          return { cheques: [...old.cheques, data.cheque] }
-        },
-      )
-    },
-  })
-
+  const accountTypes = useAccountTypes()
+  const createCheque = useCreateCheque({ setOpen })
   const form = useForm<z.infer<typeof createChequeSchema>>({
     defaultValues: {
-      chqAccType: 'EXPENSE',
       chqAmount: 0,
       chqPayeeName: '',
       chqStatus: 'PENDING',
@@ -160,9 +151,21 @@ const CrudComponents = () => {
                           <SelectValue placeholder="Select Status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="PENDING">PENDING</SelectItem>
-                          <SelectItem value="APPROVED">APPROVED</SelectItem>
-                          <SelectItem value="REJECTED">REJECTED</SelectItem>
+                          <SelectItem value="APPROVED">
+                            <Badge className="bg-green-500 hover:bg-gray-500">
+                              APPROVED
+                            </Badge>
+                          </SelectItem>
+                          <SelectItem value="PENDING">
+                            <Badge className="bg-yellow-500 hover:bg-gray-500">
+                              PENDING
+                            </Badge>
+                          </SelectItem>
+                          <SelectItem value="REJECTED">
+                            <Badge className="bg-red-500 hover:bg-gray-500">
+                              REJECTED
+                            </Badge>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -171,7 +174,7 @@ const CrudComponents = () => {
               />
               <FormField
                 control={form.control}
-                name="chqAccType"
+                name="chqAccTypeId"
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
@@ -184,13 +187,25 @@ const CrudComponents = () => {
                         defaultValue={field.value}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a Type" />
+                          <SelectValue placeholder="Account type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="EXPENSE">Expense</SelectItem>
-                          <SelectItem value="REVENUE">Revenue</SelectItem>
-                          <SelectItem value="SALARY">Salary</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
+                          {accountTypes.isSuccess && (
+                            <SelectGroup>
+                              {accountTypes.data.accountTypes.map(
+                                (accountType) => (
+                                  <SelectItem
+                                    key={accountType.accTypeId}
+                                    value={accountType.accTypeId}
+                                  >
+                                    <Badge variant={'secondary'}>
+                                      {accountType.accTypeName}
+                                    </Badge>
+                                  </SelectItem>
+                                ),
+                              )}
+                            </SelectGroup>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -217,11 +232,13 @@ const CrudComponents = () => {
           </form>
         </Form>
         <div className="flex justify-between">
-          <AlertDialogAction asChild>
-            <Button onClick={form.handleSubmit(handleSubmit)} type="submit">
-              Create
-            </Button>
-          </AlertDialogAction>
+          <PromptModal
+            dialogMessage="Continue?"
+            prompType="ADD"
+            dialogTitle="You are about to create a new cheque"
+            triggerText="Create"
+            callback={form.handleSubmit(handleSubmit)}
+          />
           <div className="flex gap-2 ">
             <Button variant={'secondary'} onClick={() => form.clearErrors()}>
               Clear
@@ -239,23 +256,7 @@ const CrudComponents = () => {
 }
 
 function Cheques() {
-  const cheques = useQuery({
-    queryKey: ['Cheques'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/cheques`,
-        {
-          credentials: 'include',
-        },
-      )
-
-      const data = (await response.json()) as Promise<{
-        cheques: Array<Cheques>
-      }>
-
-      return data
-    },
-  })
+  const cheques = useCheques()
 
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
@@ -265,6 +266,7 @@ function Cheques() {
           className="w-full md:w-[70vw]"
           columns={chequeColumns}
           data={cheques.data.cheques}
+          showVisibility
           filter={[
             {
               filterColumn: 'chqIssueDate',

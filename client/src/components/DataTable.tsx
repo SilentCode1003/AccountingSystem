@@ -16,6 +16,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -62,6 +63,8 @@ type DataTableProps<TData, TValue> = {
       date?: boolean
     }>
     CrudComponents?: ElementType
+    showVisibility?: boolean
+    showFooter?: boolean
   }
 
 const dateBetweenFilter: FilterFn<any> = (row, columnId, value) => {
@@ -88,6 +91,7 @@ function Filters<TData>({
     filterPlaceHolder?: string
     filterValues?: Array<string>
     date?: boolean
+    showVisibility?: boolean
   }>
 }) {
   return (
@@ -222,6 +226,8 @@ function DataTable<TData, TValue>({
   pageSize,
   filter,
   CrudComponents,
+  showVisibility,
+  showFooter,
   ...props
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -262,7 +268,7 @@ function DataTable<TData, TValue>({
         ) : (
           <div />
         )}
-        <div className="flex gap-4">
+        <div className={cn('flex gap-4', !showVisibility ? 'hidden' : '')}>
           <div className="self-end">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -295,7 +301,9 @@ function DataTable<TData, TValue>({
             <div className="flex justify-end lg:hidden ">
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <FilterIcon size={32} />
+                  <Button variant="secondary">
+                    <FilterIcon />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuLabel>Filters</DropdownMenuLabel>
@@ -361,6 +369,26 @@ function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
+          {showFooter && (
+            <TableFooter className={`${text({ variant: 'label' })}`}>
+              {table.getFooterGroups().map((footerGroup) => (
+                <TableRow key={footerGroup.id}>
+                  {footerGroup.headers.map((footer) => {
+                    return (
+                      <TableHead key={footer.id} className="bg-background">
+                        {footer.isPlaceholder
+                          ? null
+                          : flexRender(
+                              footer.column.columnDef.footer,
+                              footer.getContext(),
+                            )}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableFooter>
+          )}
         </Table>
       </div>
       <div className="flex items-center justify-center space-x-2 py-4">

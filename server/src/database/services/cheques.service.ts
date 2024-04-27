@@ -10,21 +10,14 @@ const CHEQUE_STATUS = {
   REJECTED: "REJECTED",
 } as const;
 
-const ACCOUNT_TYPE = {
-  RECEIVABLE: "RECEIVABLE",
-  PAYABLE: "PAYABLE",
-  REVENUE: "REVENUE",
-  EXPENSE: "EXPENSE",
-} as const;
-
 type ObjectTypes<T> = T[keyof T];
-
-type AccountType = ObjectTypes<typeof ACCOUNT_TYPE>;
 
 type ChequeStatus = ObjectTypes<typeof CHEQUE_STATUS>;
 
 export const getAllCheques = async () => {
-  const cheques = await db.query.cheques.findMany({ with: { account: true } });
+  const cheques = await db.query.cheques.findMany({
+    with: { account: { with: { accountType: true } } },
+  });
 
   return cheques;
 };
@@ -32,6 +25,7 @@ export const getAllCheques = async () => {
 export const getChequeById = async (chqId: string) => {
   const cheque = await db.query.cheques.findFirst({
     where: (cheque) => eq(cheque.chqId, chqId),
+    with: { account: { with: { accountType: true } } },
   });
 
   return cheque;
@@ -42,12 +36,13 @@ export const addCheque = async (input: {
   chqAmount: number;
   chqIssueDate: Date;
   chqStatus: ChequeStatus;
-  chqAccType: AccountType;
+  chqAccTypeId: string;
 }) => {
   const account = await addAccount({
+    accName: "CASH",
     accAmount: input.chqAmount,
     accDescription: "CHEQUE",
-    accType: input.chqAccType,
+    accTypeId: input.chqAccTypeId,
   });
 
   const newChqId = `chqId ${crypto.randomUUID()}`;
@@ -58,7 +53,7 @@ export const addCheque = async (input: {
 
   const newCheque = await db.query.cheques.findFirst({
     where: (cheque) => eq(cheque.chqId, newChqId),
-    with: { account: true },
+    with: { account: { with: { accountType: true } } },
   });
 
   return newCheque;
@@ -71,13 +66,13 @@ export const editCheque = async (input: {
     chqAmount?: number;
     chqIssueDate?: Date;
     chqStatus?: ChequeStatus;
-    chqAccType: AccountType;
+    chqAccTypeId: string;
   };
   chqAccId: string;
 }) => {
   await db
     .update(accounts)
-    .set({ accType: input.newData.chqAccType })
+    .set({ accTypeId: input.newData.chqAccTypeId })
     .where(eq(accounts.accId, input.chqAccId));
 
   await db
@@ -93,7 +88,7 @@ export const editCheque = async (input: {
 
   const updatedChq = await db.query.cheques.findFirst({
     where: (chq) => eq(chq.chqId, input.chqId),
-    with: { account: true },
+    with: { account: { with: { accountType: true } } },
   });
 
   return updatedChq;

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { loginValidator } from "../utils/validators/login.validator";
 import db from "../database";
 import { and, eq } from "drizzle-orm";
+import * as bcrypt from "bcrypt";
 
 export const login = async (req: Request, res: Response) => {
   const input = loginValidator.safeParse(req.body);
@@ -10,16 +11,22 @@ export const login = async (req: Request, res: Response) => {
 
   try {
     const checkUser = await db.query.users.findFirst({
-      where: (user) =>
-        and(
-          eq(user.userUsername, input.data.username),
-          eq(user.userPassword, input.data.password)
-        ),
+      where: (user) => and(eq(user.userUsername, input.data.username)),
     });
 
     if (!checkUser)
       return res.status(404).send({
-        error: "Username or Password is wrong!",
+        error: "Username does not exist!",
+      });
+
+    const checkPassword = await bcrypt.compare(
+      input.data.password,
+      checkUser!.userPassword
+    );
+
+    if (!checkPassword)
+      return res.status(404).send({
+        error: "Password is wrong!",
       });
 
     req.session.userId = checkUser.userId as string;

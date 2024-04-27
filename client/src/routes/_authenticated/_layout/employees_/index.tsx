@@ -1,16 +1,18 @@
-import DataTable from '@/components/DataTable'
+import DataTable from "@/components/DataTable";
+import { LoadingTable } from "@/components/LoadingComponents";
+import { PromptModal } from "@/components/PromptModal";
 import {
   employeeColumns,
   type Employees,
-} from '@/components/table-columns/employees.columns'
+} from "@/components/table-columns/employees.columns";
 import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import DatePicker from '@/components/ui/DatePicker'
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import DatePicker from "@/components/ui/DatePicker";
 import {
   Form,
   FormControl,
@@ -18,61 +20,55 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/Form'
-import { Input } from '@/components/ui/input'
-import { Text } from '@/components/ui/text'
-import { createEmployeeSchema } from '@/validators/employees.validator'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { CircleUserIcon } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+} from "@/components/ui/Form";
+import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
+import { useCreateEmployee } from "@/hooks/mutations";
+import { useEmployees } from "@/hooks/queries";
+import { employeesOptions } from "@/hooks/queries/options";
+import { createEmployeeSchema } from "@/validators/employees.validator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute } from "@tanstack/react-router";
+import { CircleUserIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-export const Route = createFileRoute('/_authenticated/_layout/employees/')({
+export const Route = createFileRoute("/_authenticated/_layout/employees/")({
+  loader: async ({ context }) => {
+    const employees =
+      await context.queryClient.ensureQueryData(employeesOptions());
+    return { employees };
+  },
   component: Employees,
-})
+  pendingComponent: LoadingComponent,
+});
 
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+    </div>
+  );
+}
 const CrudComponents = () => {
-  const [open, setOpen] = useState<boolean>(false)
-  const queryClient = useQueryClient()
-  const createEmployee = useMutation({
-    mutationFn: async (payload: z.infer<typeof createEmployeeSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/employees`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        },
-      )
-      const data = await response.json()
-      return data
-    },
-    onSuccess: async () => {
-      setOpen(false)
-      await queryClient.refetchQueries({ queryKey: ['Employees'] })
-    },
-  })
+  const [open, setOpen] = useState<boolean>(false);
+  const createEmployee = useCreateEmployee({ setOpen });
 
   const form = useForm<z.infer<typeof createEmployeeSchema>>({
     defaultValues: {
-      empName: '',
-      empAddress: '',
-      empEmail: '',
+      empName: "",
+      empAddress: "",
+      empEmail: "",
       empSalary: 0,
-      empContactInfo: '',
+      empContactInfo: "",
     },
     resolver: zodResolver(createEmployeeSchema),
-  })
+  });
 
   const handleSubmit = (values: z.infer<typeof createEmployeeSchema>) => {
-    createEmployee.mutate(values)
-  }
+    createEmployee.mutate(values);
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -81,7 +77,7 @@ const CrudComponents = () => {
       </Button>
       <AlertDialogContent className="scale-75 sm:scale-100">
         <AlertDialogHeader>
-          <Text variant={'heading3bold'}>Create Employee</Text>
+          <Text variant={"heading3bold"}>Create Employee</Text>
         </AlertDialogHeader>
         <Form {...form}>
           <form>
@@ -178,7 +174,7 @@ const CrudComponents = () => {
                         placeholder="Amount"
                         step="0.01"
                         {...field}
-                        value={Number.isNaN(field.value) ? '' : field.value}
+                        value={Number.isNaN(field.value) ? "" : field.value}
                         onChange={(e) =>
                           field.onChange(parseFloat(e.target.value))
                         }
@@ -221,20 +217,19 @@ const CrudComponents = () => {
           </form>
         </Form>
         <div className="flex justify-between">
-          {/* <AlertDialogAction asChild> */}
-          <Button
-            onClick={() => form.handleSubmit(handleSubmit)()}
-            type="submit"
-          >
-            Create
-          </Button>
-          {/* </AlertDialogAction> */}
+          <PromptModal
+            dialogMessage="Continue?"
+            prompType="ADD"
+            dialogTitle="You are about to create a new employee"
+            triggerText="Create"
+            callback={form.handleSubmit(handleSubmit)}
+          />
           <div className="flex gap-2 ">
-            <Button variant={'secondary'} onClick={() => form.clearErrors()}>
+            <Button variant={"secondary"} onClick={() => form.clearErrors()}>
               Clear
             </Button>
             <AlertDialogCancel asChild>
-              <Button variant={'outline'} className="mt-0">
+              <Button variant={"outline"} className="mt-0">
                 Cancel
               </Button>
             </AlertDialogCancel>
@@ -242,59 +237,44 @@ const CrudComponents = () => {
         </div>
       </AlertDialogContent>
     </AlertDialog>
-  )
-}
+  );
+};
 
 function Employees() {
-  const employees = useQuery({
-    queryKey: ['Employees'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/employees`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        employees: Array<Employees>
-      }>
-
-      return data
-    },
-  })
-
+  const employees = useEmployees();
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       {employees.isSuccess && (
         <DataTable
+          showVisibility
           className="w-full md:w-[70vw]"
           columns={employeeColumns}
           data={employees.data.employees}
           filter={[
             {
-              filterColumn: 'empName',
-              filterPlaceHolder: 'Filter by name',
+              filterColumn: "empName",
+              filterPlaceHolder: "Filter by name",
             },
             {
-              filterColumn: 'empSalary',
-              filterPlaceHolder: 'Filter by Salary',
+              filterColumn: "empSalary",
+              filterPlaceHolder: "Filter by Salary",
             },
             {
-              filterColumn: 'empDateTerminated',
-              filterPlaceHolder: 'Filter Date Terminated',
+              filterColumn: "empDateTerminated",
+              filterPlaceHolder: "Filter Date Terminated",
               date: true,
             },
             {
-              filterColumn: 'empBirthdate',
-              filterPlaceHolder: 'Filter birthdate',
+              filterColumn: "empBirthdate",
+              filterPlaceHolder: "Filter birthdate",
               date: true,
             },
           ]}
           CrudComponents={CrudComponents}
-        ></DataTable>
+        />
       )}
     </div>
-  )
+  );
 }
 
-export default Employees
+export default Employees;

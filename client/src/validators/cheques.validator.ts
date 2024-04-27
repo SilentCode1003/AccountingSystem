@@ -1,52 +1,83 @@
-import z from 'zod'
+import z from "zod";
 
 export const createChequeSchema = z.object({
   chqPayeeName: z.string().superRefine((val, ctx) => {
-    if (val === '') {
+    if (val === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Required`,
-      })
+      });
     }
   }),
-  chqAmount: z.union([z.number(), z.nan()]).transform((val) => {
-    if (Number.isNaN(val)) {
-      return 0
-    }
-    return val
-  }),
+  chqAmount: z
+    .union([
+      z.number().positive({ message: "must not be 0 or negative" }),
+      z.nan(),
+    ])
+    .refine((val) => !Number.isNaN(val), {
+      message: "required",
+    }),
   chqIssueDate: z.date(),
-  chqStatus: z.enum(['APPROVED', 'PENDING', 'REJECTED']),
-  chqAccType: z.enum(['PAYABLE', 'RECEIVABLE', 'REVENUE', 'EXPENSE']),
-})
-
-export const chequeUpdateSchema = z.object({
-  chqId: z.string().superRefine((val, ctx) => {
-    if (val.split(' ')[0] !== 'chqId') {
+  chqStatus: z.enum(["APPROVED", "PENDING", "REJECTED"]),
+  chqAccTypeId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "accTypeId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an cheque id.`,
-      })
+        message: `Not an account type id.`,
+      });
     }
-    if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not valid uuid.`,
-      })
+      });
+    }
+  }),
+});
+
+export const chequeUpdateSchema = z.object({
+  chqId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "chqId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an cheque id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
     }
   }),
   newData: z.object({
     chqPayeeName: z.optional(z.string()),
-    chqAmount: z.union([z.number(), z.nan()]).transform((val) => {
-      if (Number.isNaN(val)) {
-        return 0
-      }
-      return val
-    }),
+    chqAmount: z
+      .union([
+        z.number().positive({ message: "must not be 0 or negative" }),
+        z.nan(),
+      ])
+      .refine((val) => !Number.isNaN(val), {
+        message: "required",
+      }),
     chqIssueDate: z.optional(z.date()),
-    chqStatus: z.optional(z.enum(['APPROVED', 'PENDING', 'REJECTED'])),
-    chqAccType: z
-      .enum(['PAYABLE', 'RECEIVABLE', 'REVENUE', 'EXPENSE'])
+    chqStatus: z.optional(z.enum(["APPROVED", "PENDING", "REJECTED"])),
+    chqAccTypeId: z
+      .string()
+      .superRefine((val, ctx) => {
+        if (val.split(" ")[0] !== "accTypeId") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not an account type id.`,
+          });
+        }
+        if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not valid uuid.`,
+          });
+        }
+      })
       .optional(),
   }),
-})
+});
