@@ -1,8 +1,13 @@
 import DataTable from '@/components/DataTable'
+import { LoadingTable } from '@/components/LoadingComponents'
+import { PromptModal } from '@/components/PromptModal'
+import { inventoryColumns } from '@/components/table-columns/inventory.columns'
 import {
-  inventoryColumns,
-  type Inventories,
-} from '@/components/table-columns/inventory.columns'
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+} from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -20,54 +25,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useCreateInventory } from '@/hooks/mutations'
+import { useInventories } from '@/hooks/queries'
+import { inventoriesOptions } from '@/hooks/queries/options'
+import { createInventorySchema } from '@/validators/inventory.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-} from '@/components/ui/alert-dialog'
-import { PackagePlusIcon } from 'lucide-react'
-import {
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogTrigger,
 } from '@radix-ui/react-alert-dialog'
-import { createInventorySchema } from '@/validators/inventory.validator'
+import { createFileRoute } from '@tanstack/react-router'
+import { PackagePlusIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated/_layout/inventory/')({
+  loader: async ({ context }) => {
+    const inventories =
+      await context.queryClient.ensureQueryData(inventoriesOptions())
+    return { inventories }
+  },
   component: Inventory,
+  pendingComponent: LoadingComponent,
 })
 
-function CrudComponents() {
-  const queryClient = useQueryClient()
-  const createInventory = useMutation({
-    mutationKey: ['CreateInventory'],
-    mutationFn: async (payload: z.infer<typeof createInventorySchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/inventory`,
-        {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        inventory: Inventories
-      }>
-      return data
-    },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['Inventories'] })
-    },
-  })
+function LoadingComponent() {
+  return (
+    <div className="p-4 w-full flex flex-col gap-8 items-center min-h-[85vh]">
+      <LoadingTable />
+    </div>
+  )
+}
 
+function CrudComponents() {
+  const [open, setOpen] = useState<boolean>(false)
+  const createInventory = useCreateInventory({ setOpen })
   const form = useForm<z.infer<typeof createInventorySchema>>({
     defaultValues: {
       invAssetName: '',
@@ -86,7 +79,7 @@ function CrudComponents() {
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button className="flex gap-2">
           Add Inventory <PackagePlusIcon />
@@ -154,9 +147,21 @@ function CrudComponents() {
                           <SelectValue placeholder="Select Status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="GOOD">GOOD</SelectItem>
-                          <SelectItem value="WARNING">WARNING</SelectItem>
-                          <SelectItem value="DEPLETED">DEPLETED</SelectItem>
+                          <SelectItem value="GOOD">
+                            <Badge className="bg-green-500 hover:bg-gray-500">
+                              GOOD
+                            </Badge>
+                          </SelectItem>
+                          <SelectItem value="WARNING">
+                            <Badge className="bg-yellow-500 hover:bg-gray-500">
+                              WARNING
+                            </Badge>
+                          </SelectItem>
+                          <SelectItem value="DEPLETED">
+                            <Badge className="bg-red-500 hover:bg-gray-500">
+                              DEPLETED
+                            </Badge>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -164,50 +169,42 @@ function CrudComponents() {
                   </FormItem>
                 )}
               />
-
-              <div className="flex justify-between">
-                <AlertDialogAction asChild>
-                  <Button type="submit">Create</Button>
-                </AlertDialogAction>
-                <div className="flex gap-2">
-                  <Button variant={'secondary'} onClick={() => form.reset()}>
-                    Clear
-                  </Button>
-                  <AlertDialogCancel asChild>
-                    <Button variant={'outline'}>Cancel</Button>
-                  </AlertDialogCancel>
-                </div>
-              </div>
             </div>
           </form>
         </Form>
+        <div className="flex justify-between">
+          <PromptModal
+            dialogMessage="Continue?"
+            prompType="ADD"
+            dialogTitle="You are about to create a new inventory"
+            triggerText="Create"
+            callback={form.handleSubmit(handleSubmit)}
+          />
+          <div className="flex gap-2 ">
+            <Button variant={'secondary'} onClick={() => form.clearErrors()}>
+              Clear
+            </Button>
+            <AlertDialogCancel asChild>
+              <Button variant={'outline'} className="mt-0">
+                Cancel
+              </Button>
+            </AlertDialogCancel>
+          </div>
+        </div>
       </AlertDialogContent>
     </AlertDialog>
   )
 }
 
 function Inventory() {
-  const Inventories = useQuery({
-    queryKey: ['Inventories'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/inventory`,
-        {
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        inventories: Array<Inventories>
-      }>
-      return data
-    },
-  })
+  const Inventories = useInventories()
 
   return (
     <div className="p-4 min-h-[85vh] flex flex-col items-center">
       <div className="w-full translate-y-12 md:translate-y-12 sm:w-[70vw] mb-4"></div>
       {Inventories.isSuccess && (
         <DataTable
+          showVisibility
           className="w-full md:w-[70vw]"
           columns={inventoryColumns}
           data={Inventories.data.inventories}
@@ -223,7 +220,7 @@ function Inventory() {
             },
           ]}
           CrudComponents={CrudComponents}
-        ></DataTable>
+        />
       )}
     </div>
   )

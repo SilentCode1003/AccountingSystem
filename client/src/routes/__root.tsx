@@ -1,3 +1,5 @@
+import { Toaster } from '@/components/ui/toaster'
+import { accountTypesOptions } from '@/hooks/queries/options'
 import { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
@@ -12,7 +14,15 @@ export const Route = createRootRouteWithContext<{
     }
   }
 }>()({
-  loader: async () => {},
+  loader: async ({ context }) => {
+    const accountTypes = context.queryClient.ensureQueryData(
+      accountTypesOptions(),
+    )
+
+    return {
+      accountTypes,
+    }
+  },
   component: RootComponent,
 })
 
@@ -20,7 +30,8 @@ function RootComponent() {
   return (
     <>
       <Outlet />
-      <TanStackRouterDevtools />
+      <Toaster />
+      {import.meta.env.VITE_NODE_ENV !== 'PROD' && <TanStackRouterDevtools />}
     </>
   )
 }

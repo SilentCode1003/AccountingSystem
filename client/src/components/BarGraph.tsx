@@ -10,23 +10,23 @@ import {
   YAxis,
 } from 'recharts'
 
-const rndColor = randomColor({ luminosity: 'light', hue: 'red' })
-const salesColor = randomColor({ luminosity: 'light', hue: 'red' })
+const colors: any = {
+  REVENUE: '#10b981',
+  EXPENSE: '#f43f5e',
+}
 const totalColor = randomColor({ luminosity: 'light', hue: 'red' })
 
 function BarGraph({
-  data,
+  BarChartData,
 }: {
-  data: Array<{
-    name: string
-    Sales: number
-    'R&D': number
-    total: number
-  }>
+  BarChartData: {
+    dataKeys: Array<string>
+    data: Array<any>
+  }
 }) {
   return (
-    <ResponsiveContainer className="py-4" width="100%" height="100%">
-      <ComposedChart data={data} width={350} height={414}>
+    <ResponsiveContainer className="py-4 px-4" width="100%" height="100%">
+      <ComposedChart data={BarChartData.data} width={350} height={414}>
         <XAxis
           dataKey="name"
           fontSize={12}
@@ -47,28 +47,20 @@ function BarGraph({
               return (
                 <div className="rounded-lg border bg-background p-2 shadow-sm">
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="flex flex-col">
-                      <span
-                        className={`text-[0.70rem] uppercase text-[${rndColor}]`}
-                      >
-                        R&D
-                      </span>
-                      <span className={`font-bold text-[${rndColor}]`}>
-                        {payload[0].value}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[0.70rem] uppercase text-muted-foreground">
-                        Sales
-                      </span>
-                      <span className="font-bold">{payload[1].value}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[0.70rem] uppercase text-muted-foreground">
-                        Total
-                      </span>
-                      <span className="font-bold">{payload[2].value}</span>
-                    </div>
+                    {payload.map((data, index) => (
+                      <div className="flex flex-col" key={index}>
+                        <span
+                          className={`text-[0.70rem] uppercase text-[${colors[data.name as string]}]`}
+                        >
+                          {data.name}
+                        </span>
+                        <span
+                          className={`font-bold text-[${colors[data.name as string]}]`}
+                        >
+                          {data.value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )
@@ -78,20 +70,20 @@ function BarGraph({
           }}
         />
         <Legend />
-        <Bar
-          dataKey="Sales"
-          maxBarSize={40}
-          radius={[4, 4, 0, 0]}
-          stackId={'a'}
-          fill={rndColor}
-        />
-        <Bar
-          dataKey="R&D"
-          maxBarSize={40}
-          radius={[4, 4, 0, 0]}
-          stackId={'a'}
-          fill={salesColor}
-        />
+
+        {BarChartData.dataKeys.map((data, index) => {
+          console.log(data)
+          return (
+            <Bar
+              dataKey={data}
+              maxBarSize={80}
+              radius={[4, 4, 0, 0]}
+              fill={colors[data]}
+              key={index}
+            />
+          )
+        })}
+
         <Line
           type="monotone"
           dataKey="total"

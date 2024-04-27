@@ -3,38 +3,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Text } from '@/components/ui/text'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
+import { useLogin } from '@/hooks/mutations'
+import { currentUserOptions } from '@/hooks/queries/options'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/login/_layout/')({
   beforeLoad: async ({ context: { queryClient }, location }) => {
-    const data = await queryClient.ensureQueryData({
-      queryKey: ['CurrentUser'],
-      queryFn: async () => {
-        const response = await fetch(
-          `${import.meta.env.VITE_SERVER_URL}/login`,
-          {
-            credentials: 'include',
-          },
-        )
-
-        if (!response.ok)
-          return {
-            isLogged: false,
-          }
-
-        const data = (await response.json()) as Promise<{
-          isLogged: boolean
-          user?: {
-            userId: string
-            userType: string
-          }
-        }>
-
-        return data
-      },
-    })
+    const data = await queryClient.ensureQueryData(currentUserOptions())
 
     if (data && data.isLogged) {
       throw redirect({
@@ -48,34 +24,11 @@ export const Route = createFileRoute('/login/_layout/')({
   component: login,
 })
 
-type LoginPayload = {
-  username: string
-  password: string
-}
-
 function login() {
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-  const queryClient = useQueryClient()
-  const navigate = useNavigate()
 
-  const login = useMutation({
-    mutationKey: ['login'],
-    mutationFn: async (payload: LoginPayload) => {
-      await fetch(`${import.meta.env.VITE_SERVER_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
-    },
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
-      navigate({ to: '/' })
-    },
-  })
+  const login = useLogin()
 
   const handleLogin = () => {
     login.mutate({ username, password })

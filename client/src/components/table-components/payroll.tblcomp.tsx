@@ -1,17 +1,18 @@
-import { CellContext } from '@tanstack/react-table'
-import { Payrolls } from '../table-columns/payrolls.columns'
+import { CellContext } from "@tanstack/react-table";
+import { Payrolls } from "../table-columns/payrolls.columns";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { Button } from '../ui/button'
-import { EyeOff, MoreHorizontal, MoreHorizontalIcon } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { useUpdatePayroll } from "@/hooks/mutations";
+import { updatePayrollSchema } from "@/validators/payrolls.validators";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { EyeOff, MoreHorizontal, MoreHorizontalIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Employees } from "../table-columns/employees.columns";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import DatePicker from "../ui/DatePicker";
 import {
   Dialog,
   DialogClose,
@@ -20,8 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../ui/dialog'
-import { Text } from '../ui/text'
+} from "../ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import {
   Form,
   FormControl,
@@ -29,23 +37,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/Form'
-import { Input } from '../ui/input'
+} from "../ui/Form";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
-import DatePicker from '../ui/DatePicker'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { updatePayrollSchema } from '@/validators/payrolls.validators'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Employees } from '../table-columns/employees.columns'
+} from "../ui/select";
+import { Text } from "../ui/text";
+import { PromptModal } from "../PromptModal";
 
 export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   return (
@@ -53,7 +55,7 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
       <div className="flex gap-4">
         <div>
           <Avatar>
-            <AvatarImage src={'https://github.com/nestortion.png'} />
+            <AvatarImage src={"https://github.com/nestortion.png"} />
             <AvatarFallback>NG</AvatarFallback>
           </Avatar>
         </div>
@@ -90,19 +92,19 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
           </DialogHeader>
           <div className="space-y-4 sm:space-y-0">
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              <Text variant={"body"} className="w-full sm:w-[33%]">
                 ID
               </Text>
               <div className="flex-1">{row.original.employee.empId}</div>
             </DialogDescription>
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              <Text variant={"body"} className="w-full sm:w-[33%]">
                 Address
               </Text>
               <div className="flex-1">{row.original.employee.empAddress}</div>
             </DialogDescription>
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              <Text variant={"body"} className="w-full sm:w-[33%]">
                 Contact Info
               </Text>
               <div className="flex-1">
@@ -110,38 +112,38 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
               </div>
             </DialogDescription>
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              <Text variant={"body"} className="w-full sm:w-[33%]">
                 Email
               </Text>
               <div className="flex-1">{row.original.employee.empEmail}</div>
             </DialogDescription>
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              <Text variant={"body"} className="w-full sm:w-[33%]">
                 Birthdate
               </Text>
               <div className="flex-1">
                 {new Date(
-                  row.original.employee.empBirthdate,
+                  row.original.employee.empBirthdate
                 ).toLocaleDateString()}
               </div>
             </DialogDescription>
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              <Text variant={"body"} className="w-full sm:w-[33%]">
                 Date Hired
               </Text>
               <div className="flex-1">
                 {new Date(
-                  row.original.employee.empDateHired,
+                  row.original.employee.empDateHired
                 ).toLocaleDateString()}
               </div>
             </DialogDescription>
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              <Text variant={"body"} className="w-full sm:w-[33%]">
                 Date Terminated
               </Text>
               <div className="flex-1">
                 {new Date(
-                  row.original.employee.empDateTerminated,
+                  row.original.employee.empDateTerminated
                 ).toLocaleDateString()}
               </div>
             </DialogDescription>
@@ -149,115 +151,76 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
 export const DateFromColumn = ({ row }: CellContext<Payrolls, unknown>) => {
-  return new Date(row.original.prDateFrom).toLocaleDateString()
-}
+  return new Date(row.original.prDateFrom).toLocaleDateString();
+};
 
 export const DateToColumn = ({ row }: CellContext<Payrolls, unknown>) => {
-  return new Date(row.original.prDateTo).toLocaleDateString()
-}
+  return new Date(row.original.prDateTo).toLocaleDateString();
+};
 
 export const TotalDeductionColumn = ({
   row,
 }: CellContext<Payrolls, unknown>) => {
-  const formatted = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'PHP',
-  }).format(parseInt(row.getValue('prTotalDeduction')))
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "PHP",
+  }).format(row.getValue("prTotalDeduction"));
 
-  return formatted
-}
+  return formatted;
+};
 
 export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const employees = useQuery({
-    queryKey: ['Employees'],
+    queryKey: ["Employees"],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/employees`,
         {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'content-type': 'application/json',
+            "content-type": "application/json",
           },
-          credentials: 'include',
-        },
-      )
+          credentials: "include",
+        }
+      );
       const data = (await response.json()) as Promise<{
-        employees: Array<Employees>
-      }>
-      return data
+        employees: Array<Employees>;
+      }>;
+      return data;
     },
-  })
+  });
 
   const form = useForm<z.infer<typeof updatePayrollSchema>>({
     defaultValues: {
       prId: row.original.prId,
       prAccId: row.original.prAccId,
       newData: {
-        prTotalDeduction: Number(row.original.prTotalDeduction),
+        prTotalDeduction: Number.parseFloat(
+          String(row.original.prTotalDeduction)
+        ),
         prDateTo: new Date(row.original.prDateTo),
         prDateFrom: new Date(row.original.prDateFrom),
         prEmployeeId: row.original.employee.empId,
       },
     },
     resolver: zodResolver(updatePayrollSchema),
-  })
+  });
 
-  const queryClient = useQueryClient()
-
-  const updateCheque = useMutation({
-    mutationKey: ['updateCheque'],
-    mutationFn: async (payload: z.infer<typeof updatePayrollSchema>) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/payrolls`,
-        {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        payroll: Payrolls
-      }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['Payrolls'],
-        (old: { payrolls: Array<Payrolls> }) => {
-          const newPayrolls = old.payrolls.map((payroll) => {
-            if (payroll.prId === row.original.prId) {
-              return data.payroll
-            }
-            return payroll
-          })
-          return { payrolls: newPayrolls }
-        },
-      )
-      setIsOpen(false)
-    },
-
-    onError: (error) => {
-      console.log(error)
-    },
-  })
-
+  const updateCheque = useUpdatePayroll({ cell: { row }, setIsOpen });
   const handleSubmit = (values: z.infer<typeof updatePayrollSchema>) => {
-    updateCheque.mutate(values)
-  }
+    updateCheque.mutate(values);
+  };
 
-  const formatted = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'PHP',
-  }).format(parseInt(row.getValue('prFinalAmount')))
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "PHP",
+  }).format(row.getValue("prFinalAmount"));
 
   return (
     <div className="flex justify-between">
@@ -362,8 +325,8 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
                               {...field}
                               value={
                                 Number.isNaN(field.value)
-                                  ? ''
-                                  : Number(field.value)
+                                  ? ""
+                                  : Number.parseFloat(String(field.value))
                               }
                               onChange={(e) =>
                                 field.onChange(parseFloat(e.target.value))
@@ -413,26 +376,25 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
                 </form>
               </Form>
               <div className="flex justify-between">
-                <DialogClose asChild>
-                  <Button
-                    onClick={form.handleSubmit(handleSubmit)}
-                    type="submit"
-                  >
-                    Update
-                  </Button>
-                </DialogClose>
+                <PromptModal
+                  dialogMessage="Continue?"
+                  prompType="UPDATE"
+                  dialogTitle="You are about to update this payroll"
+                  triggerText="Update"
+                  callback={form.handleSubmit(handleSubmit)}
+                />
                 <div className="flex gap-2">
                   <Button
-                    variant={'secondary'}
+                    variant={"secondary"}
                     onClick={() => {
-                      form.clearErrors()
-                      form.reset()
+                      form.clearErrors();
+                      form.reset();
                     }}
                   >
                     Clear
                   </Button>
                   <DialogClose asChild>
-                    <Button variant={'outline'}>Cancel</Button>
+                    <Button variant={"outline"}>Cancel</Button>
                   </DialogClose>
                 </div>
               </div>
@@ -441,5 +403,5 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
         </Dialog>
       </div>
     </div>
-  )
-}
+  );
+};

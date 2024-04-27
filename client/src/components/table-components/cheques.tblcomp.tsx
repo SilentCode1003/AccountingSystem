@@ -1,15 +1,15 @@
+import { useUpdateCheque } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
+import { chequeUpdateSchema } from '@/validators/cheques.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { CellContext } from '@tanstack/react-table'
-import { Cheques } from '../table-columns/cheques.columns'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { Button } from '../ui/button'
 import { MoreHorizontal, MoreHorizontalIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Cheques } from '../table-columns/cheques.columns'
+import { Button } from '../ui/button'
+import DatePicker from '../ui/DatePicker'
 import {
   Dialog,
   DialogClose,
@@ -18,7 +18,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/dialog'
-import { Text } from '../ui/text'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -27,21 +34,19 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/Form'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { chequeUpdateSchema } from '@/validators/cheques.validator'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Input } from '../ui/input'
-import DatePicker from '../ui/DatePicker'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { useState } from 'react'
+import { Text } from '../ui/text'
+import { PromptModal } from '../PromptModal'
+import { cn } from '@/lib/utils'
+import { Badge } from '../ui/badge'
 
 export const IssueDateColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return new Date(row.original.chqIssueDate).toLocaleDateString()
@@ -51,7 +56,7 @@ export const PayeeNameColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
-  }).format(parseInt(row.getValue('chqAmount')))
+  }).format(row.getValue('chqAmount'))
 
   return formatted
 }
@@ -63,7 +68,7 @@ export const CreatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
 export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return (
     <div className="flex justify-between">
-      <div>{row.original.account.accType}</div>
+      <Badge variant={'outline'}>{row.original.account.accName}</Badge>
       <div>
         <Dialog>
           <DropdownMenu>
@@ -108,9 +113,9 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
                 <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Account Type
                 </Text>
-                <Text variant={'label'} className="flex-1">
-                  {row.original.account.accType}
-                </Text>
+                <Badge variant={'secondary'}>
+                  {row.original.account.accountType.accTypeName}
+                </Badge>
               </div>
               <div className="flex flex-col sm:flex-row">
                 <Text className="w-full sm:w-[33%]" variant={'body'}>
@@ -128,14 +133,32 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   )
 }
 
+export const ChequeStatusColumn = ({ row }: CellContext<Cheques, unknown>) => {
+  return (
+    <Badge
+      className={cn(
+        [
+          row.original.chqStatus === 'PENDING' && 'bg-yellow-500',
+          row.original.chqStatus === 'APPROVED' && 'bg-emerald-500',
+          row.original.chqStatus === 'REJECTED' && 'bg-red-500 ',
+        ],
+        'hover:bg-gray-500',
+      )}
+    >
+      {row.original.chqStatus}
+    </Badge>
+  )
+}
+
 export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const accountTypes = useAccountTypes()
   const form = useForm<z.infer<typeof chequeUpdateSchema>>({
     defaultValues: {
       chqId: row.original.chqId,
       newData: {
-        chqAccType: row.original.account.accType,
-        chqAmount: Number(row.original.chqAmount),
+        chqAccTypeId: row.original.account.accTypeId,
+        chqAmount: Number.parseFloat(String(row.original.chqAmount)),
         chqIssueDate: new Date(row.original.chqIssueDate),
         chqPayeeName: row.original.chqPayeeName,
         chqStatus: row.original.chqStatus,
@@ -144,49 +167,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
     resolver: zodResolver(chequeUpdateSchema),
   })
 
-  const queryClient = useQueryClient()
-
-  const updateCheque = useMutation({
-    mutationKey: ['updateCheque'],
-    mutationFn: async (
-      payload: z.infer<typeof chequeUpdateSchema> & { chqAccId: string },
-    ) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/cheques`,
-        {
-          method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-          credentials: 'include',
-        },
-      )
-      const data = (await response.json()) as Promise<{
-        cheque: Cheques
-      }>
-      return data
-    },
-    onSuccess: async (data) => {
-      await queryClient.setQueryData(
-        ['Cheques'],
-        (old: { cheques: Array<Cheques> }) => {
-          const newCheques = old.cheques.map((cheque) => {
-            if (cheque.chqId === row.original.chqId) {
-              return data.cheque
-            }
-            return cheque
-          })
-          return { cheques: newCheques }
-        },
-      )
-      setIsOpen(false)
-    },
-
-    onError: (error) => {
-      console.log(error)
-    },
-  })
+  const updateCheque = useUpdateCheque({ cell: { row }, setIsOpen })
 
   const handleSubmit = (values: z.infer<typeof chequeUpdateSchema>) => {
     updateCheque.mutate({ ...values, chqAccId: row.original.account.accId })
@@ -282,7 +263,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                               value={
                                 Number.isNaN(field.value)
                                   ? ''
-                                  : Number(field.value)
+                                  : Number.parseFloat(String(field.value))
                               }
                               onChange={(e) =>
                                 field.onChange(parseFloat(e.target.value))
@@ -310,12 +291,20 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                                 <SelectValue placeholder="Select Status" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="PENDING">PENDING</SelectItem>
                                 <SelectItem value="APPROVED">
-                                  APPROVED
+                                  <Badge className="bg-emerald-500 hover:bg-gray-500">
+                                    APPROVED
+                                  </Badge>
+                                </SelectItem>
+                                <SelectItem value="PENDING">
+                                  <Badge className="bg-yellow-500 hover:bg-gray-500">
+                                    PENDING
+                                  </Badge>
                                 </SelectItem>
                                 <SelectItem value="REJECTED">
-                                  REJECTED
+                                  <Badge className="bg-red-500 hover:bg-gray-500">
+                                    APPROVED
+                                  </Badge>
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -325,7 +314,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
-                      name="newData.chqAccType"
+                      name="newData.chqAccTypeId"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Account Type</FormLabel>
@@ -338,12 +327,22 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                                 <SelectValue placeholder="Select Account Type" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="EXPENSE">EXPENSE</SelectItem>
-                                <SelectItem value="REVENUE">REVENUE</SelectItem>
-                                <SelectItem value="RECEIVABLE">
-                                  RECEIVABLE
-                                </SelectItem>
-                                <SelectItem value="PAYABLE">PAYABLE</SelectItem>
+                                {accountTypes.isSuccess && (
+                                  <SelectGroup>
+                                    {accountTypes.data.accountTypes.map(
+                                      (accType) => (
+                                        <SelectItem
+                                          key={accType.accTypeId}
+                                          value={accType.accTypeId}
+                                        >
+                                          <Badge variant={'secondary'}>
+                                            {accType.accTypeName}
+                                          </Badge>
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectGroup>
+                                )}
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -373,14 +372,13 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                 </form>
               </Form>
               <div className="flex justify-between">
-                <DialogClose asChild>
-                  <Button
-                    onClick={form.handleSubmit(handleSubmit)}
-                    type="submit"
-                  >
-                    Update
-                  </Button>
-                </DialogClose>
+                <PromptModal
+                  dialogMessage="Continue?"
+                  prompType="UPDATE"
+                  dialogTitle="You are about to update this cheque"
+                  triggerText="Update"
+                  callback={form.handleSubmit(handleSubmit)}
+                />
                 <div className="flex gap-2">
                   <Button
                     variant={'secondary'}
