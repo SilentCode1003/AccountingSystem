@@ -1117,6 +1117,61 @@ export const useCreateTransaction = (
   })
 }
 
+export const useCreateTransactionByFile = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['createTransaction'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactions/file`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: payload,
+        },
+      )
+      const data = (await response.json()) as {
+        transaction: Transactions
+      }
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['Transactions'],
+        (old: { transactions: Array<Transactions> }) => {
+          return { transactions: [...old.transactions, data.transaction] }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Transaction was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create transaction',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useLogin = () => {
   type LoginPayload = {
     username: string
