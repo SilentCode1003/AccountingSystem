@@ -102,7 +102,7 @@ function Settings() {
   }
 
   return (
-    <div className="flex justify-center lg:justify-start w-full ">
+    <div className="flex justify-center lg:justify-start w-full h-fit">
       {user.isSuccess && (
         <div className="flex flex-col items-center gap-40 lg:gap-8 lg:items-start lg:flex-row w-fit">
           <div className="relative">

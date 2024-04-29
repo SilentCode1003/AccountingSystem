@@ -52,7 +52,11 @@ export const AccountAmountColumn = ({
 }
 
 export const AccountNameColumn = ({ row }: CellContext<Accounts, unknown>) => {
-  return <Badge variant={'outline'}>{row.original.accName}</Badge>
+  return (
+    <Badge variant={'outline'} className="w-max">
+      {row.original.accName}
+    </Badge>
+  )
 }
 
 export const AccountAccountTypeColumn = ({
