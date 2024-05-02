@@ -125,7 +125,13 @@ function TransactionsComponent() {
   })
 
   const handleSubmit = (values: z.infer<typeof createTransactionSchema>) => {
-    createTransaction.mutate(values)
+    const fd = new FormData()
+
+    Object.keys(values).forEach((key) => {
+      fd.append(key, values[key as keyof typeof values] as any)
+    })
+
+    createTransaction.mutate(fd)
   }
 
   const handleSubmitFile = () => {
@@ -382,6 +388,35 @@ function TransactionsComponent() {
                             )}
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <FormField
+                      name="tranFile"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Supporting File</FormLabel>
+                            <FormMessage />
+                          </div>
+                          <FormControl>
+                            <Input
+                              ref={field.ref}
+                              onBlur={field.onBlur}
+                              onChange={(e: any) => {
+                                if (!e.target.files) return
+
+                                if (!e.target.files[0]) return
+                                console.log(e.target.files[0])
+                                field.onChange(e.target.files[0])
+                              }}
+                              type="file"
+                              className="w-full hover:cursor-pointer"
+                            />
+                          </FormControl>
                         </FormItem>
                       )}
                     />

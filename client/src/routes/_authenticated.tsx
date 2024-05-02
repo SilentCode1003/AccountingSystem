@@ -1,4 +1,5 @@
 import ErrorComponent from '@/components/ErrorComponent'
+import { accountTypesOptions } from '@/hooks/queries/options'
 import { redirect, useRouter } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 
@@ -38,6 +39,15 @@ export const Route = createFileRoute('/_authenticated')({
           redirect: location.href,
         },
       })
+    }
+  },
+  loader: async ({ context }) => {
+    const accountTypes = context.queryClient.ensureQueryData(
+      accountTypesOptions(),
+    )
+
+    return {
+      accountTypes,
     }
   },
   errorComponent: ({ error, reset }) => {

@@ -9,6 +9,14 @@ export const getAllCustomers = async () => {
   return customers;
 };
 
+export const getCustomerByName = async (custName: string) => {
+  const customer = await db.query.customers.findFirst({
+    where: (customer) => eq(customer.custName, custName),
+  });
+
+  return customer;
+};
+
 export const addCustomer = async (input: {
   custName: string;
   custContactInfo: string;

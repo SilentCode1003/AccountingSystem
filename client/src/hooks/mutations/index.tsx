@@ -28,13 +28,11 @@ import {
   createPayrollSchema,
   updatePayrollSchema,
 } from '@/validators/payrolls.validators'
-import {
-  createTransactionSchema,
-  updateTransactionSchema,
-} from '@/validators/transactions.validator'
+import { createTransactionSchema } from '@/validators/transactions.validator'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { CellContext } from '@tanstack/react-table'
+import fileDownload from 'js-file-download'
 import { CircleXIcon, PartyPopperIcon } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
@@ -638,16 +636,13 @@ export const useUpdateTransaction = ({
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['updateTransaction'],
-    mutationFn: async (payload: z.infer<typeof updateTransactionSchema>) => {
+    mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactions`,
         {
           method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
           credentials: 'include',
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
       if (!response.ok) throw new Error((await response.json()).error)
@@ -1067,16 +1062,14 @@ export const useCreateTransaction = (
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['createTransaction'],
-    mutationFn: async (payload: z.infer<typeof createTransactionSchema>) => {
+    mutationFn: async (payload: FormData) => {
+      console.log(payload)
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactions`,
         {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
       const data = (await response.json()) as {
@@ -1210,6 +1203,27 @@ export const useLogin = () => {
         description: error.message ?? 'Failed to login',
         variant: 'destructive',
       })
+    },
+  })
+}
+
+export const useDownloadFile = (fileName: string) => {
+  return useMutation({
+    mutationKey: ['downloadFile'],
+    mutationFn: async () => {
+      const params = new URLSearchParams({ fileName })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/others/download/?` + params,
+        {
+          method: 'GET',
+          credentials: 'include',
+        },
+      )
+      const data = await response.blob()
+      return { data, fileName }
+    },
+    onSuccess: (data) => {
+      fileDownload(data.data, data.fileName.split(' ')[1])
     },
   })
 }

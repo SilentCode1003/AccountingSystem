@@ -36,6 +36,7 @@ const transactions = mysqlTable("transactions", {
   tranTransactionDate: datetime("tran_transaction_date").notNull(),
   tranCreatedAt: datetime("tran_created_at").notNull().default(new Date()),
   tranUpdatedAt: datetime("tran_updated_at").notNull().default(new Date()),
+  tranFile: text("tran_file").notNull(),
 });
 
 export const transactionAccountRelation = relations(

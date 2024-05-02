@@ -9,6 +9,7 @@ import {
   TransactionAccountIDColumn,
   TransactionAmountColumn,
   TransactionDate,
+  transactionFileColumn,
   TransactionIndexColumn,
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
@@ -61,6 +62,7 @@ export type Transactions = {
   employee: Employees
   customer: Customer
   vendor: Vendor
+  tranFile: string
 }
 
 export const transactionColumns: ColumnDef<Transactions>[] = [
@@ -97,6 +99,12 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
       )
     },
     cell: TransactionAccountIDColumn,
+  },
+  {
+    accessorKey: 'tranFile',
+    meta: 'Transaction File',
+    header: () => 'Transaction File',
+    cell: transactionFileColumn,
   },
   {
     accessorKey: 'tranAmount',
