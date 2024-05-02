@@ -1,5 +1,6 @@
 import { useUpdateCheque } from '@/hooks/mutations'
 import { useAccountTypes } from '@/hooks/queries'
+import { cn } from '@/lib/utils'
 import { chequeUpdateSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CellContext } from '@tanstack/react-table'
@@ -7,7 +8,10 @@ import { MoreHorizontal, MoreHorizontalIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { ComboBox } from '../Combobox'
+import { PromptModal } from '../PromptModal'
 import { Cheques } from '../table-columns/cheques.columns'
+import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import DatePicker from '../ui/DatePicker'
 import {
@@ -38,15 +42,11 @@ import { Input } from '../ui/input'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
 import { Text } from '../ui/text'
-import { PromptModal } from '../PromptModal'
-import { cn } from '@/lib/utils'
-import { Badge } from '../ui/badge'
 
 export const IssueDateColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return new Date(row.original.chqIssueDate).toLocaleDateString()
@@ -142,10 +142,12 @@ export const ChequeStatusColumn = ({ row }: CellContext<Cheques, unknown>) => {
           row.original.chqStatus === 'APPROVED' && 'bg-emerald-500',
           row.original.chqStatus === 'REJECTED' && 'bg-red-500 ',
         ],
-        'hover:bg-gray-500',
+        'hover:bg-gray-500 text-center',
       )}
     >
-      {row.original.chqStatus}
+      {row.original.chqStatus === 'REJECTED'
+        ? row.original.chqStatus
+        : `${row.original.chqStatus} ${row.original.chqApprovalCount}/3`}
     </Badge>
   )
 }
@@ -161,6 +163,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
         chqAmount: Number.parseFloat(String(row.original.chqAmount)),
         chqIssueDate: new Date(row.original.chqIssueDate),
         chqPayeeName: row.original.chqPayeeName,
+        chqNumber: row.original.chqNumber,
         chqStatus: row.original.chqStatus,
       },
     },
@@ -246,6 +249,25 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
+                      name="newData.chqNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Cheque Number</FormLabel>
+                            <FormMessage />
+                          </div>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              placeholder="Cheque Number"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
                       name="newData.chqAmount"
                       render={({ field }) => (
                         <FormItem>
@@ -303,7 +325,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                                 </SelectItem>
                                 <SelectItem value="REJECTED">
                                   <Badge className="bg-red-500 hover:bg-gray-500">
-                                    APPROVED
+                                    REJECTED
                                   </Badge>
                                 </SelectItem>
                               </SelectContent>
@@ -319,32 +341,19 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                         <FormItem>
                           <FormLabel>Account Type</FormLabel>
                           <FormControl>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Account Type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {accountTypes.isSuccess && (
-                                  <SelectGroup>
-                                    {accountTypes.data.accountTypes.map(
-                                      (accType) => (
-                                        <SelectItem
-                                          key={accType.accTypeId}
-                                          value={accType.accTypeId}
-                                        >
-                                          <Badge variant={'secondary'}>
-                                            {accType.accTypeName}
-                                          </Badge>
-                                        </SelectItem>
-                                      ),
-                                    )}
-                                  </SelectGroup>
+                            {accountTypes.isSuccess && (
+                              <ComboBox
+                                data={accountTypes.data.accountTypes.map(
+                                  (t) => ({
+                                    label: t.accTypeName,
+                                    value: t.accTypeId,
+                                  }),
                                 )}
-                              </SelectContent>
-                            </Select>
+                                emptyLabel="Nothing Found"
+                                value={field.value as string}
+                                setValue={field.onChange}
+                              />
+                            )}
                           </FormControl>
                           <FormMessage />
                         </FormItem>

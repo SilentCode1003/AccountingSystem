@@ -20,10 +20,14 @@ import { useUpdateTransaction } from '@/hooks/mutations'
 import { useAccountTypes, useTransactionPartners } from '@/hooks/queries'
 import { updateTransactionSchema } from '@/validators/transactions.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { DialogProps } from '@radix-ui/react-dialog'
 import { CellContext, Row } from '@tanstack/react-table'
 import { MoreHorizontalIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { ComboBox } from '../Combobox'
+import { PromptModal } from '../PromptModal'
+import { Badge } from '../ui/badge'
 import DatePicker from '../ui/DatePicker'
 import {
   Form,
@@ -40,20 +44,7 @@ import {
   MultiDialogTrigger,
   useMultiDialog,
 } from '../ui/multi-dialog'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select'
 import { Textarea } from '../ui/textarea'
-import { DialogProps } from '@radix-ui/react-dialog'
-import { PromptModal } from '../PromptModal'
-import { Badge } from '../ui/badge'
 
 export const TransactionIndexColumn = ({
   row,
@@ -319,7 +310,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
   }
   return (
     <Dialog {...props}>
-      <DialogContent>
+      <DialogContent className="scale-75 md:scale-100">
         <DialogHeader>Update Transaction</DialogHeader>
         <div className="space-y-4">
           <Form {...form}>
@@ -410,52 +401,40 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                       </div>
                       <FormControl>
                         {transactionPartners.isSuccess && (
-                          <Select
-                            defaultValue={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pick One" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectLabel>Employees</SelectLabel>
-                                {transactionPartners.data.employees.map(
-                                  (emp) => (
-                                    <SelectItem
-                                      key={emp.empId}
-                                      value={emp.empId}
-                                    >
-                                      {emp.empName} | Employee
-                                    </SelectItem>
-                                  ),
-                                )}
-                              </SelectGroup>
-                              <SelectSeparator />
-                              <SelectGroup>
-                                <SelectLabel>Customers</SelectLabel>
-                                {transactionPartners.data.customers.map(
-                                  (cust) => (
-                                    <SelectItem
-                                      key={cust.custId}
-                                      value={cust.custId}
-                                    >
-                                      {cust.custName} | Customers
-                                    </SelectItem>
-                                  ),
-                                )}
-                              </SelectGroup>
-                              <SelectSeparator />
-                              <SelectGroup>
-                                <SelectLabel>Vendors</SelectLabel>
-                                {transactionPartners.data.vendors.map((vd) => (
-                                  <SelectItem key={vd.vdId} value={vd.vdId}>
-                                    {vd.vdName} | Vendor
-                                  </SelectItem>
-                                ))}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
+                          <ComboBox
+                            data={transactionPartners.data.customers
+                              .map((c) => ({
+                                label: `${c.custName} | Customer`,
+                                value: c.custId,
+                              }))
+                              .concat([
+                                {
+                                  label: 'separator',
+                                  value: 'separator',
+                                },
+                              ])
+                              .concat(
+                                transactionPartners.data.employees.map((e) => ({
+                                  label: `${e.empName} | Employee`,
+                                  value: e.empId,
+                                })),
+                              )
+                              .concat([
+                                {
+                                  label: 'separator',
+                                  value: 'separator',
+                                },
+                              ])
+                              .concat(
+                                transactionPartners.data.vendors.map((v) => ({
+                                  label: `${v.vdName} | Vendor`,
+                                  value: v.vdId,
+                                })),
+                              )}
+                            emptyLabel="Nothing Selected"
+                            value={field.value as string}
+                            setValue={field.onChange}
+                          />
                         )}
                       </FormControl>
                       <FormMessage />
@@ -471,33 +450,16 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                         <FormLabel>Account Type</FormLabel>
                       </div>
                       <FormControl>
-                        {transactionPartners.isSuccess && (
-                          <Select
-                            defaultValue={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Account type" />
-                            </SelectTrigger>
-                            <SelectContent className="flex-1">
-                              {accountTypes.isSuccess && (
-                                <SelectGroup>
-                                  {accountTypes.data.accountTypes.map(
-                                    (accType) => (
-                                      <SelectItem
-                                        key={accType.accTypeId}
-                                        value={accType.accTypeId}
-                                      >
-                                        <Badge variant={'secondary'}>
-                                          {accType.accTypeName}
-                                        </Badge>
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectGroup>
-                              )}
-                            </SelectContent>
-                          </Select>
+                        {accountTypes.isSuccess && (
+                          <ComboBox
+                            data={accountTypes.data.accountTypes.map((t) => ({
+                              label: t.accTypeName,
+                              value: t.accTypeId,
+                            }))}
+                            emptyLabel="Nothing Found"
+                            value={field.value as string}
+                            setValue={field.onChange}
+                          />
                         )}
                       </FormControl>
                       <FormMessage />

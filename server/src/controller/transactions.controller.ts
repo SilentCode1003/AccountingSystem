@@ -8,6 +8,8 @@ import {
   createValidator,
   updateValidator,
 } from "../utils/validators/transactions.validator";
+import { UploadedFile } from "express-fileupload";
+import * as xlsx from "xlsx";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -47,4 +49,40 @@ export const updateTransaction = async (req: Request, res: Response) => {
       error: "Server error",
     });
   }
+};
+
+export const createTransactionByFile = (req: Request, res: Response) => {
+  const file = req.files!.file as UploadedFile;
+
+  const f = xlsx.read(file.data, { type: "buffer" }).Sheets["Liquidation"];
+
+  const cells = Object.keys(f);
+
+  const lq: {
+    name: string;
+    amount: number;
+    description: string;
+    date: Date;
+  } = {
+    name: "",
+    amount: 0,
+    description: "",
+    date: new Date(),
+  };
+
+  for (let i = 0; i < cells.length; i++) {
+    if (f[cells[i]].v === "SUB TOTAL:") {
+      lq["amount"] = f[cells[i + 1]].v;
+    }
+
+    if (f[cells[i]].v === "DATE :") {
+      lq["date"] = new Date(f[cells[i + 1]].w);
+    }
+
+    if (f[cells[i]].v === "NAME :") {
+      lq["name"] = f[cells[i + 1]].v;
+    }
+  }
+
+  return res.send({ lq });
 };

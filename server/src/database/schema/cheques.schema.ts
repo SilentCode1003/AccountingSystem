@@ -7,11 +7,13 @@ import {
 } from "drizzle-orm/mysql-core";
 import accounts from "./accounts.schema";
 import { relations } from "drizzle-orm";
-import { decimal } from "drizzle-orm/mysql-core";
+import { decimal, int } from "drizzle-orm/mysql-core";
 
 const cheques = mysqlTable("cheques", {
   chqId: varchar("chq_id", { length: 60 }).primaryKey(),
   chqPayeeName: varchar("chq_payee_name", { length: 50 }).notNull(),
+  chqNumber: varchar("chq_number", { length: 50 }).notNull().unique(),
+  chqApprovalCount: int("chq_approval_count").notNull().default(0),
   chqAmount: decimal("chq_amount", { precision: 13, scale: 2 })
     .$type<number>()
     .notNull(),

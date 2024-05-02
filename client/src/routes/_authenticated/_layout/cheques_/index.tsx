@@ -1,3 +1,4 @@
+import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
@@ -36,7 +37,6 @@ import { useAccountTypes, useCheques } from '@/hooks/queries'
 import { chequesOptions } from '@/hooks/queries/options'
 import { createChequeSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SelectGroup } from '@radix-ui/react-select'
 import { createFileRoute } from '@tanstack/react-router'
 import { ReceiptIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -69,6 +69,7 @@ const CrudComponents = () => {
       chqAmount: 0,
       chqPayeeName: '',
       chqStatus: 'PENDING',
+      chqNumber: '',
     },
     resolver: zodResolver(createChequeSchema),
   })
@@ -102,6 +103,25 @@ const CrudComponents = () => {
                       <Input
                         className="w-full"
                         placeholder="Payee Name"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="chqNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Cheque Number</FormLabel>
+                      <FormMessage />
+                    </div>
+                    <FormControl>
+                      <Input
+                        className="w-full"
+                        placeholder="Cheque Number"
                         {...field}
                       />
                     </FormControl>
@@ -182,32 +202,17 @@ const CrudComponents = () => {
                       <FormMessage />
                     </div>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Account type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accountTypes.isSuccess && (
-                            <SelectGroup>
-                              {accountTypes.data.accountTypes.map(
-                                (accountType) => (
-                                  <SelectItem
-                                    key={accountType.accTypeId}
-                                    value={accountType.accTypeId}
-                                  >
-                                    <Badge variant={'secondary'}>
-                                      {accountType.accTypeName}
-                                    </Badge>
-                                  </SelectItem>
-                                ),
-                              )}
-                            </SelectGroup>
-                          )}
-                        </SelectContent>
-                      </Select>
+                      {accountTypes.isSuccess && (
+                        <ComboBox
+                          data={accountTypes.data.accountTypes.map((t) => ({
+                            label: t.accTypeName,
+                            value: t.accTypeId,
+                          }))}
+                          emptyLabel="Nothing Found"
+                          value={field.value}
+                          setValue={field.onChange}
+                        />
+                      )}
                     </FormControl>
                   </FormItem>
                 )}
