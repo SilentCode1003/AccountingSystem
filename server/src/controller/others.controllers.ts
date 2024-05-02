@@ -20,6 +20,7 @@ import {
   getAccountTypeTotalPerMonthValidator,
   IncomeStatementByMonthValidator,
 } from "../utils/validators/others.validator";
+import path from "path";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -245,4 +246,16 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
     dataKeys: Array.from(new Set(aKeys)),
     data,
   });
+};
+
+export const downloadFile = async (req: Request, res: Response) => {
+  const fileName = req.query.fileName as string;
+  const filePath = path.join(
+    __dirname,
+    "..",
+    "..",
+    `/files/transactionfiles/${fileName}`
+  );
+
+  res.download(filePath);
 };

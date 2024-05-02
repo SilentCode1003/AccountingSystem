@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   AccountTypeBarChartData,
+  downloadFile,
   getAccountTotal,
   getAccountTypeTotalPerMonth,
   getBalanceSheetByMonth,
@@ -27,5 +28,8 @@ othersRouter.get("/AccountTypeBarChartData", AccountTypeBarChartData);
 
 //get Cash Flow barchart data
 othersRouter.get("/cashFlowBarChart", getBarChartCashFlowData);
+
+//download file
+othersRouter.get("/download", downloadFile);
 
 export default othersRouter;
