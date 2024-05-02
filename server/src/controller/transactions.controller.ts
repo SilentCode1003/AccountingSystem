@@ -10,6 +10,10 @@ import {
 } from "../utils/validators/transactions.validator";
 import { UploadedFile } from "express-fileupload";
 import * as xlsx from "xlsx";
+import { getAllAccountTypes } from "../database/services/accountType.service";
+import { getEmployeeByName } from "../database/services/employees.service";
+import { getCustomerByName } from "../database/services/customers.service";
+import { getVendorByName } from "../database/services/vendors.service";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -51,24 +55,35 @@ export const updateTransaction = async (req: Request, res: Response) => {
   }
 };
 
-export const createTransactionByFile = (req: Request, res: Response) => {
+export const createTransactionByFile = async (req: Request, res: Response) => {
+  if (!req.files?.file)
+    return res.status(400).send({ error: "No file uploaded" });
   const file = req.files!.file as UploadedFile;
-
-  const f = xlsx.read(file.data, { type: "buffer" }).Sheets["Liquidation"];
-
-  const cells = Object.keys(f);
-
   const lq: {
-    name: string;
+    tranPartner: string;
     amount: number;
     description: string;
     date: Date;
+    tranAccTypeId?: string;
   } = {
-    name: "",
+    tranPartner: "",
     amount: 0,
     description: "",
     date: new Date(),
   };
+
+  const accountTypes = await getAllAccountTypes();
+
+  accountTypes.map((accType) => {
+    if (file.name.startsWith(accType.accTypeName)) {
+      lq["tranAccTypeId"] = accType.accTypeId;
+      return;
+    }
+  });
+
+  const f = xlsx.read(file.data, { type: "buffer" }).Sheets["Liquidation"];
+
+  const cells = Object.keys(f);
 
   for (let i = 0; i < cells.length; i++) {
     if (f[cells[i]].v === "SUB TOTAL:") {
@@ -80,9 +95,27 @@ export const createTransactionByFile = (req: Request, res: Response) => {
     }
 
     if (f[cells[i]].v === "NAME :") {
-      lq["name"] = f[cells[i + 1]].v;
+      if (file.name.toLowerCase().includes("employee")) {
+        const tranPartner = await getEmployeeByName(f[cells[i + 1]].v);
+
+        lq["tranPartner"] = tranPartner?.empId as string;
+      } else if (file.name.includes("customer")) {
+        const tranPartner = await getCustomerByName(f[cells[i + 1]].v);
+        lq["tranPartner"] = tranPartner?.custId as string;
+      } else if (file.name.includes("vendor")) {
+        const tranPartner = await getVendorByName(f[cells[i + 1]].v);
+        lq["tranPartner"] = tranPartner?.vdId as string;
+      }
     }
   }
 
-  return res.send({ lq });
+  const transaction = await addTransaction({
+    tranAccTypeId: lq.tranAccTypeId as string,
+    tranAmount: lq.amount,
+    tranDescription: lq.description,
+    tranTransactionDate: lq.date,
+    tranPartner: lq.tranPartner,
+  });
+
+  return res.send({ transaction });
 };

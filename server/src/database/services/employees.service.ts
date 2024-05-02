@@ -9,6 +9,14 @@ export const getAllEmployees = async () => {
   return employees;
 };
 
+export const getEmployeeByName = async (empName: string) => {
+  const employee = await db.query.employees.findFirst({
+    where: eq(employees.empName, empName),
+  });
+
+  return employee;
+};
+
 export const addEmployee = async (input: {
   empName: string;
   empContactInfo: string;
