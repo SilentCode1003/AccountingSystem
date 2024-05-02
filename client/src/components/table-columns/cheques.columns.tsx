@@ -39,6 +39,8 @@ export type Cheques = {
   chqCreatedAt: string
   chqUpdatedAt: string
   chqAccId: string
+  chqNumber: string
+  chqApprovalCount: number
   account: Account
 }
 
@@ -60,6 +62,23 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
       )
     },
     cell: IssueDateColumn,
+  },
+  {
+    accessorKey: 'chqNumber',
+    meta: 'Cheque Number',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Cheque Number
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => <div className="min-w-32">{row.original.chqNumber}</div>,
   },
   {
     accessorKey: 'chqPayeeName',

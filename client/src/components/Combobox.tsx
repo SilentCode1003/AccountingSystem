@@ -11,6 +11,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandSeparator,
 } from '@/components/ui/command'
 import {
   Popover,
@@ -43,42 +44,45 @@ export function ComboBox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-full justify-between"
         >
           {value
             ? data.find((data) => {
-                console.log(data.value)
                 return data.value === value
               })?.label
-            : 'Select data...'}
+            : 'Select One'}
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <ScrollArea className="h-72 w-fit rounded-md border">
-          <Command>
-            <CommandInput placeholder="Search data..." className="h-9" />
+      <PopoverContent className=" p-0">
+        <ScrollArea className="[&>[data-radix-scroll-area-viewport]]:max-h-72 w-full rounded-md border">
+          <Command className="w-full">
+            <CommandInput placeholder="Search" className="h-9" />
             <CommandEmpty>{emptyLabel}.</CommandEmpty>
             <CommandList>
               <CommandGroup>
-                {data.map((data) => (
-                  <CommandItem
-                    key={data.value}
-                    value={data.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? '' : currentValue)
-                      setOpen(false)
-                    }}
-                  >
-                    {data.label}
-                    <CheckIcon
-                      className={cn(
-                        'ml-auto h-4 w-4',
-                        value === data.value ? 'opacity-100' : 'opacity-0',
-                      )}
-                    />
-                  </CommandItem>
-                ))}
+                {data.map((d) =>
+                  d.value !== 'separator' ? (
+                    <CommandItem
+                      key={d.value}
+                      value={d.label}
+                      onSelect={(currentValue) => {
+                        setValue(currentValue === value ? '' : d.value)
+                        setOpen(false)
+                      }}
+                    >
+                      {d.label}
+                      <CheckIcon
+                        className={cn(
+                          'ml-auto h-4 w-4',
+                          value === d.value ? 'opacity-100' : 'opacity-0',
+                        )}
+                      />
+                    </CommandItem>
+                  ) : (
+                    <CommandSeparator />
+                  ),
+                )}
               </CommandGroup>
             </CommandList>
           </Command>

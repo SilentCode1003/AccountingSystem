@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  approveCheque,
   createCheque,
   getCheques,
   updateCheque,
@@ -10,10 +11,13 @@ const chequeRouter = Router();
 //get all cheque
 chequeRouter.get("/", getCheques);
 
-//create an cheque entry
+//create a cheque entry
 chequeRouter.post("/", createCheque);
 
-//update an cheque
+//update a cheque
 chequeRouter.put("/", updateCheque);
+
+//increase cheque approval count
+chequeRouter.put("/:chqId", approveCheque);
 
 export default chequeRouter;

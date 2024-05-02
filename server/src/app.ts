@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import accountRouter from "./routes/accounts.routes";
 import employeesRouter from "./routes/employees.routes";
 import usersRouter from "./routes/users.routes";
@@ -18,8 +18,9 @@ import { getTransactionPartners } from "./controller/others.controllers";
 import accountTypeRouter from "./routes/accountType.routes";
 import authRouter from "./routes/auth.routes";
 import othersRouter from "./routes/others.routes";
-import fileUpload from "express-fileupload";
+import fileUpload, { UploadedFile } from "express-fileupload";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
+import * as xlsx from "xlsx";
 
 declare module "express-session" {
   interface SessionData {

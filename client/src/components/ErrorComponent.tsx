@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader } from './ui/card'
 import { Text } from './ui/text'
 import { TriangleAlertIcon } from 'lucide-react'
 import { Button } from './ui/button'
-import { Router } from '@tanstack/react-router'
 import Header from './Header'
 import Footer from './Footer'
 
@@ -11,7 +10,7 @@ function ErrorComponent({
   resetErrorBoundary,
   router,
 }: {
-  router?: Router
+  router?: any
   resetErrorBoundary: Function
   error: any
 }) {

@@ -29,7 +29,7 @@ function AccountsComponent() {
   const accounts = useAccounts()
 
   return (
-    <div>
+    <div className="w-full">
       {accounts.isSuccess && (
         <DataTable
           columns={accountsColumns}
