@@ -1,8 +1,8 @@
-import db from "../index";
 import crypto from "crypto";
-import { asc, desc, eq } from "drizzle-orm";
-import { addAccount, editAccount } from "./accounts.service";
+import { desc, eq } from "drizzle-orm";
+import db from "../index";
 import transactions from "../schema/transactions.schema";
+import { addAccount, editAccount } from "./accounts.service";
 
 export const getAllTransactions = async () => {
   const allTransactions = await db.query.transactions.findMany({
@@ -50,6 +50,7 @@ export const addTransaction = async (input: {
       input.tranPartner.split(" ")[0] === "custId" ? input.tranPartner : null,
     tranVdId:
       input.tranPartner.split(" ")[0] === "vdId" ? input.tranPartner : null,
+    tranFile: `${newTransactionId}.xlsx`,
   });
 
   const newTransaction = await db.query.transactions.findFirst({
@@ -71,42 +72,37 @@ export const addTransaction = async (input: {
 
 export const editTransaction = async (input: {
   tranId: string;
-  newData: {
-    tranAccId?: string;
-    tranDescription?: string;
-    tranAmount?: number;
-    tranPartner?: string;
-    tranAccTypeId?: string;
-    tranTransactionDate?: Date;
-  };
+  tranAccId?: string;
+  tranDescription?: string;
+  tranAmount?: number;
+  tranPartner?: string;
+  tranAccTypeId?: string;
+  tranTransactionDate?: Date;
 }) => {
   await db
     .update(transactions)
     .set({
-      tranAccId: input.newData.tranAccId,
-      tranAmount: input.newData.tranAmount,
-      tranDescription: input.newData.tranDescription,
-      tranTransactionDate: input.newData.tranTransactionDate,
+      tranAccId: input.tranAccId,
+      tranAmount: input.tranAmount,
+      tranDescription: input.tranDescription,
+      tranTransactionDate: input.tranTransactionDate,
+
       tranEmpId:
-        input.newData.tranPartner!.split(" ")[0] === "empId"
-          ? input.newData.tranPartner
-          : null,
+        input.tranPartner!.split(" ")[0] === "empId" ? input.tranPartner : null,
       tranCustId:
-        input.newData.tranPartner!.split(" ")[0] === "custId"
-          ? input.newData.tranPartner
+        input.tranPartner!.split(" ")[0] === "custId"
+          ? input.tranPartner
           : null,
       tranVdId:
-        input.newData.tranPartner!.split(" ")[0] === "vdId"
-          ? input.newData.tranPartner
-          : null,
+        input.tranPartner!.split(" ")[0] === "vdId" ? input.tranPartner : null,
     })
     .where(eq(transactions.tranId, input.tranId));
 
   await editAccount({
-    accId: input.newData.tranAccId as string,
+    accId: input.tranAccId as string,
     newData: {
-      accTypeId: input.newData.tranAccTypeId,
-      accAmount: input.newData.tranAmount,
+      accTypeId: input.tranAccTypeId,
+      accAmount: input.tranAmount,
     },
   });
 

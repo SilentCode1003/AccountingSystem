@@ -1,6 +1,6 @@
 import db from "../index";
 import cheques from "../schema/cheques.schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { addAccount } from "./accounts.service";
 import accounts from "../schema/accounts.schema";
 
@@ -37,6 +37,7 @@ export const addCheque = async (input: {
   chqIssueDate: Date;
   chqStatus: ChequeStatus;
   chqAccTypeId: string;
+  chqNumber: string;
 }) => {
   const account = await addAccount({
     accName: "CASH",
@@ -66,14 +67,17 @@ export const editCheque = async (input: {
     chqAmount?: number;
     chqIssueDate?: Date;
     chqStatus?: ChequeStatus;
-    chqAccTypeId: string;
+    chqAccTypeId?: string;
+    chqNumber?: string;
   };
   chqAccId: string;
 }) => {
-  await db
-    .update(accounts)
-    .set({ accTypeId: input.newData.chqAccTypeId })
-    .where(eq(accounts.accId, input.chqAccId));
+  if (input.newData.chqAccTypeId) {
+    await db
+      .update(accounts)
+      .set({ accTypeId: input.newData.chqAccTypeId })
+      .where(eq(accounts.accId, input.chqAccId));
+  }
 
   await db
     .update(cheques)
@@ -82,6 +86,7 @@ export const editCheque = async (input: {
       chqIssueDate: input.newData.chqIssueDate,
       chqPayeeName: input.newData.chqPayeeName,
       chqStatus: input.newData.chqStatus,
+      chqNumber: input.newData.chqNumber,
       chqUpdatedAt: new Date(),
     })
     .where(eq(cheques.chqId, input.chqId));
@@ -92,4 +97,31 @@ export const editCheque = async (input: {
   });
 
   return updatedChq;
+};
+
+export const setChequeStatus = async (chqId: string, status: ChequeStatus) => {
+  await db
+    .update(cheques)
+    .set({ chqStatus: status })
+    .where(eq(cheques.chqId, chqId));
+
+  const updatedCheque = await db.query.cheques.findFirst({
+    where: (cheque) => eq(cheque.chqId, chqId),
+    with: { account: { with: { accountType: true } } },
+  });
+  return updatedCheque;
+};
+
+export const incrementChequeApproval = async (chqId: string) => {
+  await db
+    .update(cheques)
+    .set({ chqApprovalCount: sql`${cheques.chqApprovalCount} + 1` })
+    .where(eq(cheques.chqId, chqId));
+
+  const updatedCheque = await db.query.cheques.findFirst({
+    where: (cheque) => eq(cheque.chqId, chqId),
+    with: { account: { with: { accountType: true } } },
+  });
+
+  return updatedCheque;
 };

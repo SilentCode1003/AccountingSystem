@@ -72,7 +72,6 @@ function BarGraph({
         <Legend />
 
         {BarChartData.dataKeys.map((data, index) => {
-          console.log(data)
           return (
             <Bar
               dataKey={data}

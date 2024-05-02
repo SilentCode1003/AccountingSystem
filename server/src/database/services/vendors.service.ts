@@ -9,6 +9,14 @@ export const getAllVendors = async () => {
   return vendors;
 };
 
+export const getVendorByName = async (vdName: string) => {
+  const vendor = await db.query.vendors.findFirst({
+    where: (vendor) => eq(vendor.vdName, vdName),
+  });
+
+  return vendor;
+};
+
 export const addVendor = async (input: {
   vdName: string;
   vdContactInfo: string;

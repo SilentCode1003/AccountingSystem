@@ -33,20 +33,13 @@ import {
   FormMessage,
 } from '../ui/Form'
 import { Input } from '../ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select'
 import { Text } from '../ui/text'
 import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
 import { PromptModal } from '../PromptModal'
 import { useState } from 'react'
 import { Badge } from '../ui/badge'
 import { cn } from '@/lib/utils'
+import { ComboBox } from '../Combobox'
 
 export const AccountAmountColumn = ({
   row,
@@ -59,7 +52,11 @@ export const AccountAmountColumn = ({
 }
 
 export const AccountNameColumn = ({ row }: CellContext<Accounts, unknown>) => {
-  return <Badge variant={'outline'}>{row.original.accName}</Badge>
+  return (
+    <Badge variant={'outline'} className="w-max">
+      {row.original.accName}
+    </Badge>
+  )
 }
 
 export const AccountAccountTypeColumn = ({
@@ -214,32 +211,17 @@ export const AccountIsActiveColumn = ({
                               </div>
                               <FormControl>
                                 {accountTypes.isSuccess && (
-                                  <Select
-                                    defaultValue={field.value}
-                                    onValueChange={field.onChange}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Account type" />
-                                    </SelectTrigger>
-                                    <SelectContent className="flex-1">
-                                      {accountTypes.isSuccess && (
-                                        <SelectGroup>
-                                          {accountTypes.data.accountTypes.map(
-                                            (accType) => (
-                                              <SelectItem
-                                                key={accType.accTypeId}
-                                                value={accType.accTypeId}
-                                              >
-                                                <Badge variant={'secondary'}>
-                                                  {accType.accTypeName}
-                                                </Badge>
-                                              </SelectItem>
-                                            ),
-                                          )}
-                                        </SelectGroup>
-                                      )}
-                                    </SelectContent>
-                                  </Select>
+                                  <ComboBox
+                                    data={accountTypes.data.accountTypes.map(
+                                      (t) => ({
+                                        label: t.accTypeName,
+                                        value: t.accTypeId,
+                                      }),
+                                    )}
+                                    emptyLabel="Nothing Found"
+                                    value={field.value}
+                                    setValue={field.onChange}
+                                  />
                                 )}
                               </FormControl>
                               <FormMessage />

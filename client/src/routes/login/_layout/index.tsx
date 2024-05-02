@@ -1,12 +1,22 @@
 import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Text } from '@/components/ui/text'
 import { useLogin } from '@/hooks/mutations'
 import { currentUserOptions } from '@/hooks/queries/options'
+import { loginSchema } from '@/validators/auth.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 export const Route = createFileRoute('/login/_layout/')({
   beforeLoad: async ({ context: { queryClient }, location }) => {
@@ -25,13 +35,18 @@ export const Route = createFileRoute('/login/_layout/')({
 })
 
 function login() {
-  const [username, setUsername] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
+  const form = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+    resolver: zodResolver(loginSchema),
+  })
 
   const login = useLogin()
 
-  const handleLogin = () => {
-    login.mutate({ username, password })
+  const handleSubmit = (values: z.infer<typeof loginSchema>) => {
+    login.mutate(values)
   }
 
   return (
@@ -61,29 +76,53 @@ function login() {
                 Enter your username and password to login!
               </Text>
             </div>
-            <div className="flex flex-col gap-4 w-full">
-              <div className="w-full">
-                <Label>Username</Label>
-                <Input
-                  className="w-full"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Password</Label>
-                <Input
-                  className="w-full"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <Button onClick={handleLogin} className="w-full mt-2">
-                Sign in
-              </Button>
-            </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)}>
+                <div className="flex flex-col gap-4 w-full">
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="w-full">
+                          <div className="w-full flex justify-between items-center">
+                            <FormLabel>Username</FormLabel>
+                            <FormMessage />
+                          </div>
+                          <FormControl>
+                            <Input className="w-full" type="text" {...field} />
+                          </FormControl>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="w-full">
+                          <div className="w-full flex justify-between items-center">
+                            <FormLabel>Password</FormLabel>
+                            <FormMessage />
+                          </div>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              type="password"
+                              {...field}
+                            />
+                          </FormControl>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <Button type="submit" className="w-full mt-4">
+                  Sign in
+                </Button>
+              </form>
+            </Form>
           </div>
         </div>
       </div>
