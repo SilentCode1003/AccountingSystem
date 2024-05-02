@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Text } from '@/components/ui/text'
-import { useUpdateTransaction } from '@/hooks/mutations'
+import { useDownloadFile, useUpdateTransaction } from '@/hooks/mutations'
 import { useAccountTypes, useTransactionPartners } from '@/hooks/queries'
 import { updateTransactionSchema } from '@/validators/transactions.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -52,12 +52,29 @@ export const TransactionIndexColumn = ({
   return row.index + 1
 }
 
+export const transactionFileColumn = ({
+  row,
+}: CellContext<Transactions, unknown>) => {
+  const downloadFile = useDownloadFile(row.original.tranFile)
+  return (
+    <Badge
+      onClick={() => downloadFile.mutate()}
+      variant={'outline'}
+      className="hover:cursor-pointer"
+    >
+      download
+    </Badge>
+  )
+}
+
 export const TransactionAccountIDColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
   return (
     <div className="flex justify-between">
-      <Badge variant={'outline'}>{row.original.account.accName}</Badge>
+      <Badge variant={'outline'} className="text-center max-w-max">
+        {row.original.account.accName}
+      </Badge>
       <div>
         <Dialog>
           <DropdownMenu>
@@ -284,17 +301,15 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
   const form = useForm<z.infer<typeof updateTransactionSchema>>({
     defaultValues: {
       tranId: props.row.original.tranId,
-      newData: {
-        tranAccId: props.row.original.account.accId,
-        tranAmount: Number.parseFloat(String(props.row.original.tranAmount)),
-        tranDescription: props.row.original.tranDescription,
-        tranPartner:
-          props.row.original.tranEmpId ??
-          props.row.original.tranCustId ??
-          props.row.original.tranVdId,
-        tranAccTypeId: props.row.original.account.accountType.accTypeId,
-        tranTransactionDate: new Date(props.row.original.tranTransactionDate),
-      },
+      tranAccId: props.row.original.account.accId,
+      tranAmount: Number.parseFloat(String(props.row.original.tranAmount)),
+      tranDescription: props.row.original.tranDescription,
+      tranPartner:
+        props.row.original.tranEmpId ??
+        props.row.original.tranCustId ??
+        props.row.original.tranVdId,
+      tranAccTypeId: props.row.original.account.accountType.accTypeId,
+      tranTransactionDate: new Date(props.row.original.tranTransactionDate),
     },
     resolver: zodResolver(updateTransactionSchema),
   })
@@ -306,7 +321,12 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
   })
 
   const handleSubmit = (values: z.infer<typeof updateTransactionSchema>) => {
-    updateTransaction.mutate(values)
+    const fd = new FormData()
+
+    Object.keys(values).forEach((key) => {
+      fd.append(key, values[key as keyof typeof values] as any)
+    })
+    updateTransaction.mutate(fd)
   }
   return (
     <Dialog {...props}>
@@ -338,7 +358,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
               <div className="flex gap-4">
                 <div className="flex-1">
                   <FormField
-                    name="newData.tranAmount"
+                    name="tranAmount"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
@@ -369,7 +389,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                 </div>
                 <div className="flex-1 flex flex-col">
                   <FormField
-                    name="newData.tranTransactionDate"
+                    name="tranTransactionDate"
                     control={form.control}
                     render={({ field }) => {
                       return (
@@ -392,7 +412,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
               </div>
               <div className="flex gap-4">
                 <FormField
-                  name="newData.tranPartner"
+                  name="tranPartner"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
@@ -442,7 +462,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                   )}
                 />
                 <FormField
-                  name="newData.tranAccTypeId"
+                  name="tranAccTypeId"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
@@ -469,7 +489,36 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
               </div>
               <div className="flex flex-col">
                 <FormField
-                  name="newData.tranDescription"
+                  name="tranFile"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Supporting File</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Input
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                          onChange={(e: any) => {
+                            if (!e.target.files) return
+
+                            if (!e.target.files[0]) return
+                            console.log(e.target.files[0])
+                            field.onChange(e.target.files[0])
+                          }}
+                          type="file"
+                          className="w-full hover:cursor-pointer"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex flex-col">
+                <FormField
+                  name="tranDescription"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
