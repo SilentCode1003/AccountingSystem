@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Text } from '@/components/ui/text'
 import { useCreateInventory } from '@/hooks/mutations'
 import { useInventories } from '@/hooks/queries'
 import { inventoriesOptions } from '@/hooks/queries/options'
@@ -79,120 +80,124 @@ function CrudComponents() {
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button className="flex gap-2">
-          Add Inventory <PackagePlusIcon />
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent className="scale-75 md:scale-100">
-        <AlertDialogHeader>Create Inventory</AlertDialogHeader>
+    <div className="flex flex-col gap-4">
+      <Text variant={'heading1bold'}>Inventory</Text>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <div className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="invAssetName"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Asset Name</FormLabel>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger asChild>
+          <Button className="flex gap-2">
+            Add Inventory <PackagePlusIcon />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent className="scale-75 md:scale-100">
+          <AlertDialogHeader>Create Inventory</AlertDialogHeader>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="invAssetName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Asset Name</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Asset Name"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="invStocks"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Asset Stocks</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Asset Stocks"
+                          {...field}
+                          onChange={(event) =>
+                            field.onChange(+event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="invStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Asset Status</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="GOOD">
+                              <Badge className="bg-green-500 hover:bg-gray-500">
+                                GOOD
+                              </Badge>
+                            </SelectItem>
+                            <SelectItem value="WARNING">
+                              <Badge className="bg-yellow-500 hover:bg-gray-500">
+                                WARNING
+                              </Badge>
+                            </SelectItem>
+                            <SelectItem value="DEPLETED">
+                              <Badge className="bg-red-500 hover:bg-gray-500">
+                                DEPLETED
+                              </Badge>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                       <FormMessage />
-                    </div>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="Asset Name"
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="invStocks"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Asset Stocks</FormLabel>
-                      <FormMessage />
-                    </div>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="Asset Stocks"
-                        {...field}
-                        onChange={(event) =>
-                          field.onChange(+event.target.value)
-                        }
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="invStatus"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Asset Status</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="GOOD">
-                            <Badge className="bg-green-500 hover:bg-gray-500">
-                              GOOD
-                            </Badge>
-                          </SelectItem>
-                          <SelectItem value="WARNING">
-                            <Badge className="bg-yellow-500 hover:bg-gray-500">
-                              WARNING
-                            </Badge>
-                          </SelectItem>
-                          <SelectItem value="DEPLETED">
-                            <Badge className="bg-red-500 hover:bg-gray-500">
-                              DEPLETED
-                            </Badge>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </form>
-        </Form>
-        <div className="flex justify-between">
-          <PromptModal
-            dialogMessage="Continue?"
-            prompType="ADD"
-            dialogTitle="You are about to create a new inventory"
-            triggerText="Create"
-            callback={form.handleSubmit(handleSubmit)}
-          />
-          <div className="flex gap-2 ">
-            <Button variant={'secondary'} onClick={() => form.clearErrors()}>
-              Clear
-            </Button>
-            <AlertDialogCancel asChild>
-              <Button variant={'outline'} className="mt-0">
-                Cancel
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </form>
+          </Form>
+          <div className="flex justify-between">
+            <PromptModal
+              dialogMessage="Continue?"
+              prompType="ADD"
+              dialogTitle="You are about to create a new inventory"
+              triggerText="Create"
+              callback={form.handleSubmit(handleSubmit)}
+            />
+            <div className="flex gap-2 ">
+              <Button variant={'secondary'} onClick={() => form.clearErrors()}>
+                Clear
               </Button>
-            </AlertDialogCancel>
+              <AlertDialogCancel asChild>
+                <Button variant={'outline'} className="mt-0">
+                  Cancel
+                </Button>
+              </AlertDialogCancel>
+            </div>
           </div>
-        </div>
-      </AlertDialogContent>
-    </AlertDialog>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   )
 }
 
