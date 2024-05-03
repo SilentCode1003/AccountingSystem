@@ -2,7 +2,7 @@ import db from "../index";
 import crypto from "crypto";
 import users from "../schema/users.schema";
 import { eq, not } from "drizzle-orm";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 
 const USER_TYPE = {
   FINANCE: "FINANCE",
