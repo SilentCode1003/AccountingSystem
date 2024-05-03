@@ -54,9 +54,11 @@ export function DatePicker({
         {!yearMonth ? (
           <Calendar
             mode="single"
+            captionLayout="dropdown-buttons"
             selected={date}
             onSelect={(e) => setDate(e)}
-            initialFocus
+            fromYear={1960}
+            toYear={2030}
             disabled={(date) =>
               date > new Date() || date < new Date('1900-01-01')
             }
