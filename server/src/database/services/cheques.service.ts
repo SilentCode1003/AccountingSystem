@@ -88,6 +88,12 @@ export const editCheque = async (input: {
       chqStatus: input.newData.chqStatus,
       chqNumber: input.newData.chqNumber,
       chqUpdatedAt: new Date(),
+      chqApprovalCount:
+        input.newData.chqStatus === "PENDING"
+          ? 0
+          : input.newData.chqStatus === "APPROVED"
+          ? 3
+          : undefined,
     })
     .where(eq(cheques.chqId, input.chqId));
 
