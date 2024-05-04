@@ -22,6 +22,7 @@ import fileUpload, { UploadedFile } from "express-fileupload";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 import * as xlsx from "xlsx";
 import apiRouter from "./routes/api.routes";
+import transactionTypesRouter from "./routes/transactionTypes.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -99,6 +100,9 @@ app.use("/payrolls", payrollRouter);
 
 //route for all transaction actions
 app.use("/transactions", transactionRouter);
+
+//route for all transaction type actions
+app.use("/transactionTypes", transactionTypesRouter);
 
 //route for all vendor actions
 app.use("/vendors", vendorRouter);
