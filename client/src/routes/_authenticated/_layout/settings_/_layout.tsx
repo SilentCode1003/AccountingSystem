@@ -20,11 +20,11 @@ function SettingsLayout() {
   return (
     <div className="min-h-[85vh] flex flex-col items-center">
       <ScrollArea className="px-4 w-full">
-        <div className=" grid grid-cols-[200px,1fr] h-[85vh]">
+        <div className="grid grid-cols-1 md:grid md:grid-cols-[200px,1fr] h-[85vh]">
           <nav
             className={cn(
               'p-4 sticky top-0 flex flex-col text-md text-muted-foreground h-fit',
-              'w-fit',
+              'text-center md:text-start md:w-fit ',
             )}
           >
             <Link
@@ -68,7 +68,7 @@ function SettingsLayout() {
               Reports
             </Link>
           </nav>
-          <div className="p-4 w-full flex h-full gap-4">
+          <div className="p-4 w-full flex flex-col md:flex-row h-full gap-4">
             <Separator className="md:hidden" />
             <Separator className="hidden md:block" orientation="vertical" />
             <Outlet />

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { loginValidator } from "../utils/validators/login.validator";
 import db from "../database";
 import { and, eq } from "drizzle-orm";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 
 export const login = async (req: Request, res: Response) => {
   const input = loginValidator.safeParse(req.body);

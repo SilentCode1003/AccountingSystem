@@ -1,17 +1,37 @@
+import { cn } from '@/lib/utils'
 import {
   ColumnDef,
+  ColumnFiltersState,
+  FilterFn,
   flexRender,
   getCoreRowModel,
-  useReactTable,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
-  ColumnFiltersState,
-  getFilteredRowModel,
-  VisibilityState,
   Table as TableType,
-  FilterFn,
+  useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table'
+import { ChevronDownIcon, FilterIcon } from 'lucide-react'
+import { ComponentProps, ElementType, useEffect, useState } from 'react'
+import { Button } from './ui/button'
+import DatePicker from './ui/DatePicker'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
+import { Input } from './ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
 import {
   Table,
   TableBody,
@@ -22,28 +42,6 @@ import {
   TableRow,
 } from './ui/table'
 import { text } from './ui/text'
-import { Button } from './ui/button'
-import { ComponentProps, ElementType, useEffect, useState } from 'react'
-import { Input } from './ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu'
-import { ChevronDownIcon, FilterIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import DatePicker from './ui/DatePicker'
-import { Popover, PopoverContent } from './ui/popover'
-import { PopoverTrigger } from '@radix-ui/react-popover'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -95,127 +93,143 @@ function Filters<TData>({
   }>
 }) {
   return (
-    <div className="flex flex-col gap-2 sm:grid sm:grid-cols-[repeat(2,minmax(200px,1fr))] sm:gap-4">
-      {filter.map(
-        ({ filterColumn, filterPlaceHolder, filterValues, date }, index) => {
-          if (!date) {
-            if (!filterValues) {
-              return (
-                <div className="flex items-center" key={index}>
-                  {filter && (
-                    <Input
-                      placeholder={filterPlaceHolder}
-                      value={
-                        (table
-                          .getColumn(filterColumn)
-                          ?.getFilterValue() as string) ?? ''
-                      }
-                      onChange={(event) =>
-                        table
-                          .getColumn(filterColumn)
-                          ?.setFilterValue(event.target.value)
-                      }
-                      className="w-full"
-                    />
-                  )}
-                </div>
-              )
-            } else
-              return (
-                <div key={index} className="max-w-sm">
-                  <Select
-                    onValueChange={
-                      table.getColumn(filterColumn)?.setFilterValue
-                    }
-                    value={
-                      (table
-                        .getColumn(filterColumn)
-                        ?.getFilterValue() as string) ?? ''
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filterValues.map((value) => (
-                        <SelectItem key={value} value={value}>
-                          {value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )
-          } else {
-            return (
-              <Popover key={index}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={'outline'}
-                    className={cn(
-                      text({ variant: 'label' }),
-                      'w-full',
-                      'justify-between',
-                    )}
-                  >
-                    {filterPlaceHolder}
-                    <ChevronDownIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="space-y-2">
-                  <DatePicker
-                    triggerLabel="Start Date"
-                    date={
-                      (
-                        table.getColumn(filterColumn)?.getFilterValue() as [
-                          Date,
-                          Date,
-                        ]
-                      )?.[0]
-                    }
-                    setDate={(e: Date) => {
-                      if (!e) return
-                      return table
-                        .getColumn(filterColumn)
-                        ?.setFilterValue((old: [Date, Date]) => [
-                          new Date(e),
-                          old?.[1],
-                        ])
-                    }}
-                  />
-                  <DatePicker
-                    triggerLabel="End Date"
-                    date={
-                      (
-                        table.getColumn(filterColumn)?.getFilterValue() as [
-                          Date,
-                          Date,
-                        ]
-                      )?.[1]
-                    }
-                    setDate={(e: Date) => {
-                      if (!e) return
-                      return table
-                        .getColumn(filterColumn)
-                        ?.setFilterValue((old: [Date, Date]) => [
-                          old?.[0],
-                          new Date(e),
-                        ])
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
-            )
-          }
-        },
-      )}
-      <Button
-        className={cn(filter.length % 2 === 0 ? 'col-span-2' : '')}
-        variant={'secondary'}
-        onClick={() => table.resetColumnFilters()}
-      >
-        Clear Filters
-      </Button>
+    <div
+    // className="flex flex-col gap-2 sm:grid sm:grid-cols-[repeat(2,minmax(200px,1fr))] sm:gap-4"
+    >
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="w-full justify-between">
+            <FilterIcon className="mr-2 h-4 w-4" />
+            Filters
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent className="flex flex-col gap-2 sm:grid sm:grid-cols-[repeat(2,minmax(200px,1fr))] sm:gap-4 w-fit -translate-x-8">
+          {filter.map(
+            (
+              { filterColumn, filterPlaceHolder, filterValues, date },
+              index,
+            ) => {
+              if (!date) {
+                if (!filterValues) {
+                  return (
+                    <div className="flex items-center" key={index}>
+                      {filter && (
+                        <Input
+                          placeholder={filterPlaceHolder}
+                          value={
+                            (table
+                              .getColumn(filterColumn)
+                              ?.getFilterValue() as string) ?? ''
+                          }
+                          onChange={(event) =>
+                            table
+                              .getColumn(filterColumn)
+                              ?.setFilterValue(event.target.value)
+                          }
+                          className="w-full"
+                        />
+                      )}
+                    </div>
+                  )
+                } else
+                  return (
+                    <div key={index} className="max-w-sm">
+                      <Select
+                        onValueChange={
+                          table.getColumn(filterColumn)?.setFilterValue
+                        }
+                        value={
+                          (table
+                            .getColumn(filterColumn)
+                            ?.getFilterValue() as string) ?? ''
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filterValues.map((value) => (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )
+              } else {
+                return (
+                  <Popover key={index}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          text({ variant: 'label' }),
+                          'w-full',
+                          'justify-between',
+                        )}
+                      >
+                        {filterPlaceHolder}
+                        <ChevronDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="space-y-2">
+                      <DatePicker
+                        triggerLabel="Start Date"
+                        date={
+                          (
+                            table.getColumn(filterColumn)?.getFilterValue() as [
+                              Date,
+                              Date,
+                            ]
+                          )?.[0]
+                        }
+                        setDate={(e: Date) => {
+                          if (!e) return
+                          return table
+                            .getColumn(filterColumn)
+                            ?.setFilterValue((old: [Date, Date]) => [
+                              new Date(e),
+                              old?.[1],
+                            ])
+                        }}
+                      />
+                      <DatePicker
+                        triggerLabel="End Date"
+                        date={
+                          (
+                            table.getColumn(filterColumn)?.getFilterValue() as [
+                              Date,
+                              Date,
+                            ]
+                          )?.[1]
+                        }
+                        setDate={(e: Date) => {
+                          if (!e) return
+                          return table
+                            .getColumn(filterColumn)
+                            ?.setFilterValue((old: [Date, Date]) => [
+                              old?.[0],
+                              new Date(e),
+                            ])
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )
+              }
+            },
+          )}
+          <Button
+            className={cn(filter.length % 2 === 0 ? 'col-span-2' : '')}
+            variant={'secondary'}
+            onClick={() => table.resetColumnFilters()}
+          >
+            Clear Filters
+          </Button>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }
@@ -268,7 +282,12 @@ function DataTable<TData, TValue>({
         ) : (
           <div />
         )}
-        <div className={cn('flex gap-4', !showVisibility ? 'hidden' : '')}>
+        <div
+          className={cn(
+            'flex flex-col gap-2 sm:flex-row sm:gap-4 self-end',
+            !showVisibility ? 'hidden' : '',
+          )}
+        >
           <div className="self-end">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -297,27 +316,8 @@ function DataTable<TData, TValue>({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {filter && (
-            <div className="flex justify-end lg:hidden ">
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant="secondary">
-                    <FilterIcon />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Filters</DropdownMenuLabel>
-                  <Filters table={table} filter={filter} />
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
 
-          {filter && (
-            <div className="hidden lg:flex lg:justify-end ">
-              <Filters table={table} filter={filter} />
-            </div>
-          )}
+          {filter && <Filters table={table} filter={filter} />}
         </div>
       </div>
 
