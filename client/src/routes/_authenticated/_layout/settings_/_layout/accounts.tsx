@@ -1,6 +1,7 @@
 import DataTable from '@/components/DataTable'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { accountsColumns } from '@/components/table-columns/accounts.columns'
+import { Text } from '@/components/ui/text'
 import { useAccounts } from '@/hooks/queries'
 import { accountsOptions } from '@/hooks/queries/options'
 import { createFileRoute } from '@tanstack/react-router'
@@ -25,6 +26,10 @@ function LoadingComponent() {
   )
 }
 
+function CrudComponents() {
+  return <Text variant={'heading1bold'}>Accounts</Text>
+}
+
 function AccountsComponent() {
   const accounts = useAccounts()
 
@@ -35,6 +40,25 @@ function AccountsComponent() {
           columns={accountsColumns}
           data={accounts.data.accounts}
           pageSize={20}
+          CrudComponents={CrudComponents}
+          filter={[
+            {
+              filterColumn: 'accName',
+              filterPlaceHolder: 'Filter name',
+            },
+            {
+              filterColumn: 'accAmount',
+              filterPlaceHolder: 'Filter amount',
+            },
+            {
+              filterColumn: 'accountType',
+              filterPlaceHolder: 'Filter by account type',
+            },
+            {
+              filterColumn: 'accDescription',
+              filterPlaceHolder: 'Filter by description',
+            },
+          ]}
           showVisibility
         />
       )}

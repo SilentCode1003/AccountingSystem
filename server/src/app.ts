@@ -21,6 +21,7 @@ import othersRouter from "./routes/others.routes";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 import * as xlsx from "xlsx";
+import apiRouter from "./routes/api.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -57,6 +58,9 @@ app.use(fileUpload());
 app.use(express.json());
 
 app.use("/auth", authRouter);
+
+//route for all external api actions
+app.use("/api", apiRouter);
 
 app.use(authMiddleware);
 
