@@ -21,6 +21,7 @@ import vendors from "./schema/vendors.schema";
 import accountTypes, {
   accountTypesAccountManyRelations,
 } from "./schema/accountType.schema";
+import apiKeys from "./schema/apiKeyStore.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -55,6 +56,7 @@ const db = drizzle(connection, {
     transactions,
     inventory,
     payrolls,
+    apiKeys,
     chequesRelations,
     transactionAccountRelation,
     transactionCustomerRelation,

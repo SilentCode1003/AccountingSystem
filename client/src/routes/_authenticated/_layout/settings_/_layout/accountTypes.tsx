@@ -76,91 +76,94 @@ const CrudComponents = () => {
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <Button className="flex gap-2" onClick={() => setOpen(true)}>
-        Add Account Type <ListPlusIcon />
-      </Button>
-      <AlertDialogContent className="scale-75 sm:scale-100">
-        <AlertDialogHeader>
-          <Text variant={'heading3bold'}>Create Account Type</Text>
-        </AlertDialogHeader>
-        <Form {...form}>
-          <form>
-            <div className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="accTypeName"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Account Type Name</FormLabel>
-                      <FormMessage />
-                    </div>
-                    <FormControl>
-                      <Input
-                        className="w-full"
-                        placeholder="Account Type Name"
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="accTypeDefault"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Account Type Default Statement</FormLabel>
-                      <FormMessage />
-                    </div>
-                    <FormControl>
-                      <Select
-                        defaultValue={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Account type default" />
-                        </SelectTrigger>
-                        <SelectContent className="flex-1">
-                          <SelectItem value="INCOMESTATEMENT">
-                            Income Statement
-                          </SelectItem>
-                          <SelectItem value="BALANCESHEET">
-                            Balance Sheet
-                          </SelectItem>
-                          <SelectItem value="CASHFLOW">Cash Flow</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-          </form>
-        </Form>
-        <div className="flex justify-between">
-          <PromptModal
-            dialogMessage="Continue?"
-            prompType="ADD"
-            dialogTitle="You are about to create a new account type"
-            triggerText="Create"
-            callback={form.handleSubmit(handleSubmit)}
-          />
-          <div className="flex gap-2 ">
-            <Button variant={'secondary'} onClick={() => form.clearErrors()}>
-              Clear
-            </Button>
-            <AlertDialogCancel asChild>
-              <Button variant={'outline'} className="mt-0">
-                Cancel
+    <div className="flex flex-col gap-4">
+      <Text variant={'heading1bold'}>Account Types</Text>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <Button className="flex gap-2" onClick={() => setOpen(true)}>
+          Add Account Type <ListPlusIcon />
+        </Button>
+        <AlertDialogContent className="scale-75 sm:scale-100">
+          <AlertDialogHeader>
+            <Text variant={'heading3bold'}>Create Account Type</Text>
+          </AlertDialogHeader>
+          <Form {...form}>
+            <form>
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="accTypeName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Account Type Name</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Account Type Name"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="accTypeDefault"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Account Type Default Statement</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Select
+                          defaultValue={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Account type default" />
+                          </SelectTrigger>
+                          <SelectContent className="flex-1">
+                            <SelectItem value="INCOMESTATEMENT">
+                              Income Statement
+                            </SelectItem>
+                            <SelectItem value="BALANCESHEET">
+                              Balance Sheet
+                            </SelectItem>
+                            <SelectItem value="CASHFLOW">Cash Flow</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </form>
+          </Form>
+          <div className="flex justify-between">
+            <PromptModal
+              dialogMessage="Continue?"
+              prompType="ADD"
+              dialogTitle="You are about to create a new account type"
+              triggerText="Create"
+              callback={form.handleSubmit(handleSubmit)}
+            />
+            <div className="flex gap-2 ">
+              <Button variant={'secondary'} onClick={() => form.clearErrors()}>
+                Clear
               </Button>
-            </AlertDialogCancel>
+              <AlertDialogCancel asChild>
+                <Button variant={'outline'} className="mt-0">
+                  Cancel
+                </Button>
+              </AlertDialogCancel>
+            </div>
           </div>
-        </div>
-      </AlertDialogContent>
-    </AlertDialog>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   )
 }
 
