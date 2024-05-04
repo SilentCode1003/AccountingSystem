@@ -7,7 +7,7 @@ import customers from "./schema/customers.schema";
 import employees from "./schema/employees.schema";
 import inventory from "./schema/inventory.schema";
 import payrolls, {
-  payrollAccountRelation,
+  payrollTransactionrelation,
   payrollEmployeeRelation,
 } from "./schema/payrolls.schema";
 import transactions, {
@@ -71,7 +71,7 @@ const db = drizzle(connection, {
     transactionVendorRelation,
     accountTypesAccountManyRelations,
     payrollEmployeeRelation,
-    payrollAccountRelation,
+    payrollTransactionrelation,
     accountTypeRelation,
   },
   mode: "default",
