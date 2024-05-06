@@ -23,9 +23,10 @@ const inventoryEntries = mysqlTable("inventory_entries", {
   invEntryInvId: varchar("inv_entry_inv_id", { length: 60 })
     .references((): AnyMySqlColumn => inventory.invId, { onDelete: "cascade" })
     .notNull(),
-  invEntryVdId: varchar("inv_entry_vd_id", { length: 60 })
-    .references((): AnyMySqlColumn => vendors.vdId, { onDelete: "cascade" })
-    .notNull(),
+  invEntryVdId: varchar("inv_entry_vd_id", { length: 60 }).references(
+    (): AnyMySqlColumn => vendors.vdId,
+    { onDelete: "cascade" }
+  ),
   invEntryCustId: varchar("inv_entry_cust_id", { length: 60 }).references(
     (): AnyMySqlColumn => customers.custId,
     { onDelete: "cascade" }
