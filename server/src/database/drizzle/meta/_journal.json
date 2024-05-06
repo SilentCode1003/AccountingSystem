@@ -141,6 +141,27 @@
       "when": 1714965580278,
       "tag": "0019_flowery_logan",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1714967908814,
+      "tag": "0020_dear_yellow_claw",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1714972730830,
+      "tag": "0021_wooden_quentin_quire",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1714972883721,
+      "tag": "0022_special_the_captain",
+      "breakpoints": true
     }
   ]
 }
