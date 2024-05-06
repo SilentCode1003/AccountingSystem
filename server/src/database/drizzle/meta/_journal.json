@@ -183,6 +183,13 @@
       "when": 1714979167956,
       "tag": "0025_giant_moira_mactaggert",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1714983365376,
+      "tag": "0026_adorable_master_chief",
+      "breakpoints": true
     }
   ]
 }

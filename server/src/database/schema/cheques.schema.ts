@@ -5,9 +5,9 @@ import {
   mysqlTable,
   varchar,
 } from "drizzle-orm/mysql-core";
-import accounts from "./accounts.schema";
 import { relations } from "drizzle-orm";
 import { decimal, int } from "drizzle-orm/mysql-core";
+import transactions from "./transactions.schema";
 
 const cheques = mysqlTable("cheques", {
   chqId: varchar("chq_id", { length: 60 }).primaryKey(),
@@ -19,17 +19,17 @@ const cheques = mysqlTable("cheques", {
     .notNull(),
   chqIssueDate: date("chq_issue_date").notNull(),
   chqStatus: mysqlEnum("chq_status", ["APPROVED", "PENDING", "REJECTED"]),
-  chqAccId: varchar("chq_account_id", { length: 60 })
-    .references(() => accounts.accId, { onDelete: "cascade" })
+  chqTranId: varchar("chq_transaction_id", { length: 60 })
+    .references(() => transactions.tranId, { onDelete: "cascade" })
     .notNull(),
   chqCreatedAt: datetime("chq_created_at").notNull().default(new Date()),
   chqUpdatedAt: datetime("chq_updated_at").notNull().default(new Date()),
 });
 
 export const chequesRelations = relations(cheques, ({ one }) => ({
-  account: one(accounts, {
-    fields: [cheques.chqAccId],
-    references: [accounts.accId],
+  account: one(transactions, {
+    fields: [cheques.chqTranId],
+    references: [transactions.tranId],
   }),
 }));
 
