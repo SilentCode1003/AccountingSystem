@@ -30,7 +30,7 @@ import inventoryEntries, {
   inventoryEntriesCustomerRelation,
   inventoryEntriesInventoryRelations,
   inventoryEntriesTransactionRelation,
-  inventoryEntriesVendorsRelations,
+  inventoryEntriesVendorRelation,
 } from "./schema/inventoryEntries.schema";
 
 // type DBSchema = {
@@ -82,7 +82,7 @@ const db = drizzle(connection, {
     inventoryEntries,
     inventoryEntriesInventoryRelations,
     inventoryEntriesTransactionRelation,
-    inventoryEntriesVendorsRelations,
+    inventoryEntriesVendorRelation,
     inventoryEntriesCustomerRelation,
   },
   mode: "default",

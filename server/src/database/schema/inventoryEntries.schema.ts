@@ -45,19 +45,9 @@ const inventoryEntries = mysqlTable("inventory_entries", {
 export const inventoryEntriesInventoryRelations = relations(
   inventoryEntries,
   ({ one }) => ({
-    Inventory: one(inventory, {
+    inventory: one(inventory, {
       fields: [inventoryEntries.invEntryInvId],
       references: [inventory.invId],
-    }),
-  })
-);
-
-export const inventoryEntriesVendorsRelations = relations(
-  inventoryEntries,
-  ({ one }) => ({
-    Vendor: one(vendors, {
-      fields: [inventoryEntries.invEntryVdId],
-      references: [vendors.vdId],
     }),
   })
 );
@@ -65,7 +55,7 @@ export const inventoryEntriesVendorsRelations = relations(
 export const inventoryEntriesCustomerRelation = relations(
   inventoryEntries,
   ({ one }) => ({
-    Customer: one(customers, {
+    customer: one(customers, {
       fields: [inventoryEntries.invEntryCustId],
       references: [customers.custId],
     }),
@@ -75,7 +65,7 @@ export const inventoryEntriesCustomerRelation = relations(
 export const inventoryEntriesVendorRelation = relations(
   inventoryEntries,
   ({ one }) => ({
-    Vendor: one(vendors, {
+    vendor: one(vendors, {
       fields: [inventoryEntries.invEntryVdId],
       references: [vendors.vdId],
     }),
@@ -85,7 +75,7 @@ export const inventoryEntriesVendorRelation = relations(
 export const inventoryEntriesTransactionRelation = relations(
   inventoryEntries,
   ({ one }) => ({
-    Transaction: one(transactions, {
+    transaction: one(transactions, {
       fields: [inventoryEntries.invEntryTranId],
       references: [transactions.tranId],
     }),
