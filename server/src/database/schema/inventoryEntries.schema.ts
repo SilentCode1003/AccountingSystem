@@ -3,6 +3,7 @@ import {
   date,
   decimal,
   int,
+  mysqlEnum,
   mysqlTable,
   varchar,
 } from "drizzle-orm/mysql-core";
@@ -29,6 +30,7 @@ const inventoryEntries = mysqlTable("inventory_entries", {
     (): AnyMySqlColumn => customers.custId,
     { onDelete: "cascade" }
   ),
+  invEntryType: mysqlEnum("inv_entry_type", ["INCOMING", "OUTGOING"]).notNull(),
   invEntryTotalPrice: decimal("inv_entry_total_price", {
     precision: 13,
     scale: 2,
