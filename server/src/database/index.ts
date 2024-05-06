@@ -26,6 +26,10 @@ import apiKeys from "./schema/apiKeyStore.schema";
 import tranTypes, {
   tranTypeTransactionManyRelations,
 } from "./schema/transactionTypes.schema";
+import inventoryEntries, {
+  inventoryEntriesInventoryRelations,
+  inventoryEntriesTransactionRelation,
+} from "./schema/inventoryEntries.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -73,6 +77,9 @@ const db = drizzle(connection, {
     payrollEmployeeRelation,
     payrollTransactionrelation,
     accountTypeRelation,
+    inventoryEntries,
+    inventoryEntriesInventoryRelations,
+    inventoryEntriesTransactionRelation,
   },
   mode: "default",
 });

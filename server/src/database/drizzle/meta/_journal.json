@@ -127,6 +127,13 @@
       "when": 1714964280921,
       "tag": "0017_minor_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1714965219338,
+      "tag": "0018_chemical_sentinels",
+      "breakpoints": true
     }
   ]
 }
