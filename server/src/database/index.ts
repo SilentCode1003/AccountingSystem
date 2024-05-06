@@ -27,8 +27,10 @@ import tranTypes, {
   tranTypeTransactionManyRelations,
 } from "./schema/transactionTypes.schema";
 import inventoryEntries, {
+  inventoryEntriesCustomerRelation,
   inventoryEntriesInventoryRelations,
   inventoryEntriesTransactionRelation,
+  inventoryEntriesVendorsRelations,
 } from "./schema/inventoryEntries.schema";
 
 // type DBSchema = {
@@ -80,6 +82,8 @@ const db = drizzle(connection, {
     inventoryEntries,
     inventoryEntriesInventoryRelations,
     inventoryEntriesTransactionRelation,
+    inventoryEntriesVendorsRelations,
+    inventoryEntriesCustomerRelation,
   },
   mode: "default",
 });
