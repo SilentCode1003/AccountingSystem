@@ -25,11 +25,12 @@ export const getAllTransactions = async () => {
 export const addTransaction = async (input: {
   tranDescription: string;
   tranAmount: number;
-  tranPartner: string;
+  tranPartner?: string;
   tranTransactionDate: Date;
   tranAccTypeId: string;
   tranTypeId: string;
   tranFileMimeType?: string;
+  tranOtherPartner?: string;
 }) => {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
@@ -47,13 +48,20 @@ export const addTransaction = async (input: {
     tranDescription: input.tranDescription,
     tranTransactionDate: input.tranTransactionDate,
     tranEmpId:
-      input.tranPartner.split(" ")[0] === "empId" ? input.tranPartner : null,
+      input.tranPartner && input.tranPartner.split(" ")[0] === "empId"
+        ? input.tranPartner
+        : null,
     tranCustId:
-      input.tranPartner.split(" ")[0] === "custId" ? input.tranPartner : null,
+      input.tranPartner && input.tranPartner.split(" ")[0] === "custId"
+        ? input.tranPartner
+        : null,
     tranVdId:
-      input.tranPartner.split(" ")[0] === "vdId" ? input.tranPartner : null,
+      input.tranPartner && input.tranPartner.split(" ")[0] === "vdId"
+        ? input.tranPartner
+        : null,
     tranFile: `${newTransactionId}.${input.tranFileMimeType ?? "xlsx"}`,
     tranTypeId: input.tranTypeId,
+    tranOtherPartner: input.tranOtherPartner ?? null,
   });
 
   const newTransaction = await db.query.transactions.findFirst({

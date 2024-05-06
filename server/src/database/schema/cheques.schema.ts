@@ -27,7 +27,7 @@ const cheques = mysqlTable("cheques", {
 });
 
 export const chequesRelations = relations(cheques, ({ one }) => ({
-  account: one(transactions, {
+  transaction: one(transactions, {
     fields: [cheques.chqTranId],
     references: [transactions.tranId],
   }),
