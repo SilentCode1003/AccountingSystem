@@ -1,28 +1,28 @@
-import express, { Request, Response } from "express";
-import accountRouter from "./routes/accounts.routes";
-import employeesRouter from "./routes/employees.routes";
-import usersRouter from "./routes/users.routes";
-import chequeRouter from "./routes/cheque.routes";
-import inventoryRouter from "./routes/inventory.routes";
-import payrollRouter from "./routes/payrolls.routes";
-import transactionRouter from "./routes/transactions.routes";
-import vendorRouter from "./routes/vendors.routes";
-import customerRouter from "./routes/customers.routes";
-import cors from "cors";
 import MongoStore from "connect-mongo";
-import session from "express-session";
+import cors from "cors";
 import "dotenv/config";
-import { authMiddleware } from "./utils/middlewares/auth.middleware";
+import express from "express";
+import fileUpload from "express-fileupload";
+import session from "express-session";
 import { currentUser } from "./controller/login.controller";
 import { getTransactionPartners } from "./controller/others.controllers";
+import accountRouter from "./routes/accounts.routes";
 import accountTypeRouter from "./routes/accountType.routes";
-import authRouter from "./routes/auth.routes";
-import othersRouter from "./routes/others.routes";
-import fileUpload, { UploadedFile } from "express-fileupload";
-import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
-import * as xlsx from "xlsx";
 import apiRouter from "./routes/api.routes";
+import authRouter from "./routes/auth.routes";
+import chequeRouter from "./routes/cheque.routes";
+import customerRouter from "./routes/customers.routes";
+import employeesRouter from "./routes/employees.routes";
+import inventoryRouter from "./routes/inventory.routes";
+import inventoryEntryRouter from "./routes/inventoryEntries.routes";
+import othersRouter from "./routes/others.routes";
+import payrollRouter from "./routes/payrolls.routes";
+import transactionRouter from "./routes/transactions.routes";
 import transactionTypesRouter from "./routes/transactionTypes.routes";
+import usersRouter from "./routes/users.routes";
+import vendorRouter from "./routes/vendors.routes";
+import { authMiddleware } from "./utils/middlewares/auth.middleware";
+import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 
 declare module "express-session" {
   interface SessionData {
@@ -94,6 +94,9 @@ app.use("/cheques", chequeRouter);
 
 //route for all inventory actions
 app.use("/inventory", inventoryRouter);
+
+//route for all inventory entries actions
+app.use("/inventoryEntries", inventoryEntryRouter);
 
 //route for all payroll actions
 app.use("/payrolls", payrollRouter);

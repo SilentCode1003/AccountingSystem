@@ -36,7 +36,7 @@ export const addTransaction = async (input: {
   const newAccount = await addAccount({
     accName: `ACCOUNT TRANSACTION`,
     accAmount: input.tranAmount,
-    accDescription: `${input.tranAccTypeId} TRANSACTION`,
+    accDescription: `TRANSACTION: ${input.tranDescription}`,
     accTypeId: input.tranAccTypeId,
   });
 
@@ -90,7 +90,6 @@ export const editTransaction = async (input: {
       tranAmount: input.tranAmount,
       tranDescription: input.tranDescription,
       tranTransactionDate: input.tranTransactionDate,
-
       tranEmpId:
         input.tranPartner!.split(" ")[0] === "empId" ? input.tranPartner : null,
       tranCustId:
@@ -103,14 +102,6 @@ export const editTransaction = async (input: {
     })
     .where(eq(transactions.tranId, input.tranId));
 
-  await editAccount({
-    accId: input.tranAccId as string,
-    newData: {
-      accTypeId: input.tranAccTypeId,
-      accAmount: input.tranAmount,
-    },
-  });
-
   const editedTran = await db.query.transactions.findFirst({
     where: (tran) => eq(tran.tranId, input.tranId),
     with: {
@@ -122,6 +113,14 @@ export const editTransaction = async (input: {
       employee: true,
       customer: true,
       vendor: true,
+    },
+  });
+
+  await editAccount({
+    accId: editedTran!.tranAccId as string,
+    newData: {
+      accTypeId: input.tranAccTypeId,
+      accAmount: input.tranAmount,
     },
   });
 
