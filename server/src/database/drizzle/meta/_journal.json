@@ -176,6 +176,13 @@
       "when": 1714974924264,
       "tag": "0024_illegal_blazing_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1714979167956,
+      "tag": "0025_giant_moira_mactaggert",
+      "breakpoints": true
     }
   ]
 }

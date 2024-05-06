@@ -35,6 +35,7 @@ const transactions = mysqlTable("transactions", {
     { onDelete: "cascade" }
   ),
   tranTransactionDate: datetime("tran_transaction_date").notNull(),
+  tranOtherPartner: text("tran_other_partner"),
   tranCreatedAt: datetime("tran_created_at").notNull().default(new Date()),
   tranUpdatedAt: datetime("tran_updated_at").notNull().default(new Date()),
   tranFile: text("tran_file").notNull(),
