@@ -120,6 +120,13 @@
       "when": 1714807723692,
       "tag": "0016_goofy_tenebrous",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1714964280921,
+      "tag": "0017_minor_tarot",
+      "breakpoints": true
     }
   ]
 }
