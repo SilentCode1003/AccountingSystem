@@ -62,7 +62,8 @@ export const createPayroll = async (req: Request, res: Response) => {
 export const updatePayroll = async (req: Request, res: Response) => {
   const input = updateValidator.safeParse({
     ...req.body,
-    prFile: req.files!.prFile,
+    prFile: req.files?.prFile,
+    prTotalDeduction: parseFloat(req.body.prTotalDeduction),
   });
 
   if (!input.success)
@@ -72,8 +73,9 @@ export const updatePayroll = async (req: Request, res: Response) => {
     const updatedPayroll = await editPayroll({
       ...input.data,
       prTranFileMimeType:
+        input.data.prFile &&
         input.data.prFile.mimetype ===
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           ? "xlsx"
           : "pdf",
     });
@@ -93,7 +95,6 @@ export const updatePayroll = async (req: Request, res: Response) => {
     );
     return res.status(200).send({ payroll: updatedPayroll });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };

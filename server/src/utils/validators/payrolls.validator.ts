@@ -100,18 +100,21 @@ export const updateValidator = z.object({
     .datetime()
     .transform((date) => new Date(date))
     .optional(),
-  prFile: z.custom<UploadedFile>().refine(
-    (file) => {
-      if (
-        file.mimetype ===
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-        file.mimetype === "application/pdf"
-      )
-        return true;
-      return false;
-    },
-    {
-      message: "Only xlsx/pdf files are allowed",
-    }
-  ),
+  prFile: z
+    .custom<UploadedFile>()
+    .refine(
+      (file) => {
+        if (
+          file.mimetype ===
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+          file.mimetype === "application/pdf"
+        )
+          return true;
+        return false;
+      },
+      {
+        message: "Only xlsx/pdf files are allowed",
+      }
+    )
+    .optional(),
 });
