@@ -24,6 +24,8 @@ export const createPayroll = async (req: Request, res: Response) => {
   const input = createValidator.safeParse({
     ...req.body,
     prTotalDeduction: parseFloat(req.body.prTotalDeduction),
+    prDateFrom: new Date(req.body.prDateFrom).toISOString(),
+    prDateTo: new Date(req.body.prDateTo).toISOString(),
     prFile: req.files!.prFile,
   });
 

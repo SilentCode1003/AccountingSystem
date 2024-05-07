@@ -10,8 +10,8 @@ import tranTypes from "../schema/transactionTypes.schema";
 export const getAllPayrolls = async () => {
   const payrolls = await db.query.payrolls.findMany({
     with: {
+      transaction: true,
       employee: true,
-      account: true,
     },
   });
 
@@ -63,6 +63,10 @@ export const addPayroll = async (input: {
 
   const newPayroll = await db.query.payrolls.findFirst({
     where: (payroll) => eq(payroll.prId, newPayrollId),
+    with: {
+      transaction: true,
+      employee: true,
+    },
   });
 
   return newPayroll;
@@ -104,10 +108,10 @@ export const editPayroll = async (input: {
 
   const updatedPr = await db.query.payrolls.findFirst({
     where: (pr) => eq(pr.prId, input.prId),
-    // with: {
-    //   employee: true,
-    //   account: true,
-    // },
+    with: {
+      employee: true,
+      transaction: true,
+    },
   });
 
   return updatedPr;
