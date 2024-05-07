@@ -16,7 +16,13 @@ type ChequeStatus = ObjectTypes<typeof CHEQUE_STATUS>;
 
 export const getAllCheques = async () => {
   const cheques = await db.query.cheques.findMany({
-    with: { transaction: { with: { accountType: true } } },
+    with: {
+      transaction: {
+        with: {
+          account: { with: { accountType: true } },
+        },
+      },
+    },
   });
 
   return cheques;
@@ -56,13 +62,22 @@ export const addCheque = async (input: {
 
   const newChqId = `chqId ${crypto.randomUUID()}`;
 
-  await db
-    .insert(cheques)
-    .values({ ...input, chqTranId: transaction!.tranId, chqId: newChqId });
+  await db.insert(cheques).values({
+    ...input,
+    chqTranId: transaction!.tranId,
+    chqId: newChqId,
+    chqApprovalCount: input.chqStatus === "APPROVED" ? 3 : 0,
+  });
 
   const newCheque = await db.query.cheques.findFirst({
     where: (cheque) => eq(cheque.chqId, newChqId),
-    with: { transaction: true },
+    with: {
+      transaction: {
+        with: {
+          account: { with: { accountType: true } },
+        },
+      },
+    },
   });
 
   return newCheque;
@@ -109,7 +124,13 @@ export const editCheque = async (input: {
 
   const updatedChq = await db.query.cheques.findFirst({
     where: (chq) => eq(chq.chqId, input.chqId),
-    with: { transaction: true },
+    with: {
+      transaction: {
+        with: {
+          account: { with: { accountType: true } },
+        },
+      },
+    },
   });
 
   return updatedChq;

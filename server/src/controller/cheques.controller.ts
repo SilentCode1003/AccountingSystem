@@ -27,9 +27,11 @@ export const createCheque = async (req: Request, res: Response) => {
     ...req.body,
     chqFile: req.files!.chqFile,
     chqAmount: parseFloat(req.body.chqAmount),
+    chqIssueDate: new Date(req.body.chqIssueDate).toISOString(),
   });
 
-  if (!input.success) return res.status(400).send({ error: input.error });
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
     const newCheque = await addCheque({
@@ -66,9 +68,9 @@ export const updateCheque = async (req: Request, res: Response) => {
     ...req.body,
     chqFile: req.files?.chqFile,
     chqAmount: req.body.chqAmount && parseFloat(req.body.chqAmount),
+    chqIssueDate: new Date(req.body.chqIssueDate).toISOString(),
   });
-  if (!input.success)
-    return res.status(400).send({ error: input.error.errors[0].message });
+  if (!input.success) return res.status(400).send({ error: input.error });
 
   try {
     const updatedChq = await editCheque({
