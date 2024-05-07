@@ -21,6 +21,7 @@ import { Route as AuthenticatedLayoutIndexImport } from './routes/_authenticated
 import { Route as AuthenticatedLayoutTransactionsIndexImport } from './routes/_authenticated/_layout/transactions_/index'
 import { Route as AuthenticatedLayoutPayrollsIndexImport } from './routes/_authenticated/_layout/payrolls_/index'
 import { Route as AuthenticatedLayoutInventoryIndexImport } from './routes/_authenticated/_layout/inventory_/index'
+import { Route as AuthenticatedLayoutInventoryEntriesIndexImport } from './routes/_authenticated/_layout/inventoryEntries_/index'
 import { Route as AuthenticatedLayoutIncomestatementIndexImport } from './routes/_authenticated/_layout/income_statement_/index'
 import { Route as AuthenticatedLayoutEmployeesIndexImport } from './routes/_authenticated/_layout/employees_/index'
 import { Route as AuthenticatedLayoutChequesIndexImport } from './routes/_authenticated/_layout/cheques_/index'
@@ -92,6 +93,12 @@ const AuthenticatedLayoutPayrollsIndexRoute =
 const AuthenticatedLayoutInventoryIndexRoute =
   AuthenticatedLayoutInventoryIndexImport.update({
     path: '/inventory/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutInventoryEntriesIndexRoute =
+  AuthenticatedLayoutInventoryEntriesIndexImport.update({
+    path: '/inventoryEntries/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
@@ -211,6 +218,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutIncomestatementIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
+    '/_authenticated/_layout/inventoryEntries/': {
+      preLoaderRoute: typeof AuthenticatedLayoutInventoryEntriesIndexImport
+      parentRoute: typeof AuthenticatedLayoutImport
+    }
     '/_authenticated/_layout/inventory/': {
       preLoaderRoute: typeof AuthenticatedLayoutInventoryIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
@@ -261,6 +272,7 @@ export const routeTree = rootRoute.addChildren([
       AuthenticatedLayoutChequesIndexRoute,
       AuthenticatedLayoutEmployeesIndexRoute,
       AuthenticatedLayoutIncomestatementIndexRoute,
+      AuthenticatedLayoutInventoryEntriesIndexRoute,
       AuthenticatedLayoutInventoryIndexRoute,
       AuthenticatedLayoutPayrollsIndexRoute,
       AuthenticatedLayoutTransactionsIndexRoute,

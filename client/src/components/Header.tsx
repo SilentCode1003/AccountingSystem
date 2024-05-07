@@ -265,7 +265,7 @@ function Header() {
               </Text>
             </SheetClose>
           </Link>
-          <Link to="/inventory">
+          <Link to="/inventoryEntries">
             <SheetClose>
               <Text
                 variant={'heading1'}
@@ -273,7 +273,7 @@ function Header() {
                 className="flex gap-4 items-center"
               >
                 <ArchiveIcon />
-                Inventory
+                Inventory Entries
               </Text>
             </SheetClose>
           </Link>
