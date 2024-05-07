@@ -9,6 +9,7 @@ export type Inventories = {
   invAssetName: string
   invStocks: number
   invStatus: 'GOOD' | 'WARNING' | 'DEPLETED'
+  invPricePerUnit: number
 }
 
 export const inventoryColumns: ColumnDef<Inventories>[] = [

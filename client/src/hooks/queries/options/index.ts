@@ -3,6 +3,7 @@ import { AccountTypes } from '@/components/table-columns/accountTypes.column'
 import { Cheques } from '@/components/table-columns/cheques.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
+import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import {
   Customer,
@@ -201,6 +202,24 @@ export const inventoriesOptions = () =>
       if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         inventories: Array<Inventories>
+      }>
+      return data
+    },
+  })
+
+export const inventoryEntriesOptions = () =>
+  queryOptions({
+    queryKey: ['inventoryEntries'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventoryEntries`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        inventoryEntries: Array<InventoryEntries>
       }>
       return data
     },

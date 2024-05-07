@@ -3,6 +3,7 @@ import { AccountTypes } from '@/components/table-columns/accountTypes.column'
 import { Cheques } from '@/components/table-columns/cheques.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
+import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
 import { toast } from '@/components/ui/use-toast'
@@ -544,6 +545,75 @@ export const useUpdateInventory = ({
   })
 }
 
+export const useUpdateInventoryEntry = ({
+  setIsOpen,
+  cell,
+}: {
+  setIsOpen: (value: boolean) => void
+  cell: Pick<CellContext<InventoryEntries, unknown>, 'row'>
+}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: ['updateInventoryEntry'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventoryEntries`,
+        {
+          method: 'PUT',
+          body: payload,
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        inventoryEntry: InventoryEntries
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['inventoryEntries'],
+        (old: { inventoryEntries: Array<InventoryEntries> }) => {
+          const newInventoryEnties = old.inventoryEntries.map(
+            (inventoryEntry) => {
+              if (inventoryEntry.invEntryId === cell.row.original.invEntryId) {
+                return data.inventoryEntry
+              }
+              return inventoryEntry
+            },
+          )
+          return { inventoryEntries: newInventoryEnties }
+        },
+      )
+      setIsOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Inventory entry was updated successfully',
+      })
+    },
+
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update inventory entry',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useUpdatePayroll = ({
   setIsOpen,
   cell,
@@ -841,6 +911,66 @@ export const useCreateInventory = ({
           </div>
         ),
         description: error.message ?? 'Failed to create inventory',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateInventoryEntry = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['CreateInventoryEntry'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventoryEntries`,
+        {
+          method: 'POST',
+          body: payload,
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        inventoryEntry: InventoryEntries
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['inventoryEntries'],
+        (old: { inventoryEntries: Array<InventoryEntries> }) => {
+          return {
+            inventoryEntries: [...old.inventoryEntries, data.inventoryEntry],
+          }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Inventory entry was created successfully',
+      })
+    },
+    onError: (error) => {
+      console.log(error)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create inventory entry',
         variant: 'destructive',
       })
     },
