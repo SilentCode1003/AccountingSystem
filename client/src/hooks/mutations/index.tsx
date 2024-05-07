@@ -12,10 +12,6 @@ import {
   updateAccountTypeSchema,
 } from '@/validators/accountTypes.validator'
 import {
-  chequeUpdateSchema,
-  createChequeSchema,
-} from '@/validators/cheques.validator'
-import {
   createEmployeeSchema,
   terminateEmployeeSchema,
   updateEmployeeSchema,
@@ -319,17 +315,12 @@ export const useUpdateCheque = ({
 
   return useMutation({
     mutationKey: ['updateCheque'],
-    mutationFn: async (
-      payload: z.infer<typeof chequeUpdateSchema> & { chqAccId: string },
-    ) => {
+    mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/cheques`,
         {
           method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+          body: payload,
           credentials: 'include',
         },
       )
@@ -695,16 +686,13 @@ export const useCreateCheque = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: z.infer<typeof createChequeSchema>) => {
+    mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/cheques`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           credentials: 'include',
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
       if (!response.ok) throw new Error((await response.json()).error)
