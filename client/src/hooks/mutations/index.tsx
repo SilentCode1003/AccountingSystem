@@ -24,10 +24,7 @@ import {
   createInventorySchema,
   updateFormSchema,
 } from '@/validators/inventory.validator'
-import {
-  createPayrollSchema,
-  updatePayrollSchema,
-} from '@/validators/payrolls.validators'
+import { updatePayrollSchema } from '@/validators/payrolls.validators'
 import { createTransactionSchema } from '@/validators/transactions.validator'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
@@ -869,16 +866,13 @@ export const useCreatePayroll = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: z.infer<typeof createPayrollSchema>) => {
+    mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/payrolls`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           credentials: 'include',
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
       if (!response.ok) throw new Error((await response.json()).error)
