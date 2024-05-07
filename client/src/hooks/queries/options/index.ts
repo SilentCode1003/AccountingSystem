@@ -7,6 +7,7 @@ import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import {
   Customer,
   Transactions,
+  TransactionType,
   Vendor,
 } from '@/components/table-columns/transactions.columns'
 import { QueryClient, queryOptions } from '@tanstack/react-query'
@@ -109,6 +110,24 @@ export const transactionsOptions = () =>
       }>
 
       return transactionData
+    },
+  })
+
+export const transactionTypesOptions = () =>
+  queryOptions({
+    queryKey: ['transactionTypes'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionTypes`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        transactionTypes: Array<TransactionType>
+      }>
+      return data
     },
   })
 

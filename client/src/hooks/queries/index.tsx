@@ -18,6 +18,7 @@ import {
   payrollsOptions,
   transactionPartnersOptions,
   transactionsOptions,
+  transactionTypesOptions,
   userOptions,
 } from './options'
 
@@ -79,3 +80,7 @@ export const useAccountTypeBarChartData = (accTypeId: string) =>
 
 export const useSuspenseCashFlowBarChartData = () =>
   useSuspenseQuery(cashFlowBarChartDataOptions())
+
+export const useTransactionTypes = () => {
+  return useQuery(transactionTypesOptions())
+}
