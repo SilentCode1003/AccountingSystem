@@ -24,6 +24,7 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
     ...req.body,
     invEntryQuantity: parseInt(req.body.invEntryQuantity),
     invEntryFile: req.files?.invEntryFile,
+    invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
 
   if (!input.success)
@@ -67,9 +68,11 @@ export const updateInventoryEntry = async (req: Request, res: Response) => {
     ...req.body,
     invEntryQuantity: parseInt(req.body.invEntryQuantity),
     invEntryFile: req.files?.invEntryFile,
+    invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
 
-  if (!input.success) return res.status(400).send({ error: input.error });
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
     const updatedInventoryEntry = await editInventoryEntry({

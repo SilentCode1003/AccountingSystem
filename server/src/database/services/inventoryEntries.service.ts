@@ -1,11 +1,10 @@
 import { eq } from "drizzle-orm";
 import db from "..";
-import inventoryEntries from "../schema/inventoryEntries.schema";
-import { addTransaction, editTransaction } from "./transactions.service";
-import tranTypes from "../schema/transactionTypes.schema";
 import accountTypes from "../schema/accountType.schema";
 import inventory from "../schema/inventory.schema";
-import { getAccountTypeById } from "./accountType.service";
+import inventoryEntries from "../schema/inventoryEntries.schema";
+import tranTypes from "../schema/transactionTypes.schema";
+import { addTransaction, editTransaction } from "./transactions.service";
 
 const INVENTORY_ENTRY_TYPE = {
   INCOMING: "INCOMING",
@@ -20,6 +19,9 @@ export const getAllInventoryEntries = async () => {
   const entries = await db.query.inventoryEntries.findMany({
     with: {
       inventory: true,
+      transaction: { with: { account: { with: { accountType: true } } } },
+      customer: true,
+      vendor: true,
     },
   });
   return entries;
@@ -30,6 +32,9 @@ export const getInventoryEntryById = async (id: string) => {
     where: eq(inventoryEntries.invEntryId, id),
     with: {
       inventory: true,
+      transaction: { with: { account: { with: { accountType: true } } } },
+      customer: true,
+      vendor: true,
     },
   });
   return entry;
@@ -107,6 +112,12 @@ export const addInventoryEntry = async (input: {
   const newInventoryEntry = await db.query.inventoryEntries.findFirst({
     where: (inventoryEntry) =>
       eq(inventoryEntry.invEntryId, newInventoryEntryId),
+    with: {
+      inventory: true,
+      transaction: { with: { account: { with: { accountType: true } } } },
+      customer: true,
+      vendor: true,
+    },
   });
   return newInventoryEntry;
 };
@@ -132,9 +143,11 @@ export const editInventoryEntry = async (input: {
     ),
   });
 
+  const InvEntryTotalPrice =
+    parseFloat(String(inv!.invPricePerUnit)) * input.invEntryQuantity!!;
   await db
     .update(inventoryEntries)
-    .set(input)
+    .set({ ...input, invEntryTotalPrice: InvEntryTotalPrice })
     .where(eq(inventoryEntries.invEntryId, input.invEntryId));
 
   await editTransaction({
