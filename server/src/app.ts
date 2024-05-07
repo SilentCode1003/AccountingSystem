@@ -23,6 +23,7 @@ import usersRouter from "./routes/users.routes";
 import vendorRouter from "./routes/vendors.routes";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
+import compression from "compression";
 
 declare module "express-session" {
   interface SessionData {
@@ -31,6 +32,8 @@ declare module "express-session" {
 }
 
 const app = express();
+
+app.use(compression());
 
 app.use(
   cors({
