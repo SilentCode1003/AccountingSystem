@@ -91,10 +91,10 @@ export const updateValidator = z.object({
       .transform((date) => new Date(date))
   ),
   chqTranId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accId") {
+    if (val.split(" ")[0] !== "tranId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an account id.`,
+        message: `Not an transaction id.`,
       });
     }
     if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {

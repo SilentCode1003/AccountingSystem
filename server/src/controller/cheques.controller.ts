@@ -58,20 +58,42 @@ export const createCheque = async (req: Request, res: Response) => {
 
     return res.status(200).send({ cheque: newCheque });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
 export const updateCheque = async (req: Request, res: Response) => {
-  const input = updateValidator.safeParse(req.body);
+  const input = updateValidator.safeParse({
+    ...req.body,
+    chqFile: req.files?.chqFile,
+    chqAmount: req.body.chqAmount && parseFloat(req.body.chqAmount),
+  });
   if (!input.success)
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
     const updatedChq = await editCheque({
       ...input.data,
+      chqTranFileMimeType:
+        input.data.chqFile &&
+        input.data.chqFile.mimetype ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          ? "xlsx"
+          : "pdf",
     });
-
+    input.data.chqFile?.mv(
+      path.join(
+        __dirname,
+        "..",
+        "..",
+        "files/transactionfiles",
+        `${updatedChq?.chqTranId}.${
+          input.data.chqFile.mimetype ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ? "xlsx"
+            : "pdf"
+        }`
+      )
+    );
     return res.status(200).send({ cheque: updatedChq });
   } catch (error) {
     return res.status(500).send({ error: "Server error" });
@@ -98,6 +120,7 @@ export const approveCheque = async (req: Request, res: Response) => {
     }
     return res.status(200).send({ cheque: incrementedChq });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };

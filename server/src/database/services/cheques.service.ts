@@ -1,11 +1,8 @@
+import { eq, sql } from "drizzle-orm";
 import db from "../index";
 import cheques from "../schema/cheques.schema";
-import { eq, sql } from "drizzle-orm";
-import { addAccount } from "./accounts.service";
-import accounts from "../schema/accounts.schema";
-import { addTransaction } from "./transactions.service";
-import { getTransactionTypeById } from "./transactionTypes.service";
 import tranTypes from "../schema/transactionTypes.schema";
+import { addTransaction, editTransaction } from "./transactions.service";
 
 const CHEQUE_STATUS = {
   PENDING: "PENDING",
@@ -28,7 +25,7 @@ export const getAllCheques = async () => {
 export const getChequeById = async (chqId: string) => {
   const cheque = await db.query.cheques.findFirst({
     where: (cheque) => eq(cheque.chqId, chqId),
-    with: { transaction: { with: { accountType: true } } },
+    with: { transaction: true },
   });
 
   return cheque;
@@ -80,31 +77,39 @@ export const editCheque = async (input: {
   chqAccTypeId?: string;
   chqNumber?: string;
   chqTranId: string;
+  chqTranFileMimeType?: string;
 }) => {
-  if (input.chqAccTypeId) {
-  }
-
-  await db
-    .update(cheques)
-    .set({
-      chqAmount: input.chqAmount,
-      chqIssueDate: input.chqIssueDate,
-      chqPayeeName: input.chqPayeeName,
-      chqStatus: input.chqStatus,
-      chqNumber: input.chqNumber,
-      chqUpdatedAt: new Date(),
-      chqApprovalCount:
-        input.chqStatus === "PENDING"
-          ? 0
-          : input.chqStatus === "APPROVED"
-          ? 3
-          : undefined,
-    })
-    .where(eq(cheques.chqId, input.chqId));
+  await Promise.all([
+    db
+      .update(cheques)
+      .set({
+        chqAmount: input.chqAmount,
+        chqIssueDate: input.chqIssueDate,
+        chqPayeeName: input.chqPayeeName,
+        chqStatus: input.chqStatus,
+        chqNumber: input.chqNumber,
+        chqUpdatedAt: new Date(),
+        chqApprovalCount:
+          input.chqStatus === "PENDING"
+            ? 0
+            : input.chqStatus === "APPROVED"
+            ? 3
+            : undefined,
+      })
+      .where(eq(cheques.chqId, input.chqId)),
+    editTransaction({
+      tranId: input.chqTranId,
+      tranAccTypeId: input.chqAccTypeId,
+      tranAmount: input.chqAmount,
+      tranOtherPartner: input.chqPayeeName,
+      tranTransactionDate: input.chqIssueDate,
+      tranFileMimeType: input.chqTranFileMimeType,
+    }),
+  ]);
 
   const updatedChq = await db.query.cheques.findFirst({
     where: (chq) => eq(chq.chqId, input.chqId),
-    with: { transaction: { with: { accountType: true } } },
+    with: { transaction: true },
   });
 
   return updatedChq;
@@ -118,7 +123,7 @@ export const setChequeStatus = async (chqId: string, status: ChequeStatus) => {
 
   const updatedCheque = await db.query.cheques.findFirst({
     where: (cheque) => eq(cheque.chqId, chqId),
-    with: { transaction: { with: { accountType: true } } },
+    with: { transaction: true },
   });
   return updatedCheque;
 };
@@ -131,7 +136,7 @@ export const incrementChequeApproval = async (chqId: string) => {
 
   const updatedCheque = await db.query.cheques.findFirst({
     where: (cheque) => eq(cheque.chqId, chqId),
-    with: { transaction: { with: { accountType: true } } },
+    with: { transaction: true },
   });
 
   return updatedCheque;

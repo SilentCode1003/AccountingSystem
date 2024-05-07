@@ -90,6 +90,7 @@ export const editTransaction = async (input: {
   tranAccTypeId?: string;
   tranTransactionDate?: Date;
   tranFileMimeType?: string;
+  tranOtherPartner?: string;
 }) => {
   await db
     .update(transactions)
@@ -99,14 +100,19 @@ export const editTransaction = async (input: {
       tranDescription: input.tranDescription,
       tranTransactionDate: input.tranTransactionDate,
       tranEmpId:
-        input.tranPartner!.split(" ")[0] === "empId" ? input.tranPartner : null,
+        input.tranPartner && input.tranPartner.split(" ")[0] === "empId"
+          ? input.tranPartner
+          : null,
       tranCustId:
-        input.tranPartner!.split(" ")[0] === "custId"
+        input.tranPartner && input.tranPartner.split(" ")[0] === "custId"
           ? input.tranPartner
           : null,
       tranVdId:
-        input.tranPartner!.split(" ")[0] === "vdId" ? input.tranPartner : null,
+        input.tranPartner && input.tranPartner.split(" ")[0] === "vdId"
+          ? input.tranPartner
+          : null,
       tranFile: `${input.tranId}.${input.tranFileMimeType ?? "xlsx"}`,
+      tranOtherPartner: input.tranOtherPartner,
     })
     .where(eq(transactions.tranId, input.tranId));
 
