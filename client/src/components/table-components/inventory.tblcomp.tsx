@@ -43,6 +43,17 @@ import { PromptModal } from '../PromptModal'
 import { useState } from 'react'
 import { Badge } from '../ui/badge'
 
+export const InventoryPricePerUnitColumn = ({
+  row,
+}: CellContext<Inventories, unknown>) => {
+  const amount = parseFloat(row.getValue('invPricePerUnit'))
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'PHP',
+  }).format(amount)
+  return formatted
+}
+
 export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
   const [open, setOpen] = useState<boolean>(false)
   const form = useForm<z.infer<typeof updateFormSchema>>({
@@ -50,6 +61,7 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
       invId: row.original.invId,
       newData: {
         invAssetName: row.original.invAssetName,
+        invPricePerUnit: row.original.invPricePerUnit,
         invStocks: row.original.invStocks,
         invStatus: row.original.invStatus,
       },
@@ -142,6 +154,31 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
                               {...field}
                             />
                           </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="newData.invPricePerUnit"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Amount</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              type="number"
+                              placeholder="Total Deduction"
+                              step="0.01"
+                              {...field}
+                              value={
+                                Number.isNaN(field.value) ? '' : field.value
+                              }
+                              onChange={(e) => {
+                                field.onChange(parseFloat(e.target.value))
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />

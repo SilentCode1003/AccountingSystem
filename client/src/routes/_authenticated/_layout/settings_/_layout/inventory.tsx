@@ -67,6 +67,7 @@ function CrudComponents() {
   const form = useForm<z.infer<typeof createInventorySchema>>({
     defaultValues: {
       invAssetName: '',
+      invPricePerUnit: 0,
       invStocks: 0,
       invStatus: 'GOOD',
     },
@@ -74,11 +75,7 @@ function CrudComponents() {
   })
 
   const handleSubmit = (values: z.infer<typeof createInventorySchema>) => {
-    createInventory.mutate({
-      invAssetName: values.invAssetName,
-      invStocks: values.invStocks,
-      invStatus: values.invStatus,
-    })
+    createInventory.mutate(values)
   }
 
   return (
@@ -113,6 +110,29 @@ function CrudComponents() {
                           {...field}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="invPricePerUnit"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          type="number"
+                          placeholder="Total Deduction"
+                          step="0.01"
+                          {...field}
+                          value={Number.isNaN(field.value) ? '' : field.value}
+                          onChange={(e) => {
+                            field.onChange(parseFloat(e.target.value))
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
