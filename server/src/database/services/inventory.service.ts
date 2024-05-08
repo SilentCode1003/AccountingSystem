@@ -23,6 +23,7 @@ export const addInventory = async (input: {
   invAssetName: string;
   invStatus: Inventoriestatus;
   invStocks: number;
+  invPricePerUnit: number;
 }) => {
   const newInventoryId = `invId ${crypto.randomUUID()}`;
 

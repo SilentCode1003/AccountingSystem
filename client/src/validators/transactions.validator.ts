@@ -35,8 +35,35 @@ export const createTransactionSchema = z.object({
     }
   }),
   tranTransactionDate: z.date(),
-  tranAccTypeId: z.string(),
-  tranFile: z.instanceof(File),
+  tranAccTypeId: z.string().superRefine((val, ctx) => {
+    if (val.split(' ')[0] !== 'accTypeId') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an account type id.`,
+      })
+    }
+    if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      })
+    }
+  }),
+  tranTypeId: z.string().superRefine((val, ctx) => {
+    if (val.split(' ')[0] !== 'tranTypeId') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an transaction type id.`,
+      })
+    }
+    if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      })
+    }
+  }),
+  tranFile: z.instanceof(File, { message: 'Required' }),
 })
 
 //validator for PUT /transactions inputs
@@ -72,6 +99,20 @@ export const updateTransactionSchema = z.object({
       }
     })
     .optional(),
+  tranTypeId: z.string().superRefine((val, ctx) => {
+    if (val.split(' ')[0] !== 'tranTypeId') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an transaction type id.`,
+      })
+    }
+    if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      })
+    }
+  }),
   tranDescription: z.string().optional(),
   tranAmount: z
     .union([
@@ -101,8 +142,25 @@ export const updateTransactionSchema = z.object({
         })
       }
     })
+    .nullable()
     .optional(),
   tranTransactionDate: z.date().optional(),
-  tranAccTypeId: z.string().optional(),
-  tranFile: z.instanceof(File),
+  tranAccTypeId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val.split(' ')[0] !== 'accTypeId') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not an account type id.`,
+        })
+      }
+      if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        })
+      }
+    })
+    .optional(),
+  tranFile: z.instanceof(File).optional(),
 })

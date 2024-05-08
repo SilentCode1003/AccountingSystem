@@ -1,10 +1,13 @@
 import { Accounts } from '@/components/table-columns/accounts.columns'
 import { AccountTypes } from '@/components/table-columns/accountTypes.column'
 import { Cheques } from '@/components/table-columns/cheques.columns'
+import { Customers } from '@/components/table-columns/customers.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
+import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
+import { Vendors } from '@/components/table-columns/vendors.columns'
 import { toast } from '@/components/ui/use-toast'
 import { updateAccountSchema } from '@/validators/accounts.validator'
 import {
@@ -12,9 +15,9 @@ import {
   updateAccountTypeSchema,
 } from '@/validators/accountTypes.validator'
 import {
-  chequeUpdateSchema,
-  createChequeSchema,
-} from '@/validators/cheques.validator'
+  createCustomerSchema,
+  updateCustomersSchema,
+} from '@/validators/customers.validator'
 import {
   createEmployeeSchema,
   terminateEmployeeSchema,
@@ -24,11 +27,12 @@ import {
   createInventorySchema,
   updateFormSchema,
 } from '@/validators/inventory.validator'
-import {
-  createPayrollSchema,
-  updatePayrollSchema,
-} from '@/validators/payrolls.validators'
+import { updatePayrollSchema } from '@/validators/payrolls.validators'
 import { createTransactionSchema } from '@/validators/transactions.validator'
+import {
+  createVendorSchema,
+  updateVendorSchema,
+} from '@/validators/vendors.validator'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { CellContext } from '@tanstack/react-table'
@@ -322,17 +326,12 @@ export const useUpdateCheque = ({
 
   return useMutation({
     mutationKey: ['updateCheque'],
-    mutationFn: async (
-      payload: z.infer<typeof chequeUpdateSchema> & { chqAccId: string },
-    ) => {
+    mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/cheques`,
         {
           method: 'PUT',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+          body: payload,
           credentials: 'include',
         },
       )
@@ -356,6 +355,14 @@ export const useUpdateCheque = ({
           return { cheques: newCheques }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -474,6 +481,14 @@ export const useUpdateEmployee = ({
       await queryClient.refetchQueries({
         queryKey: ['Employees'],
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['Payrolls'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -494,6 +509,158 @@ export const useUpdateEmployee = ({
           </div>
         ),
         description: error.message ?? 'Failed to update employee',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useUpdateCustomer = ({
+  setOpen,
+  cell,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  cell: Pick<CellContext<Customers, unknown>, 'row'>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['updateCustomer'],
+    mutationFn: async (payload: z.infer<typeof updateCustomersSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/customers`,
+        {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        customer: Customers
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['customers'],
+        (old: { customers: Array<Customers> }) => {
+          const newCustomers = old.customers.map((customer) => {
+            if (customer.custId === cell.row.original.custId) {
+              return data.customer
+            }
+            return customer
+          })
+          return { customers: newCustomers }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Customer was updated successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update Customer',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useUpdateVendor = ({
+  setOpen,
+  cell,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  cell: Pick<CellContext<Vendors, unknown>, 'row'>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['updateVendor'],
+    mutationFn: async (payload: z.infer<typeof updateVendorSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/vendors`,
+        {
+          method: 'PUT',
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        vendor: Vendors
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['vendors'],
+        (old: { vendors: Array<Vendors> }) => {
+          const newVendors = old.vendors.map((customer) => {
+            if (customer.vdId === cell.row.original.vdId) {
+              return data.vendor
+            }
+            return customer
+          })
+          return { vendors: newVendors }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Vendor was updated successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update Vendor',
         variant: 'destructive',
       })
     },
@@ -530,6 +697,10 @@ export const useUpdateInventory = ({
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ['Inventories'] })
+      await queryClient.invalidateQueries({
+        queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -550,6 +721,83 @@ export const useUpdateInventory = ({
           </div>
         ),
         description: error.message ?? 'Failed to update inventory',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useUpdateInventoryEntry = ({
+  setIsOpen,
+  cell,
+}: {
+  setIsOpen: (value: boolean) => void
+  cell: Pick<CellContext<InventoryEntries, unknown>, 'row'>
+}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: ['updateInventoryEntry'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventoryEntries`,
+        {
+          method: 'PUT',
+          body: payload,
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        inventoryEntry: InventoryEntries
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['inventoryEntries'],
+        (old: { inventoryEntries: Array<InventoryEntries> }) => {
+          const newInventoryEnties = old.inventoryEntries.map(
+            (inventoryEntry) => {
+              if (inventoryEntry.invEntryId === cell.row.original.invEntryId) {
+                return data.inventoryEntry
+              }
+              return inventoryEntry
+            },
+          )
+          return { inventoryEntries: newInventoryEnties }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
+      setIsOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Inventory entry was updated successfully',
+      })
+    },
+
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update inventory entry',
         variant: 'destructive',
       })
     },
@@ -599,6 +847,14 @@ export const useUpdatePayroll = ({
           return { payrolls: newPayrolls }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -652,8 +908,8 @@ export const useUpdateTransaction = ({
       }>
       return data
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
         ['Transactions'],
         (old: { transactions: Array<Transactions> }) => {
           const newTransactions = old.transactions.map((transaction) => {
@@ -665,6 +921,10 @@ export const useUpdateTransaction = ({
           return { transactions: newTransactions }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       setOpenUpdate(false)
       toast({
         title: (
@@ -698,16 +958,13 @@ export const useCreateCheque = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: z.infer<typeof createChequeSchema>) => {
+    mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/cheques`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           credentials: 'include',
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
       if (!response.ok) throw new Error((await response.json()).error)
@@ -723,6 +980,14 @@ export const useCreateCheque = ({
           return { cheques: [...old.cheques, data.cheque] }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -772,9 +1037,16 @@ export const useCreateEmployee = ({
       const data = (await response.json()) as Promise<{ employee: Employees }>
       return data
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       setOpen(false)
-      await queryClient.refetchQueries({ queryKey: ['Employees'] })
+      await queryClient.setQueryData(
+        ['Employees'],
+        (old: { employees: Array<Employees> }) => {
+          return {
+            employees: [...old.employees, data.employee],
+          }
+        },
+      )
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -794,6 +1066,124 @@ export const useCreateEmployee = ({
           </div>
         ),
         description: error.message ?? 'Failed to create employee',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateCustomer = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: z.infer<typeof createCustomerSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/customers`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{ customer: Customers }>
+      return data
+    },
+    onSuccess: async (data) => {
+      setOpen(false)
+      await queryClient.setQueryData(
+        ['customers'],
+        (old: { customers: Array<Customers> }) => {
+          return {
+            customers: [...old.customers, data.customer],
+          }
+        },
+      )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Customer was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create Customer',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateVendor = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: z.infer<typeof createVendorSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/vendors`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{ vendor: Vendors }>
+      return data
+    },
+    onSuccess: async (data) => {
+      setOpen(false)
+      await queryClient.setQueryData(
+        ['vendors'],
+        (old: { vendors: Array<Vendors> }) => {
+          return {
+            vendors: [...old.vendors, data.vendor],
+          }
+        },
+      )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Vendor was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create Vendor',
         variant: 'destructive',
       })
     },
@@ -862,6 +1252,74 @@ export const useCreateInventory = ({
   })
 }
 
+export const useCreateInventoryEntry = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['CreateInventoryEntry'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/inventoryEntries`,
+        {
+          method: 'POST',
+          body: payload,
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        inventoryEntry: InventoryEntries
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['inventoryEntries'],
+        (old: { inventoryEntries: Array<InventoryEntries> }) => {
+          return {
+            inventoryEntries: [...old.inventoryEntries, data.inventoryEntry],
+          }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Inventory entry was created successfully',
+      })
+    },
+    onError: (error) => {
+      console.log(error)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create inventory entry',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useCreatePayroll = ({
   setOpen,
 }: {
@@ -869,16 +1327,13 @@ export const useCreatePayroll = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: z.infer<typeof createPayrollSchema>) => {
+    mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/payrolls`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           credentials: 'include',
-          body: JSON.stringify(payload),
+          body: payload,
         },
       )
       if (!response.ok) throw new Error((await response.json()).error)
@@ -886,9 +1341,24 @@ export const useCreatePayroll = ({
       const data = (await response.json()) as Promise<{ payroll: Payrolls }>
       return data
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       setOpen(false)
-      await queryClient.refetchQueries({ queryKey: ['Payrolls'] })
+      await queryClient.setQueryData(
+        ['Payrolls'],
+        (old: { payrolls: Array<Payrolls> }) => {
+          return {
+            payrolls: [...old.payrolls, data.payroll],
+          }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -1084,6 +1554,10 @@ export const useCreateTransaction = (
           return { transactions: [...old.transactions, data.transaction] }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       form.reset()
       toast({
         title: (
@@ -1139,6 +1613,10 @@ export const useCreateTransactionByFile = ({
           return { transactions: [...old.transactions, data.transaction] }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (

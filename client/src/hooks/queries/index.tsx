@@ -12,13 +12,17 @@ import {
   cashFlowBarChartDataOptions,
   chequesOptions,
   currentUserOptions,
+  customersOptions,
   employeesOptions,
   incomeStatementOptions,
   inventoriesOptions,
+  inventoryEntriesOptions,
   payrollsOptions,
   transactionPartnersOptions,
   transactionsOptions,
+  transactionTypesOptions,
   userOptions,
+  vendorsOptions,
 } from './options'
 
 export const useCurrentUser = () => {
@@ -38,17 +42,12 @@ export const useUserSuspense = () => {
   return useSuspenseQuery(userOptions(queryClient))
 }
 
-export const useTransactionPartners = () => {
-  return useQuery(transactionPartnersOptions())
-}
+export const useTransactionPartners = () =>
+  useQuery(transactionPartnersOptions())
 
-export const useTransactions = () => {
-  return useQuery(transactionsOptions())
-}
+export const useTransactions = () => useQuery(transactionsOptions())
 
-export const useAccountTypes = () => {
-  return useQuery(accountTypesOptions())
-}
+export const useAccountTypes = () => useQuery(accountTypesOptions())
 
 export const useAccountTypesSuspense = () =>
   useSuspenseQuery(accountTypesOptions())
@@ -57,7 +56,13 @@ export const useCheques = () => useQuery(chequesOptions())
 
 export const useEmployees = () => useQuery(employeesOptions())
 
+export const useCustomers = () => useQuery(customersOptions())
+
+export const useVendors = () => useQuery(vendorsOptions())
+
 export const useInventories = () => useQuery(inventoriesOptions())
+
+export const useInventoryEntries = () => useQuery(inventoryEntriesOptions())
 
 export const usePayrolls = () => useQuery(payrollsOptions())
 
@@ -79,3 +84,7 @@ export const useAccountTypeBarChartData = (accTypeId: string) =>
 
 export const useSuspenseCashFlowBarChartData = () =>
   useSuspenseQuery(cashFlowBarChartDataOptions())
+
+export const useTransactionTypes = () => {
+  return useQuery(transactionTypesOptions())
+}

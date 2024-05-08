@@ -106,6 +106,90 @@
       "when": 1714707185222,
       "tag": "0014_outgoing_angel",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1714804656523,
+      "tag": "0015_funny_scorpion",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1714807723692,
+      "tag": "0016_goofy_tenebrous",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1714964280921,
+      "tag": "0017_minor_tarot",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1714965219338,
+      "tag": "0018_chemical_sentinels",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1714965580278,
+      "tag": "0019_flowery_logan",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1714967908814,
+      "tag": "0020_dear_yellow_claw",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1714972730830,
+      "tag": "0021_wooden_quentin_quire",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1714972883721,
+      "tag": "0022_special_the_captain",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1714974800301,
+      "tag": "0023_keen_umar",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1714974924264,
+      "tag": "0024_illegal_blazing_skull",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1714979167956,
+      "tag": "0025_giant_moira_mactaggert",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1714983365376,
+      "tag": "0026_adorable_master_chief",
+      "breakpoints": true
     }
   ]
 }

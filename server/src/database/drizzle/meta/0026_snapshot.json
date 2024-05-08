@@ -1,0 +1,1094 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "id": "17757f1a-1913-4a66-993c-18e850df1a16",
+  "prevId": "bd51528a-e78f-4526-bc8b-f8535e0eec03",
+  "tables": {
+    "accounts": {
+      "name": "accounts",
+      "columns": {
+        "acc_id": {
+          "name": "acc_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_name": {
+          "name": "acc_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_type_id": {
+          "name": "acc_type_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_amount": {
+          "name": "acc_amount",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_description": {
+          "name": "acc_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_is_active": {
+          "name": "acc_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "acc_created_at": {
+          "name": "acc_created_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'2024-05-06 08:15:51.168'"
+        },
+        "acc_updated_at": {
+          "name": "acc_updated_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'2024-05-06 08:15:51.168'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "accounts_acc_type_id_account_types_acc_type_id_fk": {
+          "name": "accounts_acc_type_id_account_types_acc_type_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "account_types",
+          "columnsFrom": [
+            "acc_type_id"
+          ],
+          "columnsTo": [
+            "acc_type_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "accounts_acc_id": {
+          "name": "accounts_acc_id",
+          "columns": [
+            "acc_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "account_types": {
+      "name": "account_types",
+      "columns": {
+        "acc_type_id": {
+          "name": "acc_type_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_type_name": {
+          "name": "acc_type_name",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acc_type_default": {
+          "name": "acc_type_default",
+          "type": "enum('BALANCESHEET','CASHFLOW','INCOMESTATEMENT')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "account_types_acc_type_id": {
+          "name": "account_types_acc_type_id",
+          "columns": [
+            "acc_type_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "account_types_acc_type_name_unique": {
+          "name": "account_types_acc_type_name_unique",
+          "columns": [
+            "acc_type_name"
+          ]
+        }
+      }
+    },
+    "api_key_store": {
+      "name": "api_key_store",
+      "columns": {
+        "aks_id": {
+          "name": "aks_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "aks_user_name": {
+          "name": "aks_user_name",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "aks_hashed_key": {
+          "name": "aks_hashed_key",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "api_key_store_aks_id": {
+          "name": "api_key_store_aks_id",
+          "columns": [
+            "aks_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "api_key_store_aks_user_name_unique": {
+          "name": "api_key_store_aks_user_name_unique",
+          "columns": [
+            "aks_user_name"
+          ]
+        },
+        "api_key_store_aks_hashed_key_unique": {
+          "name": "api_key_store_aks_hashed_key_unique",
+          "columns": [
+            "aks_hashed_key"
+          ]
+        }
+      }
+    },
+    "cheques": {
+      "name": "cheques",
+      "columns": {
+        "chq_id": {
+          "name": "chq_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chq_payee_name": {
+          "name": "chq_payee_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chq_number": {
+          "name": "chq_number",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chq_approval_count": {
+          "name": "chq_approval_count",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "chq_amount": {
+          "name": "chq_amount",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chq_issue_date": {
+          "name": "chq_issue_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chq_status": {
+          "name": "chq_status",
+          "type": "enum('APPROVED','PENDING','REJECTED')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "chq_transaction_id": {
+          "name": "chq_transaction_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "chq_created_at": {
+          "name": "chq_created_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'2024-05-06 08:15:51.197'"
+        },
+        "chq_updated_at": {
+          "name": "chq_updated_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'2024-05-06 08:15:51.197'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cheques_chq_transaction_id_transactions_tran_id_fk": {
+          "name": "cheques_chq_transaction_id_transactions_tran_id_fk",
+          "tableFrom": "cheques",
+          "tableTo": "transactions",
+          "columnsFrom": [
+            "chq_transaction_id"
+          ],
+          "columnsTo": [
+            "tran_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "cheques_chq_id": {
+          "name": "cheques_chq_id",
+          "columns": [
+            "chq_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "cheques_chq_number_unique": {
+          "name": "cheques_chq_number_unique",
+          "columns": [
+            "chq_number"
+          ]
+        }
+      }
+    },
+    "customers": {
+      "name": "customers",
+      "columns": {
+        "cust_id": {
+          "name": "cust_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cust_name": {
+          "name": "cust_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cust_address": {
+          "name": "cust_address",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cust_contact_info": {
+          "name": "cust_contact_info",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cust_email": {
+          "name": "cust_email",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cust_is_active": {
+          "name": "cust_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "customers_cust_id": {
+          "name": "customers_cust_id",
+          "columns": [
+            "cust_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "customers_cust_email_unique": {
+          "name": "customers_cust_email_unique",
+          "columns": [
+            "cust_email"
+          ]
+        }
+      }
+    },
+    "employees": {
+      "name": "employees",
+      "columns": {
+        "emp_id": {
+          "name": "emp_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emp_name": {
+          "name": "emp_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "emp_address": {
+          "name": "emp_address",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emp_contact_info": {
+          "name": "emp_contact_info",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emp_email": {
+          "name": "emp_email",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emp_birthdate": {
+          "name": "emp_birthdate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emp_date_hired": {
+          "name": "emp_date_hired",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emp_date_terminated": {
+          "name": "emp_date_terminated",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "emp_salary": {
+          "name": "emp_salary",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "employees_emp_id": {
+          "name": "employees_emp_id",
+          "columns": [
+            "emp_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "employees_emp_email_unique": {
+          "name": "employees_emp_email_unique",
+          "columns": [
+            "emp_email"
+          ]
+        }
+      }
+    },
+    "inventory": {
+      "name": "inventory",
+      "columns": {
+        "inv_id": {
+          "name": "inv_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_asset_name": {
+          "name": "inv_asset_name",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_stocks": {
+          "name": "inv_stocks",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_status": {
+          "name": "inv_status",
+          "type": "enum('GOOD','WARNING','DEPLETED')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "inv_price_per_unit": {
+          "name": "inv_price_per_unit",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "inventory_inv_id": {
+          "name": "inventory_inv_id",
+          "columns": [
+            "inv_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "inventory_inv_asset_name_unique": {
+          "name": "inventory_inv_asset_name_unique",
+          "columns": [
+            "inv_asset_name"
+          ]
+        }
+      }
+    },
+    "inventory_entries": {
+      "name": "inventory_entries",
+      "columns": {
+        "inv_entry_id": {
+          "name": "inv_entry_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_entry_tran_id": {
+          "name": "inv_entry_tran_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_entry_inv_id": {
+          "name": "inv_entry_inv_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_entry_vd_id": {
+          "name": "inv_entry_vd_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "inv_entry_cust_id": {
+          "name": "inv_entry_cust_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "inv_entry_type": {
+          "name": "inv_entry_type",
+          "type": "enum('INCOMING','OUTGOING')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_entry_total_price": {
+          "name": "inv_entry_total_price",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_entry_date": {
+          "name": "inv_entry_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "inv_entry_quantity": {
+          "name": "inv_entry_quantity",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "inventory_entries_inv_entry_tran_id_transactions_tran_id_fk": {
+          "name": "inventory_entries_inv_entry_tran_id_transactions_tran_id_fk",
+          "tableFrom": "inventory_entries",
+          "tableTo": "transactions",
+          "columnsFrom": [
+            "inv_entry_tran_id"
+          ],
+          "columnsTo": [
+            "tran_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "inventory_entries_inv_entry_inv_id_inventory_inv_id_fk": {
+          "name": "inventory_entries_inv_entry_inv_id_inventory_inv_id_fk",
+          "tableFrom": "inventory_entries",
+          "tableTo": "inventory",
+          "columnsFrom": [
+            "inv_entry_inv_id"
+          ],
+          "columnsTo": [
+            "inv_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "inventory_entries_inv_entry_vd_id_vendors_vd_id_fk": {
+          "name": "inventory_entries_inv_entry_vd_id_vendors_vd_id_fk",
+          "tableFrom": "inventory_entries",
+          "tableTo": "vendors",
+          "columnsFrom": [
+            "inv_entry_vd_id"
+          ],
+          "columnsTo": [
+            "vd_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "inventory_entries_inv_entry_cust_id_customers_cust_id_fk": {
+          "name": "inventory_entries_inv_entry_cust_id_customers_cust_id_fk",
+          "tableFrom": "inventory_entries",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "inv_entry_cust_id"
+          ],
+          "columnsTo": [
+            "cust_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "inventory_entries_inv_entry_id": {
+          "name": "inventory_entries_inv_entry_id",
+          "columns": [
+            "inv_entry_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "payrolls": {
+      "name": "payrolls",
+      "columns": {
+        "pr_id": {
+          "name": "pr_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pr_transaction_id": {
+          "name": "pr_transaction_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pr_employee_id": {
+          "name": "pr_employee_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pr_total_deduction": {
+          "name": "pr_total_deduction",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pr_date_from": {
+          "name": "pr_date_from",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pr_date_to": {
+          "name": "pr_date_to",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pr_final_amount": {
+          "name": "pr_final_amount",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "payrolls_pr_transaction_id_transactions_tran_id_fk": {
+          "name": "payrolls_pr_transaction_id_transactions_tran_id_fk",
+          "tableFrom": "payrolls",
+          "tableTo": "transactions",
+          "columnsFrom": [
+            "pr_transaction_id"
+          ],
+          "columnsTo": [
+            "tran_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "payrolls_pr_employee_id_employees_emp_id_fk": {
+          "name": "payrolls_pr_employee_id_employees_emp_id_fk",
+          "tableFrom": "payrolls",
+          "tableTo": "employees",
+          "columnsFrom": [
+            "pr_employee_id"
+          ],
+          "columnsTo": [
+            "emp_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "payrolls_pr_id": {
+          "name": "payrolls_pr_id",
+          "columns": [
+            "pr_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "transactions": {
+      "name": "transactions",
+      "columns": {
+        "tran_id": {
+          "name": "tran_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tran_account_id": {
+          "name": "tran_account_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tran_description": {
+          "name": "tran_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tran_amount": {
+          "name": "tran_amount",
+          "type": "decimal(13,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tran_employee_id": {
+          "name": "tran_employee_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tran_vendor_id": {
+          "name": "tran_vendor_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tran_customer_id": {
+          "name": "tran_customer_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tran_transaction_date": {
+          "name": "tran_transaction_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tran_other_partner": {
+          "name": "tran_other_partner",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tran_created_at": {
+          "name": "tran_created_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'2024-05-06 08:15:51.196'"
+        },
+        "tran_updated_at": {
+          "name": "tran_updated_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'2024-05-06 08:15:51.196'"
+        },
+        "tran_file": {
+          "name": "tran_file",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tran_type_id": {
+          "name": "tran_type_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "transactions_tran_account_id_accounts_acc_id_fk": {
+          "name": "transactions_tran_account_id_accounts_acc_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "tran_account_id"
+          ],
+          "columnsTo": [
+            "acc_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "transactions_tran_employee_id_employees_emp_id_fk": {
+          "name": "transactions_tran_employee_id_employees_emp_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "employees",
+          "columnsFrom": [
+            "tran_employee_id"
+          ],
+          "columnsTo": [
+            "emp_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "transactions_tran_vendor_id_vendors_vd_id_fk": {
+          "name": "transactions_tran_vendor_id_vendors_vd_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "vendors",
+          "columnsFrom": [
+            "tran_vendor_id"
+          ],
+          "columnsTo": [
+            "vd_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "transactions_tran_customer_id_customers_cust_id_fk": {
+          "name": "transactions_tran_customer_id_customers_cust_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "customers",
+          "columnsFrom": [
+            "tran_customer_id"
+          ],
+          "columnsTo": [
+            "cust_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "transactions_tran_type_id_tran_types_tran_type_id_fk": {
+          "name": "transactions_tran_type_id_tran_types_tran_type_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "tran_types",
+          "columnsFrom": [
+            "tran_type_id"
+          ],
+          "columnsTo": [
+            "tran_type_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "transactions_tran_id": {
+          "name": "transactions_tran_id",
+          "columns": [
+            "tran_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "tran_types": {
+      "name": "tran_types",
+      "columns": {
+        "tran_type_id": {
+          "name": "tran_type_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tran_type_name": {
+          "name": "tran_type_name",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "tran_types_tran_type_id": {
+          "name": "tran_types_tran_type_id",
+          "columns": [
+            "tran_type_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "tran_types_tran_type_name_unique": {
+          "name": "tran_types_tran_type_name_unique",
+          "columns": [
+            "tran_type_name"
+          ]
+        }
+      }
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_type": {
+          "name": "user_type",
+          "type": "enum('FINANCE','HIGHER_DEPARTMENT')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "user_username": {
+          "name": "user_username",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_fullname": {
+          "name": "user_fullname",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "user_profile_pic": {
+          "name": "user_profile_pic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_contact_number": {
+          "name": "user_contact_number",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_password": {
+          "name": "user_password",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_is_active": {
+          "name": "user_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "users_user_id": {
+          "name": "users_user_id",
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "vendors": {
+      "name": "vendors",
+      "columns": {
+        "vd_id": {
+          "name": "vd_id",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "vd_name": {
+          "name": "vd_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "vd_address": {
+          "name": "vd_address",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "vd_contact_info": {
+          "name": "vd_contact_info",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "vd_email": {
+          "name": "vd_email",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "vd_is_active": {
+          "name": "vd_is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "vendors_vd_id": {
+          "name": "vendors_vd_id",
+          "columns": [
+            "vd_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "vendors_vd_email_unique": {
+          "name": "vendors_vd_email_unique",
+          "columns": [
+            "vd_email"
+          ]
+        }
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {
+      "\"cheques\".\"chq_account_id\"": "\"cheques\".\"chq_transaction_id\""
+    }
+  }
+}

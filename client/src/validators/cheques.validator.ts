@@ -34,6 +34,7 @@ export const createChequeSchema = z.object({
       })
     }
   }),
+  chqFile: z.instanceof(File, { message: 'Required' }),
 })
 
 export const chequeUpdateSchema = z.object({
@@ -51,35 +52,34 @@ export const chequeUpdateSchema = z.object({
       })
     }
   }),
-  newData: z.object({
-    chqPayeeName: z.optional(z.string()),
-    chqAmount: z
-      .union([
-        z.number().positive({ message: 'must not be 0 or negative' }),
-        z.nan(),
-      ])
-      .refine((val) => !Number.isNaN(val), {
-        message: 'required',
-      }),
-    chqIssueDate: z.optional(z.date()),
-    chqNumber: z.string().max(50).optional(),
-    chqStatus: z.optional(z.enum(['APPROVED', 'PENDING', 'REJECTED'])),
-    chqAccTypeId: z
-      .string()
-      .superRefine((val, ctx) => {
-        if (val.split(' ')[0] !== 'accTypeId') {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not an account type id.`,
-          })
-        }
-        if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not valid uuid.`,
-          })
-        }
-      })
-      .optional(),
-  }),
+  chqPayeeName: z.optional(z.string()),
+  chqAmount: z
+    .union([
+      z.number().positive({ message: 'must not be 0 or negative' }),
+      z.nan(),
+    ])
+    .refine((val) => !Number.isNaN(val), {
+      message: 'required',
+    }),
+  chqIssueDate: z.optional(z.date()),
+  chqNumber: z.string().max(50).optional(),
+  chqStatus: z.optional(z.enum(['APPROVED', 'PENDING', 'REJECTED'])),
+  chqAccTypeId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val.split(' ')[0] !== 'accTypeId') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not an account type id.`,
+        })
+      }
+      if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        })
+      }
+    })
+    .optional(),
+  chqFile: z.instanceof(File, { message: 'Required' }).optional(),
 })

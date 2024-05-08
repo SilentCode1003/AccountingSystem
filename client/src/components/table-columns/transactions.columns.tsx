@@ -11,6 +11,7 @@ import {
   TransactionDate,
   transactionFileColumn,
   TransactionIndexColumn,
+  TransactionTypeColumn,
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
 
@@ -47,6 +48,11 @@ export type Customer = {
   custIsActive: string
 }
 
+export type TransactionType = {
+  tranTypeId: string
+  tranTypeName: string
+}
+
 export type Transactions = {
   tranId: string
   tranAccId: string
@@ -63,6 +69,9 @@ export type Transactions = {
   customer: Customer
   vendor: Vendor
   tranFile: string
+  tranOtherPartner?: string
+  tranTypeId: string
+  transactionType: TransactionType
 }
 
 export const transactionColumns: ColumnDef<Transactions>[] = [
@@ -103,8 +112,26 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranFile',
     meta: 'Transaction File',
-    header: () => 'Transaction File',
+    header: () => <div className="whitespace-nowrap">Transaction File</div>,
     cell: transactionFileColumn,
+  },
+  {
+    accessorKey: 'tranTypeId',
+    meta: 'Transaction Type',
+    accessorFn: (row) => row.transactionType.tranTypeName,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Transaction Type
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: TransactionTypeColumn,
   },
   {
     accessorKey: 'tranAmount',

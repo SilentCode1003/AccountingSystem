@@ -49,7 +49,7 @@ import { Badge } from '../ui/badge'
 export const AccountTypeNameColumn = ({
   row,
 }: CellContext<AccountTypes, unknown>) => {
-  return <Badge variant={'outline'}>{row.original.accTypeName}</Badge>
+  return <Badge variant={'secondary'}>{row.original.accTypeName}</Badge>
 }
 
 export const AccountTypeAccountsColumn = ({
@@ -82,7 +82,11 @@ export const AccountTypeAccountsColumn = ({
       <div className="flex flex-col gap-4">
         {row.original.accounts.length > 0 ? (
           row.original.accounts.map((acc) => (
-            <Badge variant={'outline'} className="w-fit" key={acc.accId}>
+            <Badge
+              variant={'outline'}
+              className="whitespace-nowrap"
+              key={acc.accId}
+            >
               {acc.accName}
             </Badge>
           ))

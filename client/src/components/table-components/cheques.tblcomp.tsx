@@ -68,7 +68,9 @@ export const CreatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
 export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return (
     <div className="flex justify-between">
-      <Badge variant={'outline'}>{row.original.account.accName}</Badge>
+      <Badge variant={'outline'}>
+        {row.original.transaction.account.accName}
+      </Badge>
       <div>
         <Dialog>
           <DropdownMenu>
@@ -83,7 +85,9 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
               <DropdownMenuItem
                 className="hover:cursor-pointer"
                 onClick={() =>
-                  navigator.clipboard.writeText(row.original.account.accId)
+                  navigator.clipboard.writeText(
+                    row.original.transaction.account.accId,
+                  )
                 }
               >
                 Copy Account ID
@@ -106,7 +110,7 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
                   Account ID
                 </Text>
                 <Text variant={'label'} className="flex-1">
-                  {row.original.account.accId}
+                  {row.original.transaction.account.accId}
                 </Text>
               </div>
               <div className="flex flex-col sm:flex-row">
@@ -114,7 +118,7 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
                   Account Type
                 </Text>
                 <Badge variant={'secondary'}>
-                  {row.original.account.accountType.accTypeName}
+                  {row.original.transaction.account.accountType.accTypeName}
                 </Badge>
               </div>
               <div className="flex flex-col sm:flex-row">
@@ -122,7 +126,7 @@ export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
                   Description
                 </Text>
                 <Text variant={'label'} className="flex-1">
-                  {row.original.account.accDescription}
+                  {row.original.transaction.account.accDescription}
                 </Text>
               </div>
             </div>
@@ -158,14 +162,12 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const form = useForm<z.infer<typeof chequeUpdateSchema>>({
     defaultValues: {
       chqId: row.original.chqId,
-      newData: {
-        chqAccTypeId: row.original.account.accTypeId,
-        chqAmount: Number.parseFloat(String(row.original.chqAmount)),
-        chqIssueDate: new Date(row.original.chqIssueDate),
-        chqPayeeName: row.original.chqPayeeName,
-        chqNumber: row.original.chqNumber,
-        chqStatus: row.original.chqStatus,
-      },
+      chqAccTypeId: row.original.transaction.account.accTypeId,
+      chqAmount: Number.parseFloat(String(row.original.chqAmount)),
+      chqIssueDate: new Date(row.original.chqIssueDate),
+      chqPayeeName: row.original.chqPayeeName,
+      chqNumber: row.original.chqNumber,
+      chqStatus: row.original.chqStatus,
     },
     resolver: zodResolver(chequeUpdateSchema),
   })
@@ -173,7 +175,13 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const updateCheque = useUpdateCheque({ cell: { row }, setIsOpen })
 
   const handleSubmit = (values: z.infer<typeof chequeUpdateSchema>) => {
-    updateCheque.mutate({ ...values, chqAccId: row.original.account.accId })
+    const fd = new FormData()
+
+    Object.keys(values).forEach((key) => {
+      fd.append(key, values[key as keyof typeof values] as any)
+    })
+    fd.append('chqTranId', row.original.chqTranId)
+    updateCheque.mutate(fd)
   }
   return (
     <div className="flex justify-between">
@@ -230,7 +238,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
-                      name="newData.chqPayeeName"
+                      name="chqPayeeName"
                       render={({ field }) => (
                         <FormItem>
                           <div className="flex items-center justify-between">
@@ -249,7 +257,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
-                      name="newData.chqNumber"
+                      name="chqNumber"
                       render={({ field }) => (
                         <FormItem>
                           <div className="flex items-center justify-between">
@@ -268,7 +276,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
-                      name="newData.chqAmount"
+                      name="chqAmount"
                       render={({ field }) => (
                         <FormItem>
                           <div className="flex items-center justify-between">
@@ -296,8 +304,33 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                       )}
                     />
                     <FormField
+                      name="chqFile"
                       control={form.control}
-                      name="newData.chqStatus"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Supporting File</FormLabel>
+                          <FormControl>
+                            <Input
+                              ref={field.ref}
+                              onBlur={field.onBlur}
+                              onChange={(e: any) => {
+                                if (!e.target.files) return
+
+                                if (!e.target.files[0]) return
+                                console.log(e.target.files[0])
+                                field.onChange(e.target.files[0])
+                              }}
+                              type="file"
+                              className="w-full hover:cursor-pointer"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="chqStatus"
                       render={({ field }) => (
                         <FormItem>
                           <div className="flex items-center justify-between">
@@ -336,7 +369,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
-                      name="newData.chqAccTypeId"
+                      name="chqAccTypeId"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Account Type</FormLabel>
@@ -361,7 +394,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                     />
                     <FormField
                       control={form.control}
-                      name="newData.chqIssueDate"
+                      name="chqIssueDate"
                       render={({ field }) => (
                         <FormItem>
                           <div className="flex items-center justify-between">

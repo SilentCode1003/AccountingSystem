@@ -17,7 +17,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Text } from '@/components/ui/text'
 import { useDownloadFile, useUpdateTransaction } from '@/hooks/mutations'
-import { useAccountTypes, useTransactionPartners } from '@/hooks/queries'
+import {
+  useAccountTypes,
+  useTransactionPartners,
+  useTransactionTypes,
+} from '@/hooks/queries'
 import { updateTransactionSchema } from '@/validators/transactions.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogProps } from '@radix-ui/react-dialog'
@@ -139,6 +143,16 @@ export const TransactionAccountIDColumn = ({
   )
 }
 
+export const TransactionTypeColumn = ({
+  row,
+}: CellContext<Transactions, unknown>) => {
+  return (
+    <Badge variant={'secondary'}>
+      {row.original.transactionType.tranTypeName}
+    </Badge>
+  )
+}
+
 export const TransactionAmountColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
@@ -164,10 +178,10 @@ export const TransactionWithColumn = ({
 }: CellContext<Transactions, unknown> & { dashboard?: boolean }) => {
   let data: {
     id: string
-    type: string
-    name: string
-    contactInfo: string
-    email: string
+    type?: string
+    name?: string
+    contactInfo?: string
+    email?: string
     isActive?: string
     dateHired?: string
     address?: string
@@ -190,13 +204,18 @@ export const TransactionWithColumn = ({
       email: row.original.customer.custEmail,
       address: row.original.customer.custAddress,
     }
-  } else {
+  } else if (row.original.tranVdId) {
     data = {
       id: row.original.vendor.vdId,
       type: 'vendor',
       name: row.original.vendor.vdName,
       contactInfo: row.original.vendor.vdContactInfo,
       email: row.original.vendor.vdEmail,
+    }
+  } else {
+    data = {
+      id: '',
+      name: row.original.tranOtherPartner,
     }
   }
   return (
@@ -219,11 +238,13 @@ export const TransactionWithColumn = ({
               >
                 Copy ID
               </DropdownMenuItem>
-              <MultiDialogTrigger value="viewDetails">
-                <DropdownMenuItem className="hover:cursor-pointer">
-                  View Details
-                </DropdownMenuItem>
-              </MultiDialogTrigger>
+              {!row.original.tranOtherPartner && (
+                <MultiDialogTrigger value="viewDetails">
+                  <DropdownMenuItem className="hover:cursor-pointer">
+                    View Details
+                  </DropdownMenuItem>
+                </MultiDialogTrigger>
+              )}
               {!dashboard && (
                 <MultiDialogTrigger value="updateTransaction">
                   <DropdownMenuItem className="hover:cursor-pointer">
@@ -298,6 +319,7 @@ export const TransactionWithColumn = ({
 function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
   const [, setOpen] = useMultiDialog('updateTransaction')
   const accountTypes = useAccountTypes()
+  const transactionTypes = useTransactionTypes()
   const form = useForm<z.infer<typeof updateTransactionSchema>>({
     defaultValues: {
       tranId: props.row.original.tranId,
@@ -307,9 +329,11 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
       tranPartner:
         props.row.original.tranEmpId ??
         props.row.original.tranCustId ??
-        props.row.original.tranVdId,
+        props.row.original.tranVdId ??
+        undefined,
       tranAccTypeId: props.row.original.account.accountType.accTypeId,
       tranTransactionDate: new Date(props.row.original.tranTransactionDate),
+      tranTypeId: props.row.original.tranTypeId,
     },
     resolver: zodResolver(updateTransactionSchema),
   })
@@ -492,11 +516,8 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                   name="tranFile"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between">
-                        <FormLabel>Supporting File</FormLabel>
-                        <FormMessage />
-                      </div>
+                    <FormItem className="flex-1">
+                      <FormLabel>Supporting File</FormLabel>
                       <FormControl>
                         <Input
                           ref={field.ref}
@@ -512,6 +533,32 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                           className="w-full hover:cursor-pointer"
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="tranTypeId"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Transaction Type</FormLabel>
+                      <FormControl>
+                        {transactionTypes.isSuccess && (
+                          <ComboBox
+                            data={transactionTypes.data.transactionTypes.map(
+                              (t) => ({
+                                label: t.tranTypeName,
+                                value: t.tranTypeId,
+                              }),
+                            )}
+                            emptyLabel="Nothing Found"
+                            value={field.value}
+                            setValue={field.onChange}
+                          />
+                        )}
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
