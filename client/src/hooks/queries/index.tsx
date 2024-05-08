@@ -12,6 +12,7 @@ import {
   cashFlowBarChartDataOptions,
   chequesOptions,
   currentUserOptions,
+  customersOptions,
   employeesOptions,
   incomeStatementOptions,
   inventoriesOptions,
@@ -21,6 +22,7 @@ import {
   transactionsOptions,
   transactionTypesOptions,
   userOptions,
+  vendorsOptions,
 } from './options'
 
 export const useCurrentUser = () => {
@@ -53,6 +55,10 @@ export const useAccountTypesSuspense = () =>
 export const useCheques = () => useQuery(chequesOptions())
 
 export const useEmployees = () => useQuery(employeesOptions())
+
+export const useCustomers = () => useQuery(customersOptions())
+
+export const useVendors = () => useQuery(vendorsOptions())
 
 export const useInventories = () => useQuery(inventoriesOptions())
 

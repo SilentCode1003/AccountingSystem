@@ -1,6 +1,7 @@
 import { Accounts } from '@/components/table-columns/accounts.columns'
 import { AccountTypes } from '@/components/table-columns/accountTypes.column'
 import { Cheques } from '@/components/table-columns/cheques.columns'
+import { Customers } from '@/components/table-columns/customers.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
@@ -11,6 +12,7 @@ import {
   TransactionType,
   Vendor,
 } from '@/components/table-columns/transactions.columns'
+import { Vendors } from '@/components/table-columns/vendors.columns'
 import { QueryClient, queryOptions } from '@tanstack/react-query'
 
 export const currentUserOptions = () => {
@@ -183,6 +185,43 @@ export const employeesOptions = () =>
       if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         employees: Array<Employees>
+      }>
+
+      return data
+    },
+  })
+
+export const customersOptions = () =>
+  queryOptions({
+    queryKey: ['customers'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/customers`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        customers: Array<Customers>
+      }>
+
+      return data
+    },
+  })
+export const vendorsOptions = () =>
+  queryOptions({
+    queryKey: ['vendors'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/vendors`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        vendors: Array<Vendors>
       }>
 
       return data
