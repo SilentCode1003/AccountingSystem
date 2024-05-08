@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import db from "..";
 import accountTypes from "../schema/accountType.schema";
+import crypto from "crypto";
 import inventory from "../schema/inventory.schema";
 import inventoryEntries from "../schema/inventoryEntries.schema";
 import tranTypes from "../schema/transactionTypes.schema";
