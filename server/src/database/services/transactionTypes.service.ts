@@ -15,6 +15,9 @@ export const getAllTransactionTypes = async () => {
 export const getTransactionTypeById = async (tranTypeId: string) => {
   const transactionType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeId, tranTypeId),
+    with: {
+      transactions: true,
+    },
   });
   return transactionType;
 };
@@ -40,4 +43,8 @@ export const editTransactionType = async (input: {
     .where(eq(tranTypes.tranTypeId, input.tranTypeId));
   const editedTransactionType = await getTransactionTypeById(input.tranTypeId);
   return editedTransactionType;
+};
+
+export const removeTransactionType = async (input: { tranTypeId: string }) => {
+  await db.delete(tranTypes).where(eq(tranTypes.tranTypeId, input.tranTypeId));
 };

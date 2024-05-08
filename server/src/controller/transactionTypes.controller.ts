@@ -3,11 +3,14 @@ import {
   addTransactionType,
   editTransactionType,
   getAllTransactionTypes,
+  removeTransactionType,
 } from "../database/services/transactionTypes.service";
 import {
   createValidator,
+  deleteValidator,
   updateValidator,
 } from "../utils/validators/transactionTypes.validator";
+import db from "../database";
 
 export const getTransactionTypes = async (req: Request, res: Response) => {
   try {
@@ -55,6 +58,26 @@ export const updateTransactionType = async (req: Request, res: Response) => {
     return res.status(200).send({
       transactionType: updatedTransactionType,
     });
+  } catch (error) {
+    return res.status(500).send({
+      error: "Server error",
+    });
+  }
+};
+
+export const deleteTransactionType = async (req: Request, res: Response) => {
+  const input = deleteValidator.safeParse(req.params);
+
+  if (!input.success)
+    return res.status(400).send({
+      error: input.error.errors[0].message,
+    });
+
+  try {
+    await removeTransactionType(input.data);
+    return res
+      .status(200)
+      .send({ success: true, deletedTranTypeId: input.data.tranTypeId });
   } catch (error) {
     return res.status(500).send({
       error: "Server error",
