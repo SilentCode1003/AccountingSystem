@@ -34,7 +34,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-export const Route = createFileRoute('/_authenticated/_layout/employees/')({
+export const Route = createFileRoute(
+  '/_authenticated/_layout/settings/_layout/employees',
+)({
   loader: async ({ context }) => {
     const employees =
       await context.queryClient.ensureQueryData(employeesOptions())
@@ -252,11 +254,10 @@ const CrudComponents = () => {
 function Employees() {
   const employees = useEmployees()
   return (
-    <div className="p-4 min-h-[85vh] flex flex-col items-center">
+    <div className="w-full">
       {employees.isSuccess && (
         <DataTable
           showVisibility
-          className="w-full md:w-[70vw]"
           columns={employeeColumns}
           data={employees.data.employees}
           filter={[

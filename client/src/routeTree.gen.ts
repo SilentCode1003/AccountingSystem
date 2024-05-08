@@ -20,16 +20,16 @@ import { Route as LoginLayoutIndexImport } from './routes/login/_layout/index'
 import { Route as AuthenticatedLayoutIndexImport } from './routes/_authenticated/_layout/index'
 import { Route as AuthenticatedLayoutTransactionsIndexImport } from './routes/_authenticated/_layout/transactions_/index'
 import { Route as AuthenticatedLayoutPayrollsIndexImport } from './routes/_authenticated/_layout/payrolls_/index'
-import { Route as AuthenticatedLayoutInventoryIndexImport } from './routes/_authenticated/_layout/inventory_/index'
 import { Route as AuthenticatedLayoutInventoryEntriesIndexImport } from './routes/_authenticated/_layout/inventoryEntries_/index'
 import { Route as AuthenticatedLayoutIncomestatementIndexImport } from './routes/_authenticated/_layout/income_statement_/index'
-import { Route as AuthenticatedLayoutEmployeesIndexImport } from './routes/_authenticated/_layout/employees_/index'
 import { Route as AuthenticatedLayoutChequesIndexImport } from './routes/_authenticated/_layout/cheques_/index'
 import { Route as AuthenticatedLayoutCashflowIndexImport } from './routes/_authenticated/_layout/cash_flow_/index'
 import { Route as AuthenticatedLayoutBalancesheetIndexImport } from './routes/_authenticated/_layout/balance_sheet_/index'
 import { Route as AuthenticatedLayoutSettingslayoutImport } from './routes/_authenticated/_layout/settings_/_layout'
 import { Route as AuthenticatedLayoutSettingslayoutIndexImport } from './routes/_authenticated/_layout/settings_/_layout/index'
 import { Route as AuthenticatedLayoutSettingslayoutReportsImport } from './routes/_authenticated/_layout/settings_/_layout/reports'
+import { Route as AuthenticatedLayoutSettingslayoutInventoryImport } from './routes/_authenticated/_layout/settings_/_layout/inventory'
+import { Route as AuthenticatedLayoutSettingslayoutEmployeesImport } from './routes/_authenticated/_layout/settings_/_layout/employees'
 import { Route as AuthenticatedLayoutSettingslayoutAccountsImport } from './routes/_authenticated/_layout/settings_/_layout/accounts'
 import { Route as AuthenticatedLayoutSettingslayoutAccountTypesImport } from './routes/_authenticated/_layout/settings_/_layout/accountTypes'
 
@@ -90,12 +90,6 @@ const AuthenticatedLayoutPayrollsIndexRoute =
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
-const AuthenticatedLayoutInventoryIndexRoute =
-  AuthenticatedLayoutInventoryIndexImport.update({
-    path: '/inventory/',
-    getParentRoute: () => AuthenticatedLayoutRoute,
-  } as any)
-
 const AuthenticatedLayoutInventoryEntriesIndexRoute =
   AuthenticatedLayoutInventoryEntriesIndexImport.update({
     path: '/inventoryEntries/',
@@ -105,12 +99,6 @@ const AuthenticatedLayoutInventoryEntriesIndexRoute =
 const AuthenticatedLayoutIncomestatementIndexRoute =
   AuthenticatedLayoutIncomestatementIndexImport.update({
     path: '/income_statement/',
-    getParentRoute: () => AuthenticatedLayoutRoute,
-  } as any)
-
-const AuthenticatedLayoutEmployeesIndexRoute =
-  AuthenticatedLayoutEmployeesIndexImport.update({
-    path: '/employees/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
@@ -147,6 +135,18 @@ const AuthenticatedLayoutSettingslayoutIndexRoute =
 const AuthenticatedLayoutSettingslayoutReportsRoute =
   AuthenticatedLayoutSettingslayoutReportsImport.update({
     path: '/reports',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutSettingslayoutInventoryRoute =
+  AuthenticatedLayoutSettingslayoutInventoryImport.update({
+    path: '/inventory',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutSettingslayoutEmployeesRoute =
+  AuthenticatedLayoutSettingslayoutEmployeesImport.update({
+    path: '/employees',
     getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
   } as any)
 
@@ -210,20 +210,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutChequesIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
-    '/_authenticated/_layout/employees/': {
-      preLoaderRoute: typeof AuthenticatedLayoutEmployeesIndexImport
-      parentRoute: typeof AuthenticatedLayoutImport
-    }
     '/_authenticated/_layout/income_statement/': {
       preLoaderRoute: typeof AuthenticatedLayoutIncomestatementIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/inventoryEntries/': {
       preLoaderRoute: typeof AuthenticatedLayoutInventoryEntriesIndexImport
-      parentRoute: typeof AuthenticatedLayoutImport
-    }
-    '/_authenticated/_layout/inventory/': {
-      preLoaderRoute: typeof AuthenticatedLayoutInventoryIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/payrolls/': {
@@ -240,6 +232,14 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/_layout/settings/_layout/accounts': {
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutAccountsImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
+    '/_authenticated/_layout/settings/_layout/employees': {
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutEmployeesImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
+    '/_authenticated/_layout/settings/_layout/inventory': {
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutInventoryImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/reports': {
@@ -263,6 +263,8 @@ export const routeTree = rootRoute.addChildren([
         AuthenticatedLayoutSettingslayoutRoute.addChildren([
           AuthenticatedLayoutSettingslayoutAccountTypesRoute,
           AuthenticatedLayoutSettingslayoutAccountsRoute,
+          AuthenticatedLayoutSettingslayoutEmployeesRoute,
+          AuthenticatedLayoutSettingslayoutInventoryRoute,
           AuthenticatedLayoutSettingslayoutReportsRoute,
           AuthenticatedLayoutSettingslayoutIndexRoute,
         ]),
@@ -270,10 +272,8 @@ export const routeTree = rootRoute.addChildren([
       AuthenticatedLayoutBalancesheetIndexRoute,
       AuthenticatedLayoutCashflowIndexRoute,
       AuthenticatedLayoutChequesIndexRoute,
-      AuthenticatedLayoutEmployeesIndexRoute,
       AuthenticatedLayoutIncomestatementIndexRoute,
       AuthenticatedLayoutInventoryEntriesIndexRoute,
-      AuthenticatedLayoutInventoryIndexRoute,
       AuthenticatedLayoutPayrollsIndexRoute,
       AuthenticatedLayoutTransactionsIndexRoute,
     ]),

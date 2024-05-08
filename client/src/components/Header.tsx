@@ -19,7 +19,6 @@ import {
   MoonIcon,
   ReceiptIcon,
   SettingsIcon,
-  UsersRoundIcon,
 } from 'lucide-react'
 import { RxHamburgerMenu } from 'react-icons/rx'
 import {
@@ -226,18 +225,6 @@ function Header() {
               >
                 <ArrowLeftRightIcon />
                 Transactions
-              </Text>
-            </SheetClose>
-          </Link>
-          <Link to="/employees">
-            <SheetClose>
-              <Text
-                variant={'heading1'}
-                style={'underline'}
-                className="flex gap-4 items-center"
-              >
-                <UsersRoundIcon />
-                Employees
               </Text>
             </SheetClose>
           </Link>
