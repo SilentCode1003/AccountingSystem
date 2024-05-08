@@ -198,20 +198,6 @@ function VendorsComponent() {
               filterColumn: 'vdName',
               filterPlaceHolder: 'Filter by name',
             },
-            {
-              filterColumn: 'vdSalary',
-              filterPlaceHolder: 'Filter by Salary',
-            },
-            {
-              filterColumn: 'vdDateTerminated',
-              filterPlaceHolder: 'Filter Date Terminated',
-              date: true,
-            },
-            {
-              filterColumn: 'vdBirthdate',
-              filterPlaceHolder: 'Filter birthdate',
-              date: true,
-            },
           ]}
           CrudComponents={CrudComponents}
         />

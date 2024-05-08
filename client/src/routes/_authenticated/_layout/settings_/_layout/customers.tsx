@@ -199,20 +199,6 @@ function CustomersComponent() {
               filterColumn: 'custName',
               filterPlaceHolder: 'Filter by name',
             },
-            {
-              filterColumn: 'custSalary',
-              filterPlaceHolder: 'Filter by Salary',
-            },
-            {
-              filterColumn: 'custDateTerminated',
-              filterPlaceHolder: 'Filter Date Terminated',
-              date: true,
-            },
-            {
-              filterColumn: 'custBirthdate',
-              filterPlaceHolder: 'Filter birthdate',
-              date: true,
-            },
           ]}
           CrudComponents={CrudComponents}
         />
