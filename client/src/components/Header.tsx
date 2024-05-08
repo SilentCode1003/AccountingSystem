@@ -270,7 +270,7 @@ function Header() {
               <Text
                 variant={'heading1'}
                 style={'underline'}
-                className="flex gap-4 items-center"
+                className="flex gap-4 items-center text-start "
               >
                 <ArchiveIcon />
                 Inventory Entries

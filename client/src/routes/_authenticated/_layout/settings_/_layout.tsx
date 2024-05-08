@@ -23,7 +23,7 @@ function SettingsLayout() {
         <div className="grid grid-cols-1 md:grid md:grid-cols-[200px,1fr] h-[85vh]">
           <nav
             className={cn(
-              'p-4 sticky top-0 flex flex-col text-md text-muted-foreground h-fit',
+              'p-4 flex flex-col text-md text-muted-foreground h-fit',
               'text-center md:text-start md:w-fit ',
             )}
           >
