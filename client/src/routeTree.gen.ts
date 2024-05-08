@@ -27,9 +27,11 @@ import { Route as AuthenticatedLayoutCashflowIndexImport } from './routes/_authe
 import { Route as AuthenticatedLayoutBalancesheetIndexImport } from './routes/_authenticated/_layout/balance_sheet_/index'
 import { Route as AuthenticatedLayoutSettingslayoutImport } from './routes/_authenticated/_layout/settings_/_layout'
 import { Route as AuthenticatedLayoutSettingslayoutIndexImport } from './routes/_authenticated/_layout/settings_/_layout/index'
+import { Route as AuthenticatedLayoutSettingslayoutVendorsImport } from './routes/_authenticated/_layout/settings_/_layout/vendors'
 import { Route as AuthenticatedLayoutSettingslayoutReportsImport } from './routes/_authenticated/_layout/settings_/_layout/reports'
 import { Route as AuthenticatedLayoutSettingslayoutInventoryImport } from './routes/_authenticated/_layout/settings_/_layout/inventory'
 import { Route as AuthenticatedLayoutSettingslayoutEmployeesImport } from './routes/_authenticated/_layout/settings_/_layout/employees'
+import { Route as AuthenticatedLayoutSettingslayoutCustomersImport } from './routes/_authenticated/_layout/settings_/_layout/customers'
 import { Route as AuthenticatedLayoutSettingslayoutAccountsImport } from './routes/_authenticated/_layout/settings_/_layout/accounts'
 import { Route as AuthenticatedLayoutSettingslayoutAccountTypesImport } from './routes/_authenticated/_layout/settings_/_layout/accountTypes'
 
@@ -132,6 +134,12 @@ const AuthenticatedLayoutSettingslayoutIndexRoute =
     getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
   } as any)
 
+const AuthenticatedLayoutSettingslayoutVendorsRoute =
+  AuthenticatedLayoutSettingslayoutVendorsImport.update({
+    path: '/vendors',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
 const AuthenticatedLayoutSettingslayoutReportsRoute =
   AuthenticatedLayoutSettingslayoutReportsImport.update({
     path: '/reports',
@@ -147,6 +155,12 @@ const AuthenticatedLayoutSettingslayoutInventoryRoute =
 const AuthenticatedLayoutSettingslayoutEmployeesRoute =
   AuthenticatedLayoutSettingslayoutEmployeesImport.update({
     path: '/employees',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutSettingslayoutCustomersRoute =
+  AuthenticatedLayoutSettingslayoutCustomersImport.update({
+    path: '/customers',
     getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
   } as any)
 
@@ -234,6 +248,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutAccountsImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
+    '/_authenticated/_layout/settings/_layout/customers': {
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutCustomersImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
     '/_authenticated/_layout/settings/_layout/employees': {
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutEmployeesImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
@@ -244,6 +262,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/_layout/settings/_layout/reports': {
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutReportsImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
+    '/_authenticated/_layout/settings/_layout/vendors': {
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutVendorsImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/': {
@@ -263,9 +285,11 @@ export const routeTree = rootRoute.addChildren([
         AuthenticatedLayoutSettingslayoutRoute.addChildren([
           AuthenticatedLayoutSettingslayoutAccountTypesRoute,
           AuthenticatedLayoutSettingslayoutAccountsRoute,
+          AuthenticatedLayoutSettingslayoutCustomersRoute,
           AuthenticatedLayoutSettingslayoutEmployeesRoute,
           AuthenticatedLayoutSettingslayoutInventoryRoute,
           AuthenticatedLayoutSettingslayoutReportsRoute,
+          AuthenticatedLayoutSettingslayoutVendorsRoute,
           AuthenticatedLayoutSettingslayoutIndexRoute,
         ]),
       ]),
