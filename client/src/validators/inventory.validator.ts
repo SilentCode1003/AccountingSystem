@@ -3,6 +3,14 @@ import { z } from 'zod'
 export const createInventorySchema = z
   .object({
     invAssetName: z.string().min(1, { message: 'Required' }),
+    invPricePerUnit: z
+      .union([
+        z.number().positive({ message: 'must not be 0 or negative' }),
+        z.nan(),
+      ])
+      .refine((val) => !Number.isNaN(val), {
+        message: 'required',
+      }),
     invStocks: z.number().min(1, { message: 'Required' }),
     invStatus: z.enum(['GOOD', 'WARNING', 'DEPLETED']),
   })
@@ -25,6 +33,15 @@ export const updateFormSchema = z.object({
   }),
   newData: z.object({
     invAssetName: z.string().optional(),
+    invPricePerUnit: z
+      .union([
+        z.number().positive({ message: 'must not be 0 or negative' }),
+        z.nan(),
+      ])
+      .refine((val) => !Number.isNaN(val), {
+        message: 'required',
+      })
+      .optional(),
     invStocks: z.number().optional(),
     invStatus: z.enum(['GOOD', 'WARNING', 'DEPLETED']).optional(),
   }),

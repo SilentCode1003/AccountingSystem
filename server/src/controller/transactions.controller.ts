@@ -1,21 +1,22 @@
+import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
+import path from "path";
+import * as xlsx from "xlsx";
+import db from "../database";
+import { getAllAccountTypes } from "../database/services/accountType.service";
+import { getCustomerByName } from "../database/services/customers.service";
+import { getEmployeeByName } from "../database/services/employees.service";
 import {
   addTransaction,
   editTransaction,
   getAllTransactions,
 } from "../database/services/transactions.service";
+import { getVendorByName } from "../database/services/vendors.service";
 import {
   createTransactionByFileValidator,
   createValidator,
   updateValidator,
 } from "../utils/validators/transactions.validator";
-import * as xlsx from "xlsx";
-import { getAllAccountTypes } from "../database/services/accountType.service";
-import { getEmployeeByName } from "../database/services/employees.service";
-import { getCustomerByName } from "../database/services/customers.service";
-import { getVendorByName } from "../database/services/vendors.service";
-import path from "path";
-import fs from "fs/promises";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -150,12 +151,17 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       }
     }
 
+    const transactionType = await db.query.tranTypes.findFirst({
+      where: (tranType) => eq(tranType.tranTypeName, "LIQUIDATION"),
+    });
+
     const transaction = await addTransaction({
       tranAccTypeId: lq.tranAccTypeId as string,
       tranAmount: lq.amount,
       tranDescription: lq.description,
       tranTransactionDate: lq.date,
       tranPartner: lq.tranPartner,
+      tranTypeId: transactionType?.tranTypeId as string,
     });
 
     file.mv(

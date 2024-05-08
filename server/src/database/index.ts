@@ -7,7 +7,7 @@ import customers from "./schema/customers.schema";
 import employees from "./schema/employees.schema";
 import inventory from "./schema/inventory.schema";
 import payrolls, {
-  payrollAccountRelation,
+  payrollTransactionrelation,
   payrollEmployeeRelation,
 } from "./schema/payrolls.schema";
 import transactions, {
@@ -15,6 +15,7 @@ import transactions, {
   transactionCustomerRelation,
   transactionEmployeeRelation,
   transactionVendorRelation,
+  tranTypeRelation,
 } from "./schema/transactions.schema";
 import users from "./schema/users.schema";
 import vendors from "./schema/vendors.schema";
@@ -22,6 +23,15 @@ import accountTypes, {
   accountTypesAccountManyRelations,
 } from "./schema/accountType.schema";
 import apiKeys from "./schema/apiKeyStore.schema";
+import tranTypes, {
+  tranTypeTransactionManyRelations,
+} from "./schema/transactionTypes.schema";
+import inventoryEntries, {
+  inventoryEntriesCustomerRelation,
+  inventoryEntriesInventoryRelations,
+  inventoryEntriesTransactionRelation,
+  inventoryEntriesVendorRelation,
+} from "./schema/inventoryEntries.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -57,6 +67,9 @@ const db = drizzle(connection, {
     inventory,
     payrolls,
     apiKeys,
+    tranTypes,
+    tranTypeTransactionManyRelations,
+    tranTypeRelation,
     chequesRelations,
     transactionAccountRelation,
     transactionCustomerRelation,
@@ -64,8 +77,13 @@ const db = drizzle(connection, {
     transactionVendorRelation,
     accountTypesAccountManyRelations,
     payrollEmployeeRelation,
-    payrollAccountRelation,
+    payrollTransactionrelation,
     accountTypeRelation,
+    inventoryEntries,
+    inventoryEntriesInventoryRelations,
+    inventoryEntriesTransactionRelation,
+    inventoryEntriesVendorRelation,
+    inventoryEntriesCustomerRelation,
   },
   mode: "default",
 });

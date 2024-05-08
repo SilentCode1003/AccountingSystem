@@ -23,7 +23,7 @@ function SettingsLayout() {
         <div className="grid grid-cols-1 md:grid md:grid-cols-[200px,1fr] h-[85vh]">
           <nav
             className={cn(
-              'p-4 sticky top-0 flex flex-col text-md text-muted-foreground h-fit',
+              'p-4 flex flex-col text-md text-muted-foreground h-fit',
               'text-center md:text-start md:w-fit ',
             )}
           >
@@ -56,6 +56,46 @@ function SettingsLayout() {
               to="/settings/accountTypes"
             >
               Account types
+            </Link>
+            <Link
+              className={cn(
+                router.location.pathname === '/settings/employees' &&
+                  "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
+                'px-4 py-2 rounded-md',
+              )}
+              to="/settings/employees"
+            >
+              Employees
+            </Link>
+            <Link
+              className={cn(
+                router.location.pathname === '/settings/customers' &&
+                  "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
+                'px-4 py-2 rounded-md',
+              )}
+              to="/settings/customers"
+            >
+              Customers
+            </Link>
+            <Link
+              className={cn(
+                router.location.pathname === '/settings/vendors' &&
+                  "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
+                'px-4 py-2 rounded-md',
+              )}
+              to="/settings/vendors"
+            >
+              Vendors
+            </Link>
+            <Link
+              className={cn(
+                router.location.pathname === '/settings/inventory' &&
+                  "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
+                'px-4 py-2 rounded-md',
+              )}
+              to="/settings/inventory"
+            >
+              Inventory
             </Link>
             <Link
               className={cn(

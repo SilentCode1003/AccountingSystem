@@ -208,8 +208,8 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
             sql`year(${new Date(new Date().getFullYear(), i)})`
           ),
           inArray(accounts.accTypeId, [
-            "accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce",
-            "accTypeId 972ee0ef-3a55-4c9a-9707-3c3fc08e367c",
+            "accTypeId 5176aa41-6659-46f7-a72b-56adfc1fa14f",
+            "accTypeId 42da30cc-96d8-4b4e-a718-1dffe25fb884",
           ])
         )
       )
