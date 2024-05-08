@@ -41,7 +41,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-export const Route = createFileRoute('/_authenticated/_layout/inventory/')({
+export const Route = createFileRoute(
+  '/_authenticated/_layout/settings/_layout/inventory',
+)({
   loader: async ({ context }) => {
     const inventories =
       await context.queryClient.ensureQueryData(inventoriesOptions())
@@ -65,6 +67,7 @@ function CrudComponents() {
   const form = useForm<z.infer<typeof createInventorySchema>>({
     defaultValues: {
       invAssetName: '',
+      invPricePerUnit: 0,
       invStocks: 0,
       invStatus: 'GOOD',
     },
@@ -72,11 +75,7 @@ function CrudComponents() {
   })
 
   const handleSubmit = (values: z.infer<typeof createInventorySchema>) => {
-    createInventory.mutate({
-      invAssetName: values.invAssetName,
-      invStocks: values.invStocks,
-      invStatus: values.invStatus,
-    })
+    createInventory.mutate(values)
   }
 
   return (
@@ -111,6 +110,29 @@ function CrudComponents() {
                           {...field}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="invPricePerUnit"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          type="number"
+                          placeholder="Total Deduction"
+                          step="0.01"
+                          {...field}
+                          value={Number.isNaN(field.value) ? '' : field.value}
+                          onChange={(e) => {
+                            field.onChange(parseFloat(e.target.value))
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -205,12 +227,10 @@ function Inventory() {
   const Inventories = useInventories()
 
   return (
-    <div className="p-4 min-h-[85vh] flex flex-col items-center">
-      <div className="w-full translate-y-12 md:translate-y-12 sm:w-[70vw] mb-4"></div>
+    <div className="w-full ">
       {Inventories.isSuccess && (
         <DataTable
           showVisibility
-          className="w-full md:w-[70vw]"
           columns={inventoryColumns}
           data={Inventories.data.inventories}
           filter={[

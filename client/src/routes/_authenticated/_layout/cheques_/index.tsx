@@ -75,7 +75,12 @@ const CrudComponents = () => {
   })
 
   const handleSubmit = (values: z.infer<typeof createChequeSchema>) => {
-    createCheque.mutate(values)
+    const fd = new FormData()
+
+    Object.keys(values).forEach((key) => {
+      fd.append(key, values[key as keyof typeof values] as any)
+    })
+    createCheque.mutate(fd)
   }
 
   return (
@@ -152,6 +157,31 @@ const CrudComponents = () => {
                           }
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="chqFile"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Supporting File</FormLabel>
+                      <FormControl>
+                        <Input
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                          onChange={(e: any) => {
+                            if (!e.target.files) return
+
+                            if (!e.target.files[0]) return
+                            console.log(e.target.files[0])
+                            field.onChange(e.target.files[0])
+                          }}
+                          type="file"
+                          className="w-full hover:cursor-pointer"
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

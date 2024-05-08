@@ -32,6 +32,7 @@ import {
   useAccountTypes,
   useTransactionPartners,
   useTransactions,
+  useTransactionTypes,
 } from '@/hooks/queries'
 import {
   transactionPartnersOptions,
@@ -119,6 +120,8 @@ function TransactionsComponent() {
     resolver: zodResolver(createTransactionSchema),
   })
   const createTransaction = useCreateTransaction(form)
+
+  const transactionTypes = useTransactionTypes()
 
   const createTransactionByFile = useCreateTransactionByFile({
     setOpen: setUploadOpen,
@@ -255,10 +258,7 @@ function TransactionsComponent() {
                         control={form.control}
                         render={({ field }) => (
                           <FormItem>
-                            <div className="flex items-center justify-between">
-                              <FormLabel>Amount</FormLabel>
-                              <FormMessage />
-                            </div>
+                            <FormLabel>Amount</FormLabel>
                             <FormControl>
                               <Input
                                 className="w-full"
@@ -279,6 +279,7 @@ function TransactionsComponent() {
                                 }}
                               />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -290,10 +291,7 @@ function TransactionsComponent() {
                         render={({ field }) => {
                           return (
                             <FormItem>
-                              <div className="flex items-center justify-between">
-                                <FormLabel>Transaction Date</FormLabel>
-                                <FormMessage />
-                              </div>
+                              <FormLabel>Transaction Date</FormLabel>
                               <FormControl>
                                 <DatePicker
                                   date={field.value}
@@ -303,6 +301,7 @@ function TransactionsComponent() {
                                   }}
                                 />
                               </FormControl>
+                              <FormMessage />
                             </FormItem>
                           )
                         }}
@@ -315,9 +314,7 @@ function TransactionsComponent() {
                       control={form.control}
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <div className="flex flex-col justify-between">
-                            <FormLabel>Person Transacting with</FormLabel>
-                          </div>
+                          <FormLabel>Person Transacting with</FormLabel>
                           <FormControl>
                             {transactionPartners.isSuccess && (
                               <ComboBox
@@ -369,9 +366,7 @@ function TransactionsComponent() {
                       control={form.control}
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <FormLabel>Account Type</FormLabel>
-                          </div>
+                          <FormLabel>Account Type</FormLabel>
                           <FormControl>
                             {accountTypes.isSuccess && (
                               <ComboBox
@@ -392,16 +387,13 @@ function TransactionsComponent() {
                       )}
                     />
                   </div>
-                  <div className="flex flex-col">
+                  <div className="flex gap-4">
                     <FormField
                       name="tranFile"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center justify-between">
-                            <FormLabel>Supporting File</FormLabel>
-                            <FormMessage />
-                          </div>
+                        <FormItem className="flex-1">
+                          <FormLabel>Supporting File</FormLabel>
                           <FormControl>
                             <Input
                               ref={field.ref}
@@ -417,6 +409,32 @@ function TransactionsComponent() {
                               className="w-full hover:cursor-pointer"
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="tranTypeId"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Transaction Type</FormLabel>
+                          <FormControl>
+                            {transactionTypes.isSuccess && (
+                              <ComboBox
+                                data={transactionTypes.data.transactionTypes.map(
+                                  (t) => ({
+                                    label: t.tranTypeName,
+                                    value: t.tranTypeId,
+                                  }),
+                                )}
+                                emptyLabel="Nothing Found"
+                                value={field.value}
+                                setValue={field.onChange}
+                              />
+                            )}
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />

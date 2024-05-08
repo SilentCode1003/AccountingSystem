@@ -1,3 +1,4 @@
+import { UploadedFile } from "express-fileupload";
 import z from "zod";
 
 //validator for POST /cheques inputs
@@ -24,6 +25,20 @@ export const createValidator = z.object({
       });
     }
   }),
+  chqFile: z.custom<UploadedFile>().refine(
+    (file) => {
+      if (
+        file.mimetype ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.mimetype === "application/pdf"
+      )
+        return true;
+      return false;
+    },
+    {
+      message: "Only xlsx/pdf files are allowed",
+    }
+  ),
 });
 
 //validor for PUT /cheques input
@@ -42,46 +57,44 @@ export const updateValidator = z.object({
       });
     }
   }),
-  newData: z.object({
-    chqPayeeName: z.optional(z.string()),
-    chqAmount: z.optional(z.number()),
-    chqIssueDate: z.optional(
-      z
-        .string()
-        .datetime()
-        .transform((date) => new Date(date))
-    ),
-    chqStatus: z.optional(z.enum(["APPROVED", "PENDING", "REJECTED"])),
-    chqNumber: z.string().max(50).optional(),
-    chqAccTypeId: z
+  chqPayeeName: z.optional(z.string()),
+  chqAmount: z.optional(z.number()),
+  chqIssueDate: z.optional(
+    z
       .string()
-      .superRefine((val, ctx) => {
-        if (val.split(" ")[0] !== "accTypeId") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not an account type id.`,
-          });
-        }
-        if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Not valid uuid.`,
-          });
-        }
-      })
-      .optional(),
-    chqUpdatedAt: z.optional(
-      z
-        .string()
-        .datetime()
-        .transform((date) => new Date(date))
-    ),
-  }),
-  chqAccId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accId") {
+      .datetime()
+      .transform((date) => new Date(date))
+  ),
+  chqStatus: z.optional(z.enum(["APPROVED", "PENDING", "REJECTED"])),
+  chqNumber: z.string().max(50).optional(),
+  chqAccTypeId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val.split(" ")[0] !== "accTypeId") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not an account type id.`,
+        });
+      }
+      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        });
+      }
+    })
+    .optional(),
+  chqUpdatedAt: z.optional(
+    z
+      .string()
+      .datetime()
+      .transform((date) => new Date(date))
+  ),
+  chqTranId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "tranId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an account id.`,
+        message: `Not an transaction id.`,
       });
     }
     if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
@@ -91,6 +104,23 @@ export const updateValidator = z.object({
       });
     }
   }),
+  chqFile: z
+    .custom<UploadedFile>()
+    .refine(
+      (file) => {
+        if (
+          file.mimetype ===
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+          file.mimetype === "application/pdf"
+        )
+          return true;
+        return false;
+      },
+      {
+        message: "Only xlsx/pdf files are allowed",
+      }
+    )
+    .optional(),
 });
 
 export const approveChequeValidator = z.object({

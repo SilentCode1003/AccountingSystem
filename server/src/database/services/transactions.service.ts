@@ -7,6 +7,7 @@ import { addAccount, editAccount } from "./accounts.service";
 export const getAllTransactions = async () => {
   const allTransactions = await db.query.transactions.findMany({
     with: {
+      transactionType: true,
       account: {
         with: {
           accountType: true,
@@ -25,16 +26,19 @@ export const getAllTransactions = async () => {
 export const addTransaction = async (input: {
   tranDescription: string;
   tranAmount: number;
-  tranPartner: string;
+  tranPartner?: string;
   tranTransactionDate: Date;
   tranAccTypeId: string;
+  tranTypeId: string;
+  tranFileMimeType?: string;
+  tranOtherPartner?: string;
 }) => {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
   const newAccount = await addAccount({
     accName: `ACCOUNT TRANSACTION`,
     accAmount: input.tranAmount,
-    accDescription: `${input.tranAccTypeId} TRANSACTION`,
+    accDescription: `TRANSACTION: ${input.tranDescription}`,
     accTypeId: input.tranAccTypeId,
   });
 
@@ -45,17 +49,26 @@ export const addTransaction = async (input: {
     tranDescription: input.tranDescription,
     tranTransactionDate: input.tranTransactionDate,
     tranEmpId:
-      input.tranPartner.split(" ")[0] === "empId" ? input.tranPartner : null,
+      input.tranPartner && input.tranPartner.split(" ")[0] === "empId"
+        ? input.tranPartner
+        : null,
     tranCustId:
-      input.tranPartner.split(" ")[0] === "custId" ? input.tranPartner : null,
+      input.tranPartner && input.tranPartner.split(" ")[0] === "custId"
+        ? input.tranPartner
+        : null,
     tranVdId:
-      input.tranPartner.split(" ")[0] === "vdId" ? input.tranPartner : null,
-    tranFile: `${newTransactionId}.xlsx`,
+      input.tranPartner && input.tranPartner.split(" ")[0] === "vdId"
+        ? input.tranPartner
+        : null,
+    tranFile: `${newTransactionId}.${input.tranFileMimeType ?? "xlsx"}`,
+    tranTypeId: input.tranTypeId,
+    tranOtherPartner: input.tranOtherPartner ?? null,
   });
 
   const newTransaction = await db.query.transactions.findFirst({
     where: (transaction) => eq(transaction.tranId, newTransactionId),
     with: {
+      transactionType: true,
       account: {
         with: {
           accountType: true,
@@ -78,6 +91,9 @@ export const editTransaction = async (input: {
   tranPartner?: string;
   tranAccTypeId?: string;
   tranTransactionDate?: Date;
+  tranFileMimeType?: string;
+  tranOtherPartner?: string;
+  tranTypeId?: string;
 }) => {
   await db
     .update(transactions)
@@ -86,29 +102,28 @@ export const editTransaction = async (input: {
       tranAmount: input.tranAmount,
       tranDescription: input.tranDescription,
       tranTransactionDate: input.tranTransactionDate,
-
       tranEmpId:
-        input.tranPartner!.split(" ")[0] === "empId" ? input.tranPartner : null,
+        input.tranPartner && input.tranPartner.split(" ")[0] === "empId"
+          ? input.tranPartner
+          : null,
       tranCustId:
-        input.tranPartner!.split(" ")[0] === "custId"
+        input.tranPartner && input.tranPartner.split(" ")[0] === "custId"
           ? input.tranPartner
           : null,
       tranVdId:
-        input.tranPartner!.split(" ")[0] === "vdId" ? input.tranPartner : null,
+        input.tranPartner && input.tranPartner.split(" ")[0] === "vdId"
+          ? input.tranPartner
+          : null,
+      tranFile: `${input.tranId}.${input.tranFileMimeType ?? "xlsx"}`,
+      tranTypeId: input.tranTypeId,
+      tranOtherPartner: input.tranOtherPartner,
     })
     .where(eq(transactions.tranId, input.tranId));
-
-  await editAccount({
-    accId: input.tranAccId as string,
-    newData: {
-      accTypeId: input.tranAccTypeId,
-      accAmount: input.tranAmount,
-    },
-  });
 
   const editedTran = await db.query.transactions.findFirst({
     where: (tran) => eq(tran.tranId, input.tranId),
     with: {
+      transactionType: true,
       account: {
         with: {
           accountType: true,
@@ -117,6 +132,14 @@ export const editTransaction = async (input: {
       employee: true,
       customer: true,
       vendor: true,
+    },
+  });
+
+  await editAccount({
+    accId: editedTran!.tranAccId as string,
+    newData: {
+      accTypeId: input.tranAccTypeId,
+      accAmount: input.tranAmount,
     },
   });
 

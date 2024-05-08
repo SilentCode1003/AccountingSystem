@@ -1,3 +1,4 @@
+import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
@@ -22,13 +23,6 @@ import {
   FormMessage,
 } from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
 import { useCreatePayroll } from '@/hooks/mutations'
 import { useEmployees, usePayrolls } from '@/hooks/queries'
@@ -75,7 +69,12 @@ const CrudComponents = () => {
   })
 
   const handleSubmit = (values: z.infer<typeof createPayrollSchema>) => {
-    createPayroll.mutate(values)
+    const fd = new FormData()
+
+    Object.keys(values).forEach((key) => {
+      fd.append(key, values[key as keyof typeof values] as any)
+    })
+    createPayroll.mutate(fd)
   }
 
   return (
@@ -103,24 +102,17 @@ const CrudComponents = () => {
                         <FormMessage />
                       </div>
                       <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Employee" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {employees.data?.employees.map((employee) => (
-                              <SelectItem
-                                key={employee.empId}
-                                value={employee.empId}
-                              >
-                                {employee.empName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        {employees.isSuccess && (
+                          <ComboBox
+                            data={employees.data.employees.map((employee) => ({
+                              value: employee.empId,
+                              label: employee.empName,
+                            }))}
+                            emptyLabel="Nothing Selected"
+                            value={field.value}
+                            setValue={field.onChange}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}
@@ -147,6 +139,31 @@ const CrudComponents = () => {
                           }
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="prFile"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Supporting File</FormLabel>
+                      <FormControl>
+                        <Input
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                          onChange={(e: any) => {
+                            if (!e.target.files) return
+
+                            if (!e.target.files[0]) return
+                            console.log(e.target.files[0])
+                            field.onChange(e.target.files[0])
+                          }}
+                          type="file"
+                          className="w-full hover:cursor-pointer"
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

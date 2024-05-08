@@ -11,23 +11,7 @@ import {
 import { Button } from '../ui/button'
 import { text } from '../ui/text'
 import { ArrowUpDownIcon } from 'lucide-react'
-
-type AccountType = {
-  accTypeId: string
-  accTypeName: string
-}
-
-type Account = {
-  accId: string
-  accName: string
-  accTypeId: string
-  accountType: AccountType
-  accAmount: number
-  accDescription: string
-  accIsActive: boolean
-  accCreatedAt: boolean
-  accUpdatedAt: boolean
-}
+import { Transactions } from './transactions.columns'
 
 export type Cheques = {
   chqId: string
@@ -38,10 +22,10 @@ export type Cheques = {
   chqAccTypeId: string
   chqCreatedAt: string
   chqUpdatedAt: string
-  chqAccId: string
   chqNumber: string
   chqApprovalCount: number
-  account: Account
+  chqTranId: string
+  transaction: Transactions
 }
 
 export const chequeColumns: ColumnDef<Cheques>[] = [

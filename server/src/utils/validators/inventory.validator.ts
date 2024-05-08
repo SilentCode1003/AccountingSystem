@@ -5,6 +5,7 @@ export const createValidator = z.object({
   invAssetName: z.string(),
   invStocks: z.number(),
   invStatus: z.enum(["GOOD", "WARNING", "DEPLETED"]),
+  invPricePerUnit: z.number(),
 });
 
 //validator for PUT /inventory input
@@ -27,5 +28,6 @@ export const updateValidator = z.object({
     invAssetName: z.string().optional(),
     invStocks: z.number().optional(),
     invStatus: z.enum(["GOOD", "WARNING", "DEPLETED"]).optional(),
+    invPricePerUnit: z.number().optional(),
   }),
 });

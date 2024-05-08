@@ -2,13 +2,17 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Button } from '../ui/button'
 import { ArrowUpDownIcon } from 'lucide-react'
 import { text } from '../ui/text'
-import { StatusColumn } from '../table-components/inventory.tblcomp'
+import {
+  InventoryPricePerUnitColumn,
+  StatusColumn,
+} from '../table-components/inventory.tblcomp'
 
 export type Inventories = {
   invId: string
   invAssetName: string
   invStocks: number
   invStatus: 'GOOD' | 'WARNING' | 'DEPLETED'
+  invPricePerUnit: number
 }
 
 export const inventoryColumns: ColumnDef<Inventories>[] = [
@@ -27,6 +31,23 @@ export const inventoryColumns: ColumnDef<Inventories>[] = [
         </Button>
       )
     },
+  },
+  {
+    accessorKey: 'invPricePerUnit',
+    meta: 'Asset Price',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({ variant: 'body', className: 'p-0' })}
+        >
+          Asset Price
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: InventoryPricePerUnitColumn,
   },
   {
     accessorKey: 'invStocks',
