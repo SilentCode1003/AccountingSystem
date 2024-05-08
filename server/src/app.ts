@@ -24,6 +24,7 @@ import vendorRouter from "./routes/vendors.routes";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 import compression from "compression";
+import morgan from "morgan";
 
 declare module "express-session" {
   interface SessionData {
@@ -33,6 +34,7 @@ declare module "express-session" {
 
 const app = express();
 
+app.use(morgan("dev"));
 app.use(compression());
 
 app.use(
