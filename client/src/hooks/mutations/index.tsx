@@ -7,6 +7,7 @@ import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
+import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
 import { Vendors } from '@/components/table-columns/vendors.columns'
 import { toast } from '@/components/ui/use-toast'
 import { updateAccountSchema } from '@/validators/accounts.validator'
@@ -29,6 +30,10 @@ import {
 } from '@/validators/inventory.validator'
 import { updatePayrollSchema } from '@/validators/payrolls.validators'
 import { createTransactionSchema } from '@/validators/transactions.validator'
+import {
+  createTransactionTypeSchema,
+  updateTransactionTypeSchema,
+} from '@/validators/transactionTypes.validator'
 import {
   createVendorSchema,
   updateVendorSchema,
@@ -309,6 +314,136 @@ export const useDeleteAccountType = () => {
           </div>
         ),
         description: error.message ?? 'Failed to delete account type ',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useUpdateTransactionType = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['useTransactionType'],
+    mutationFn: async (
+      payload: z.infer<typeof updateTransactionTypeSchema>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionTypes`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        transactionType: TransactionTypes
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['transactionTypes'],
+        (old: { transactionTypes: Array<TransactionTypes> }) => {
+          return {
+            transactionTypes: old.transactionTypes.map((tranType) => {
+              if (tranType.tranTypeId === data.transactionType.tranTypeId) {
+                return data.transactionType
+              }
+              return tranType
+            }),
+          }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Transaction type was updated successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update transaction type',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useDeleteTransactionType = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['deleteTransactionType'],
+    mutationFn: async (
+      payload: Pick<z.infer<typeof updateTransactionTypeSchema>, 'tranTypeId'>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionTypes/${payload.tranTypeId}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        deletedTranTypeId: string
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['transactionTypes'],
+        (old: { transactionTypes: Array<TransactionTypes> }) => {
+          return {
+            transactionTypes: old.transactionTypes.filter(
+              (tranType) => tranType.tranTypeId !== data.deletedTranTypeId,
+            ),
+          }
+        },
+      )
+      toast({
+        title: (
+          <div>
+            <div className="flex gap-2 items-centers">
+              <PartyPopperIcon />
+              Success
+            </div>
+          </div>
+        ),
+        description: 'Transaction type was deleted successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to delete transaction type ',
         variant: 'destructive',
       })
     },
@@ -1437,6 +1572,69 @@ export const useCreateAccountType = ({
           </div>
         ),
         description: error.message ?? 'Failed to create account type',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateTransactionType = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (
+      payload: z.infer<typeof createTransactionTypeSchema>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionTypes`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        transactionType: TransactionTypes
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['transactionTypes'],
+        (old: { transactionTypes: Array<TransactionTypes> }) => {
+          return {
+            transactionTypes: [...old.transactionTypes, data.transactionType],
+          }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Transaction type was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create transaction type',
         variant: 'destructive',
       })
     },

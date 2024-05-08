@@ -14,6 +14,7 @@ import {
   TransactionTypeColumn,
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
+import { TransactionTypes } from './transactionTypes.columns'
 
 type AccountType = {
   accTypeId: string
@@ -48,11 +49,6 @@ export type Customer = {
   custIsActive: string
 }
 
-export type TransactionType = {
-  tranTypeId: string
-  tranTypeName: string
-}
-
 export type Transactions = {
   tranId: string
   tranAccId: string
@@ -71,7 +67,7 @@ export type Transactions = {
   tranFile: string
   tranOtherPartner?: string
   tranTypeId: string
-  transactionType: TransactionType
+  transactionType: TransactionTypes
 }
 
 export const transactionColumns: ColumnDef<Transactions>[] = [
