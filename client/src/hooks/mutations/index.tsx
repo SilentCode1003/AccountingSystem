@@ -355,6 +355,14 @@ export const useUpdateCheque = ({
           return { cheques: newCheques }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -473,6 +481,14 @@ export const useUpdateEmployee = ({
       await queryClient.refetchQueries({
         queryKey: ['Employees'],
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['Payrolls'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -541,6 +557,14 @@ export const useUpdateCustomer = ({
           return { customers: newCustomers }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -609,6 +633,14 @@ export const useUpdateVendor = ({
           return { vendors: newVendors }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -665,6 +697,10 @@ export const useUpdateInventory = ({
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ['Inventories'] })
+      await queryClient.invalidateQueries({
+        queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -733,6 +769,14 @@ export const useUpdateInventoryEntry = ({
           return { inventoryEntries: newInventoryEnties }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -803,6 +847,14 @@ export const useUpdatePayroll = ({
           return { payrolls: newPayrolls }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -856,8 +908,8 @@ export const useUpdateTransaction = ({
       }>
       return data
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
         ['Transactions'],
         (old: { transactions: Array<Transactions> }) => {
           const newTransactions = old.transactions.map((transaction) => {
@@ -869,6 +921,10 @@ export const useUpdateTransaction = ({
           return { transactions: newTransactions }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       setOpenUpdate(false)
       toast({
         title: (
@@ -924,6 +980,14 @@ export const useCreateCheque = ({
           return { cheques: [...old.cheques, data.cheque] }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -1221,6 +1285,14 @@ export const useCreateInventoryEntry = ({
           }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -1269,9 +1341,24 @@ export const useCreatePayroll = ({
       const data = (await response.json()) as Promise<{ payroll: Payrolls }>
       return data
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       setOpen(false)
-      await queryClient.refetchQueries({ queryKey: ['Payrolls'] })
+      await queryClient.setQueryData(
+        ['Payrolls'],
+        (old: { payrolls: Array<Payrolls> }) => {
+          return {
+            payrolls: [...old.payrolls, data.payroll],
+          }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['Transactions'],
+        type: 'inactive',
+      })
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -1467,6 +1554,10 @@ export const useCreateTransaction = (
           return { transactions: [...old.transactions, data.transaction] }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       form.reset()
       toast({
         title: (
@@ -1522,6 +1613,10 @@ export const useCreateTransactionByFile = ({
           return { transactions: [...old.transactions, data.transaction] }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
