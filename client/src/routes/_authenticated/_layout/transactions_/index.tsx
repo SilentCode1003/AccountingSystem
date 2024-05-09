@@ -422,12 +422,20 @@ function TransactionsComponent() {
                           <FormControl>
                             {transactionTypes.isSuccess && (
                               <ComboBox
-                                data={transactionTypes.data.transactionTypes.map(
-                                  (t) => ({
+                                data={transactionTypes.data.transactionTypes
+                                  .filter((tranType) => {
+                                    if (
+                                      tranType.tranTypeName == 'PAYROLL' ||
+                                      tranType.tranTypeName == 'CHEQUE' ||
+                                      tranType.tranTypeName == 'INVENTORY'
+                                    )
+                                      return false
+                                    return true
+                                  })
+                                  .map((t) => ({
                                     label: t.tranTypeName,
                                     value: t.tranTypeId,
-                                  }),
-                                )}
+                                  }))}
                                 emptyLabel="Nothing Found"
                                 value={field.value}
                                 setValue={field.onChange}
