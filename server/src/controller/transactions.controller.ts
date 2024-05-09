@@ -21,9 +21,11 @@ import {
 export const getTransactions = async (req: Request, res: Response) => {
   try {
     const transactions = await getAllTransactions();
-
+    console.log("successfully fetched all transactions");
     return res.status(200).send({ transactions });
   } catch (error) {
+    console.log("error in fetching all transactions");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -52,8 +54,11 @@ export const createTransaction = async (req: Request, res: Response) => {
         `${newTransaction?.tranId}.xlsx`
       )
     );
+    console.log("successfully created an transaction");
     return res.status(200).send({ transaction: newTransaction });
   } catch (error) {
+    console.log("error creating an transaction");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -79,8 +84,12 @@ export const updateTransaction = async (req: Request, res: Response) => {
         `${input.data.tranId}.xlsx`
       )
     );
+
+    console.log("successfully updated an transaction");
     return res.status(200).send({ transaction: updatedTransaction });
   } catch (error) {
+    console.log("error updating an transaction");
+    console.log(error);
     return res.status(500).send({
       error: "Server error",
     });
@@ -173,9 +182,11 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
         `${transaction?.tranId}.xlsx`
       )
     );
-
+    console.log("successfully created an transaction by file");
     return res.send({ transaction });
   } catch (error) {
+    console.log("error creating an transaction by file");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };

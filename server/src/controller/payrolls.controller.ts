@@ -13,10 +13,13 @@ import path from "path";
 export const getPayrolls = async (req: Request, res: Response) => {
   try {
     const payrolls = await getAllPayrolls();
+    console.log("successfully fetched all payrolls");
     return res.status(200).send({
       payrolls,
     });
   } catch (error) {
+    console.log("error in fetching all payrolls");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -55,9 +58,12 @@ export const createPayroll = async (req: Request, res: Response) => {
         }`
       )
     );
+
+    console.log("successfully created new payroll");
     return res.status(200).send({ payroll: newPayroll });
   } catch (error) {
     console.log(error);
+    console.log("error creating new payroll");
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -95,8 +101,12 @@ export const updatePayroll = async (req: Request, res: Response) => {
         }`
       )
     );
+
+    console.log("successfully updated payroll");
     return res.status(200).send({ payroll: updatedPayroll });
   } catch (error) {
+    console.log("error updating an payroll");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
