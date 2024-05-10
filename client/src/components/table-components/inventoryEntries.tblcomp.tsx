@@ -95,7 +95,7 @@ export const InventoryEntryAccountColumn = ({
 }: CellContext<InventoryEntries, unknown>) => {
   return (
     <div className="flex justify-between items-center">
-      <Badge variant={'outline'}>
+      <Badge variant={'outline'} className="text-center">
         {row.original.transaction.account.accName}
       </Badge>
       <div>

@@ -9,9 +9,9 @@ import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import {
   Customer,
   Transactions,
-  TransactionType,
   Vendor,
 } from '@/components/table-columns/transactions.columns'
+import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
 import { Vendors } from '@/components/table-columns/vendors.columns'
 import { QueryClient, queryOptions } from '@tanstack/react-query'
 
@@ -128,7 +128,7 @@ export const transactionTypesOptions = () =>
       )
       if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
-        transactionTypes: Array<TransactionType>
+        transactionTypes: Array<TransactionTypes>
       }>
       return data
     },

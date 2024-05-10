@@ -68,7 +68,7 @@ export const CreatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
 export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return (
     <div className="flex justify-between items-center">
-      <Badge variant={'outline'} className="text-nowrap">
+      <Badge variant={'outline'} className="text-center">
         {row.original.transaction.account.accName}
       </Badge>
       <div>
