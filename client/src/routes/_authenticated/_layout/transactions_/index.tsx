@@ -98,6 +98,10 @@ function LoadingComponent() {
   )
 }
 
+function CrudComponents() {
+  return <Text variant={'heading1bold'}>Transactions</Text>
+}
+
 function TransactionsComponent() {
   const [file, setFile] = useState<File>()
   const [uploadOpen, setUploadOpen] = useState<boolean>(false)
@@ -153,6 +157,7 @@ function TransactionsComponent() {
           pageSize={5}
           className="w-full md:w-[70vw]"
           columns={transactionColumns}
+          CrudComponents={CrudComponents}
           data={transactions.data.transactions}
           filter={[
             {
