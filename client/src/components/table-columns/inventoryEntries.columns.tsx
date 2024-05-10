@@ -38,7 +38,10 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -55,7 +58,10 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Quantity
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -71,7 +77,10 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Total Price
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -88,7 +97,10 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Type
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -106,7 +118,10 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Account
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -123,7 +138,10 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Inventory
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -144,7 +162,10 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Partner
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

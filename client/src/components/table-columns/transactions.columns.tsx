@@ -79,7 +79,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction ID
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -96,7 +99,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Account
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -108,7 +114,16 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranFile',
     meta: 'Transaction File',
-    header: () => <div className="whitespace-nowrap">Transaction File</div>,
+    header: () => (
+      <div
+        className={text({
+          variant: 'bodybold',
+          className: 'p-0 text-foreground whitespace-nowrap',
+        })}
+      >
+        Transaction File
+      </div>
+    ),
     cell: transactionFileColumn,
   },
   {
@@ -120,7 +135,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Type
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -137,7 +155,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -155,7 +176,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -177,7 +201,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Partner
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -198,7 +225,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Account
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -215,7 +245,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -233,7 +266,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -255,7 +291,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Partner
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

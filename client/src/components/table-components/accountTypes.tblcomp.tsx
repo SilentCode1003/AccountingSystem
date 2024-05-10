@@ -78,7 +78,7 @@ export const AccountTypeAccountsColumn = ({
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div className="flex flex-col gap-4">
         {row.original.accounts.length > 0 ? (
           row.original.accounts.map((acc) => (

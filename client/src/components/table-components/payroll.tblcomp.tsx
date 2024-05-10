@@ -46,7 +46,7 @@ import { Text } from '../ui/text'
 export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   return (
     <div className="flex justify-between min-w-32 items-center">
-      <div className="flex gap-4">
+      <div className="flex items-center gap-4">
         <div>
           <Avatar>
             <AvatarImage src={'https://github.com/nestortion.png'} />
@@ -220,7 +220,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   }).format(row.getValue('prFinalAmount'))
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{formatted}</div>
       <div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

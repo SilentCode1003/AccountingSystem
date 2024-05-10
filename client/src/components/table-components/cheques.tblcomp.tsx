@@ -67,8 +67,8 @@ export const CreatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
 
 export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return (
-    <div className="flex justify-between">
-      <Badge variant={'outline'}>
+    <div className="flex justify-between items-center">
+      <Badge variant={'outline'} className="text-nowrap">
         {row.original.transaction.account.accName}
       </Badge>
       <div>
@@ -184,7 +184,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
     updateCheque.mutate(fd)
   }
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{new Date(row.original.chqUpdatedAt).toLocaleDateString()}</div>
       <div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

@@ -73,7 +73,7 @@ export const TranTypeTransactionsColumn = ({
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div className="flex flex-col gap-4">
         {row.original.transactions.length > 0 ? (
           row.original.transactions.map((tran) => (

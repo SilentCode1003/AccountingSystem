@@ -1,5 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { text } from '@/components/ui/text'
 import { cn } from '@/lib/utils'
 import {
   createFileRoute,
@@ -23,6 +24,7 @@ function SettingsLayout() {
         <div className="grid grid-cols-1 md:grid md:grid-cols-[200px,1fr] h-[85vh]">
           <nav
             className={cn(
+              text({ variant: 'body' }),
               'p-4 flex flex-col text-md text-muted-foreground h-fit',
               'text-center md:text-start md:w-fit ',
             )}

@@ -57,7 +57,10 @@ function BarGraph({
                         <span
                           className={`font-bold text-[${colors[data.name as string]}]`}
                         >
-                          {data.value}
+                          {new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: 'PHP',
+                          }).format(Number(data.value))}
                         </span>
                       </div>
                     ))}

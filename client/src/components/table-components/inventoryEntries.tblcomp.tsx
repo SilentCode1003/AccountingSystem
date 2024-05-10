@@ -94,7 +94,7 @@ export const InventoryEntryAccountColumn = ({
   row,
 }: CellContext<InventoryEntries, unknown>) => {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <Badge variant={'outline'}>
         {row.original.transaction.account.accName}
       </Badge>
@@ -168,7 +168,7 @@ export const InventoryEntryInventoryColumn = ({
   row,
 }: CellContext<InventoryEntries, unknown>) => {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <Badge variant={'outline'} className="text-center max-w-max">
         {row.original.inventory.invAssetName}
       </Badge>
@@ -280,7 +280,7 @@ export const InventoryEntryPartnerColumn = ({
     }
   }
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{data.name}</div>
       <div>
         <MultiDialog>

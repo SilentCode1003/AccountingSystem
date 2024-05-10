@@ -146,7 +146,7 @@ function Filters<TData>({
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Status" />
+                          <SelectValue placeholder={filterPlaceHolder} />
                         </SelectTrigger>
                         <SelectContent>
                           {filterValues.map((value) => (
@@ -321,9 +321,9 @@ function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-hidden">
         <Table>
-          <TableHeader className={`${text({ variant: 'label' })}`}>
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -341,7 +341,7 @@ function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className={`${text({ variant: 'body' })}`}>
+          <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -370,19 +370,19 @@ function DataTable<TData, TValue>({
             )}
           </TableBody>
           {showFooter && (
-            <TableFooter className={`${text({ variant: 'label' })}`}>
+            <TableFooter>
               {table.getFooterGroups().map((footerGroup) => (
                 <TableRow key={footerGroup.id}>
                   {footerGroup.headers.map((footer) => {
                     return (
-                      <TableHead key={footer.id} className="bg-background">
+                      <TableCell key={footer.id} className="bg-background ">
                         {footer.isPlaceholder
                           ? null
                           : flexRender(
                               footer.column.columnDef.footer,
                               footer.getContext(),
                             )}
-                      </TableHead>
+                      </TableCell>
                     )
                   })}
                 </TableRow>

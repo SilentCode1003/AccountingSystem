@@ -23,7 +23,10 @@ export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Account Type Name
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -40,7 +43,10 @@ export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           accounts
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

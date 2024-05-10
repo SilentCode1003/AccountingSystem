@@ -75,8 +75,8 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
   }
 
   return (
-    <div className="flex justify-between ">
-      <div className="flex gap-4 items-center">
+    <div className="flex justify-between items-center ">
+      <div>
         <Badge
           className={cn(
             [
