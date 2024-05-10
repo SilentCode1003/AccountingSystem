@@ -42,6 +42,7 @@ export const Route = createFileRoute('/_authenticated')({
     }
   },
   loader: async ({ context }) => {
+    if (!context) return
     const accountTypes = context.queryClient.ensureQueryData(
       accountTypesOptions(),
     )
