@@ -110,16 +110,17 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       .send({ error: validateFile.error.errors[0].message });
   try {
     const file = validateFile.data.tranFile;
+    const firstWordRegex = /^([\w]+)/;
     const lq: {
       tranPartner: string;
       amount: number;
-      description: string;
+      description?: string;
       date: Date;
       tranAccTypeId?: string;
     } = {
       tranPartner: "",
       amount: 0,
-      description: "",
+      description: file.name.match(firstWordRegex)?.[0],
       date: new Date(),
     };
 
@@ -163,11 +164,10 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
     const transactionType = await db.query.tranTypes.findFirst({
       where: (tranType) => eq(tranType.tranTypeName, "LIQUIDATION"),
     });
-
     const transaction = await addTransaction({
       tranAccTypeId: lq.tranAccTypeId as string,
       tranAmount: lq.amount,
-      tranDescription: lq.description,
+      tranDescription: lq.description ?? "FILE TRANSACTION",
       tranTransactionDate: lq.date,
       tranPartner: lq.tranPartner,
       tranTypeId: transactionType?.tranTypeId as string,
