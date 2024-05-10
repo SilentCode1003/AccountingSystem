@@ -17,7 +17,7 @@ import { QueryClient, queryOptions } from '@tanstack/react-query'
 
 export const currentUserOptions = () => {
   return queryOptions({
-    queryKey: ['CurrentUser'],
+    queryKey: ['currentUser'],
     queryFn: async () => {
       const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/login`, {
         credentials: 'include',
@@ -51,7 +51,7 @@ export const userOptions = (queryClient: QueryClient) => {
           userId: string
           userType: string
         }
-      }>(['CurrentUser'])
+      }>(['currentUser'])
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/users/?` +
           new URLSearchParams({ userId: userId?.user.userId as string }),
@@ -77,7 +77,7 @@ export const userOptions = (queryClient: QueryClient) => {
 
 export const transactionPartnersOptions = () => {
   return queryOptions({
-    queryKey: ['TransactionPartners'],
+    queryKey: ['transactionPartners'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactionPartners`,
@@ -98,7 +98,7 @@ export const transactionPartnersOptions = () => {
 
 export const transactionsOptions = () =>
   queryOptions({
-    queryKey: ['Transactions'],
+    queryKey: ['transactions'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactions`,
@@ -154,7 +154,7 @@ export const accountTypesOptions = () =>
 
 export const chequesOptions = () =>
   queryOptions({
-    queryKey: ['Cheques'],
+    queryKey: ['cheques'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/cheques`,
@@ -174,7 +174,7 @@ export const chequesOptions = () =>
 
 export const employeesOptions = () =>
   queryOptions({
-    queryKey: ['Employees'],
+    queryKey: ['employees'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/employees`,
@@ -230,7 +230,7 @@ export const vendorsOptions = () =>
 
 export const inventoriesOptions = () =>
   queryOptions({
-    queryKey: ['Inventories'],
+    queryKey: ['inventories'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/inventory`,
@@ -266,7 +266,7 @@ export const inventoryEntriesOptions = () =>
 
 export const payrollsOptions = () =>
   queryOptions({
-    queryKey: ['Payrolls'],
+    queryKey: ['payrolls'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/payrolls`,
@@ -410,7 +410,7 @@ export const accountTypeTotalPerMonthOptions = (
 ) =>
   queryOptions({
     queryKey: [
-      'AccountTypeTotalPerMonth',
+      'accountTypeTotalPerMonth',
       { date: date.getMonth() },
       { accTypeId },
     ],

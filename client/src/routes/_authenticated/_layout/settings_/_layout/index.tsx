@@ -66,7 +66,7 @@ function Settings() {
         userId: string
         userType: string
       }
-    }>(['CurrentUser'])
+    }>(['currentUser'])
 
     const fd = new FormData()
 

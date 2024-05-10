@@ -59,7 +59,7 @@ export const useLogout = () => {
       })
     },
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
+      await queryClient.refetchQueries({ queryKey: ['currentUser'] })
       navigate({ to: '/login' })
     },
   })
@@ -479,7 +479,7 @@ export const useUpdateCheque = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Cheques'],
+        ['cheques'],
         (old: { cheques: Array<Cheques> }) => {
           const newCheques = old.cheques.map((cheque) => {
             if (cheque.chqId === cell.row.original.chqId) {
@@ -495,7 +495,7 @@ export const useUpdateCheque = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -549,7 +549,7 @@ export const useTerminateEmployee = () => {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(
-        ['Employees'],
+        ['employees'],
         (old: { employees: Array<Employees> }) => {
           const newEmployees = old.employees.map((employee) => {
             if (employee.empId === data.employee.empId) {
@@ -614,14 +614,14 @@ export const useUpdateEmployee = ({
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({
-        queryKey: ['Employees'],
+        queryKey: ['employees'],
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Payrolls'],
+        queryKey: ['payrolls'],
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setOpen(false)
@@ -697,7 +697,7 @@ export const useUpdateCustomer = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setOpen(false)
@@ -773,7 +773,7 @@ export const useUpdateVendor = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setOpen(false)
@@ -831,7 +831,7 @@ export const useUpdateInventory = ({
       return data
     },
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['Inventories'] })
+      await queryClient.refetchQueries({ queryKey: ['inventories'] })
       await queryClient.invalidateQueries({
         queryKey: ['inventoryEntries'],
         type: 'inactive',
@@ -909,7 +909,7 @@ export const useUpdateInventoryEntry = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -971,7 +971,7 @@ export const useUpdatePayroll = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Payrolls'],
+        ['payrolls'],
         (old: { payrolls: Array<Payrolls> }) => {
           const newPayrolls = old.payrolls.map((payroll) => {
             if (payroll.prId === cell.row.original.prId) {
@@ -987,7 +987,7 @@ export const useUpdatePayroll = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -1045,7 +1045,7 @@ export const useUpdateTransaction = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Transactions'],
+        ['transactions'],
         (old: { transactions: Array<Transactions> }) => {
           const newTransactions = old.transactions.map((transaction) => {
             if (transaction.tranId === cell.row.original.tranId) {
@@ -1110,7 +1110,7 @@ export const useCreateCheque = ({
     onSuccess: async (data) => {
       setOpen(false)
       await queryClient.setQueryData(
-        ['Cheques'],
+        ['cheques'],
         (old: { cheques: Array<Cheques> }) => {
           return { cheques: [...old.cheques, data.cheque] }
         },
@@ -1120,7 +1120,7 @@ export const useCreateCheque = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       toast({
@@ -1175,7 +1175,7 @@ export const useCreateEmployee = ({
     onSuccess: async (data) => {
       setOpen(false)
       await queryClient.setQueryData(
-        ['Employees'],
+        ['employees'],
         (old: { employees: Array<Employees> }) => {
           return {
             employees: [...old.employees, data.employee],
@@ -1354,7 +1354,7 @@ export const useCreateInventory = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Inventories'],
+        ['inventories'],
         (old: { inventories: Array<Inventories> }) => {
           return {
             inventories: [...old.inventories, data.inventory],
@@ -1425,7 +1425,7 @@ export const useCreateInventoryEntry = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setOpen(false)
@@ -1478,7 +1478,7 @@ export const useCreatePayroll = ({
     onSuccess: async (data) => {
       setOpen(false)
       await queryClient.setQueryData(
-        ['Payrolls'],
+        ['payrolls'],
         (old: { payrolls: Array<Payrolls> }) => {
           return {
             payrolls: [...old.payrolls, data.payroll],
@@ -1490,7 +1490,7 @@ export const useCreatePayroll = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       toast({
@@ -1745,7 +1745,7 @@ export const useCreateTransaction = (
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Transactions'],
+        ['transactions'],
         (old: { transactions: Array<Transactions> }) => {
           return { transactions: [...old.transactions, data.transaction] }
         },
@@ -1804,7 +1804,7 @@ export const useCreateTransactionByFile = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Transactions'],
+        ['transactions'],
         (old: { transactions: Array<Transactions> }) => {
           return { transactions: [...old.transactions, data.transaction] }
         },

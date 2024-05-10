@@ -171,7 +171,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const employees = useQuery({
-    queryKey: ['Employees'],
+    queryKey: ['employees'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/employees`,
