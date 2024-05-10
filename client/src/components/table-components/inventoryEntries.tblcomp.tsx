@@ -406,7 +406,6 @@ function UpdateFormDialog(props: DialogProps & { row: Row<InventoryEntries> }) {
   })
 
   const handleSubmit = (values: z.infer<typeof updateInventoryEntrySchema>) => {
-    console.log(values)
     const fd = new FormData()
 
     Object.keys(values).forEach((key) => {
@@ -545,6 +544,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<InventoryEntries> }) {
                           field.onChange(e.target.files[0])
                         }}
                         type="file"
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf"
                         className="w-full hover:cursor-pointer"
                       />
                     </FormControl>

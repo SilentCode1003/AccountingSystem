@@ -1440,7 +1440,6 @@ export const useCreateInventoryEntry = ({
       })
     },
     onError: (error) => {
-      console.log(error)
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -1731,7 +1730,6 @@ export const useCreateTransaction = (
   return useMutation({
     mutationKey: ['createTransaction'],
     mutationFn: async (payload: FormData) => {
-      console.log(payload)
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactions`,
         {

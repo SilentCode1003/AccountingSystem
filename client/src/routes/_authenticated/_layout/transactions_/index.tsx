@@ -402,10 +402,10 @@ function TransactionsComponent() {
                                 if (!e.target.files) return
 
                                 if (!e.target.files[0]) return
-                                console.log(e.target.files[0])
                                 field.onChange(e.target.files[0])
                               }}
                               type="file"
+                              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                               className="w-full hover:cursor-pointer"
                             />
                           </FormControl>
