@@ -73,6 +73,7 @@ export type Transactions = {
 export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranId',
+    accessorFn: (_, index) => index,
     meta: 'Transaction ID',
     header: ({ column }) => {
       return (
