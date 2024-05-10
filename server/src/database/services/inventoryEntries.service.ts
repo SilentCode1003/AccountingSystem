@@ -80,6 +80,8 @@ export const addInventoryEntry = async (input: {
     tranTypeId: transactionType!.tranTypeId,
     tranFileMimeType: input.invEntryTranFileMimeType,
     tranTransactionDate: input.invEntryDate,
+    tranAccName:
+      input.invEntryType === "INCOMING" ? "BOUGHT INVENTORY" : "SOLD INVENTORY",
   });
 
   await db.insert(inventoryEntries).values({
@@ -159,6 +161,8 @@ export const editInventoryEntry = async (input: {
     tranPartner: input.invEntryPartner!,
     tranFileMimeType: input.invEntryTranFileMimeType,
     tranTransactionDate: input.invEntryDate,
+    tranAccName:
+      input.invEntryType === "INCOMING" ? "BOUGHT INVENTORY" : "SOLD INVENTORY",
   });
 
   const updatedInventoryEntry = await getInventoryEntryById(input.invEntryId);

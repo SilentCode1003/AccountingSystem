@@ -59,6 +59,7 @@ export const addCheque = async (input: {
     tranOtherPartner: input.chqPayeeName,
     tranTransactionDate: input.chqIssueDate,
     tranFileMimeType: input.chqTranFileMimeType,
+    tranAccName: "CHEQUE",
   });
 
   const newChqId = `chqId ${crypto.randomUUID()}`;
