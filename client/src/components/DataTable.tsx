@@ -71,11 +71,11 @@ const dateBetweenFilter: FilterFn<any> = (row, columnId, value) => {
 
   if ((start || end) && !date) return false
   if (start && !end) {
-    return date.getDate() >= start.getDate()
+    return date >= start
   } else if (!start && end) {
-    return date.getDate() <= end.getDate()
+    return date <= end
   } else if (start && end) {
-    return date.getDate() >= start.getDate() && date.getDate() <= end.getDate()
+    return date >= start && date <= end
   } else return true
 }
 
