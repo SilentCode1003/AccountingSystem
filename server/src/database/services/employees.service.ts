@@ -2,6 +2,7 @@ import db from "../index";
 import crypto from "crypto";
 import employees from "../schema/employees.schema";
 import { eq } from "drizzle-orm";
+import { editPayroll } from "./payroll.service";
 
 export const getAllEmployees = async () => {
   const employees = await db.query.employees.findMany();
@@ -50,6 +51,10 @@ export const editEmployee = async (input: {
     empSalary?: number;
   };
 }) => {
+  const prevValues = await db.query.employees.findFirst({
+    where: (emp) => eq(emp.empId, input.empId),
+  });
+
   await db
     .update(employees)
     .set(input.newData)
@@ -58,6 +63,22 @@ export const editEmployee = async (input: {
   const editedEmployee = await db.query.employees.findFirst({
     where: (emp) => eq(emp.empId, input.empId),
   });
+
+  if (Number(prevValues?.empSalary) !== input.newData.empSalary) {
+    const payrollIds = await db.query.payrolls.findMany({
+      where: (payroll) => eq(payroll.prEmployeeId, input.empId),
+    });
+    await Promise.all(
+      payrollIds.map(async (payroll) => {
+        await editPayroll({
+          prId: payroll.prId,
+          prTranId: payroll.prTranId,
+          prTotalDeduction: payroll.prTotalDeduction,
+          prEmployeeId: payroll.prEmployeeId,
+        });
+      })
+    );
+  }
 
   return editedEmployee;
 };
