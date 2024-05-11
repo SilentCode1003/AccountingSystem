@@ -624,6 +624,10 @@ export const useUpdateEmployee = ({
         queryKey: ['transactions'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -834,6 +838,14 @@ export const useUpdateInventory = ({
       await queryClient.refetchQueries({ queryKey: ['inventories'] })
       await queryClient.invalidateQueries({
         queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
         type: 'inactive',
       })
       setOpen(false)
