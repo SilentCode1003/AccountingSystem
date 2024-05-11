@@ -61,7 +61,9 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
       invId: row.original.invId,
       newData: {
         invAssetName: row.original.invAssetName,
-        invPricePerUnit: row.original.invPricePerUnit,
+        invPricePerUnit: Number.parseFloat(
+          String(row.original.invPricePerUnit),
+        ),
         invStocks: row.original.invStocks,
         invStatus: row.original.invStatus,
       },

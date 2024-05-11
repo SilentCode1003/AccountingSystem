@@ -133,6 +133,7 @@ export const inventoryEntriesColumns: ColumnDef<InventoryEntries>[] = [
   {
     accessorKey: 'invEntryInvId',
     meta: 'Inventory',
+    accessorFn: (row) => row.inventory.invAssetName,
     header: ({ column }) => {
       return (
         <Button
