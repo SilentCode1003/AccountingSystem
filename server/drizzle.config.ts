@@ -6,7 +6,7 @@ export default {
   schema: "./src/database/schema/*",
 
   out: "./src/database/drizzle",
-  driver: "mysql2", // 'pg' | 'mysql2' | 'better-sqlite' | 'libsql' | 'turso'
+  dialect: "mysql",
   dbCredentials: {
     host: process.env.DB_HOST as string,
     user: process.env.DB_USER,
