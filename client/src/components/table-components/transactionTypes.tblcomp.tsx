@@ -79,7 +79,7 @@ export const TranTypeTransactionsColumn = ({
           row.original.transactions.map((tran) => (
             <Badge
               variant={'outline'}
-              className="whitespace-nowrap"
+              className="w-fit whitespace-nowrap"
               key={tran.tranId}
             >
               {tran.tranDescription}

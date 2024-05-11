@@ -84,7 +84,7 @@ export const AccountTypeAccountsColumn = ({
           row.original.accounts.map((acc) => (
             <Badge
               variant={'outline'}
-              className="whitespace-nowrap"
+              className="w-fit whitespace-nowrap"
               key={acc.accId}
             >
               {acc.accName}
