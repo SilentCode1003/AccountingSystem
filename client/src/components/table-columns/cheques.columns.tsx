@@ -1,16 +1,16 @@
 import { ColumnDef } from '@tanstack/react-table'
 
+import { ArrowUpDownIcon } from 'lucide-react'
 import {
   AccountColumn,
+  ChequeAmountColumn,
   ChequeStatusColumn,
   CreatedAtColumn,
   IssueDateColumn,
-  PayeeNameColumn,
   UpdatedAtColumn,
 } from '../table-components/cheques.tblcomp'
 import { Button } from '../ui/button'
 import { text } from '../ui/text'
-import { ArrowUpDownIcon } from 'lucide-react'
 import { Transactions } from './transactions.columns'
 
 export type Cheques = {
@@ -94,6 +94,7 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
   },
   {
     accessorKey: 'chqAmount',
+    accessorFn: (row) => Number(row.chqAmount),
     meta: 'Amount',
     header: ({ column }) => {
       return (
@@ -110,7 +111,7 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         </Button>
       )
     },
-    cell: PayeeNameColumn,
+    cell: ChequeAmountColumn,
   },
   {
     accessorKey: 'chqAccId',

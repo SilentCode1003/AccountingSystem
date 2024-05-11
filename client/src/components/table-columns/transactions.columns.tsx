@@ -94,6 +94,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranAccId',
+    accessorFn: (row) => row.account.accName,
     meta: 'Account',
     header: ({ column }) => {
       return (

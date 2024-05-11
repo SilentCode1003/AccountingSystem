@@ -52,7 +52,7 @@ export const IssueDateColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return new Date(row.original.chqIssueDate).toLocaleDateString()
 }
 
-export const PayeeNameColumn = ({ row }: CellContext<Cheques, unknown>) => {
+export const ChequeAmountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
