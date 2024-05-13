@@ -22,7 +22,10 @@ export const vendorColumns: ColumnDef<Vendors>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Vendor Name
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -38,7 +41,10 @@ export const vendorColumns: ColumnDef<Vendors>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Vendor Address
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -54,7 +60,10 @@ export const vendorColumns: ColumnDef<Vendors>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Vendor Contact Info
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -70,7 +79,10 @@ export const vendorColumns: ColumnDef<Vendors>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Vendor Email
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

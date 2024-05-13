@@ -17,8 +17,11 @@ import path from "path";
 export const getCheques = async (req: Request, res: Response) => {
   try {
     const cheques = await getAllCheques();
+    console.log("successfully fetched all cheques");
     return res.status(200).send({ cheques });
   } catch (error) {
+    console.log("error in fetching all cheques");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -58,8 +61,11 @@ export const createCheque = async (req: Request, res: Response) => {
       )
     );
 
+    console.log("successfully created new cheque");
     return res.status(200).send({ cheque: newCheque });
   } catch (error) {
+    console.log("error creating new cheque");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -96,8 +102,11 @@ export const updateCheque = async (req: Request, res: Response) => {
         }`
       )
     );
+    console.log("successfully updated cheque");
     return res.status(200).send({ cheque: updatedChq });
   } catch (error) {
+    console.log("error updating cheque");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -111,17 +120,23 @@ export const approveCheque = async (req: Request, res: Response) => {
 
     if (!chq) return res.status(404).send({ error: "Cheque not found" });
 
-    if (chq.chqStatus === "APPROVED")
+    if (chq.chqStatus === "APPROVED") {
+      console.log("Cheque already approved");
       return res.status(200).send({ cheque: chq });
+    }
 
     const incrementedChq = await incrementChequeApproval(input.data.chqId);
 
     if (incrementedChq!.chqApprovalCount >= 3) {
       const updatedChq = await setChequeStatus(input.data.chqId, "APPROVED");
+      console.log("Set cheque status to approved");
+
       return res.status(200).send({ cheque: updatedChq });
     }
+    console.log("successfully incremented cheque");
     return res.status(200).send({ cheque: incrementedChq });
   } catch (error) {
+    console.log("error in incrementing cheque status cheque");
     console.log(error);
     return res.status(500).send({ error: "Server error" });
   }

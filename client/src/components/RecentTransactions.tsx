@@ -302,7 +302,7 @@ function RecentTransactions<TData, TValue>({
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div>
         <Table>
           <TableHeader className={`${text({ variant: 'label' })}`}>
             {table.getHeaderGroups().map((headerGroup) => (

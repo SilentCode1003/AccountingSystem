@@ -46,7 +46,7 @@ import { Text } from '../ui/text'
 export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   return (
     <div className="flex justify-between min-w-32 items-center">
-      <div className="flex gap-4">
+      <div className="flex items-center gap-4">
         <div>
           <Avatar>
             <AvatarImage src={'https://github.com/nestortion.png'} />
@@ -171,7 +171,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const employees = useQuery({
-    queryKey: ['Employees'],
+    queryKey: ['employees'],
     queryFn: async () => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/employees`,
@@ -220,7 +220,7 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
   }).format(row.getValue('prFinalAmount'))
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{formatted}</div>
       <div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -339,10 +339,10 @@ export const FinalAmountColumn = ({ row }: CellContext<Payrolls, unknown>) => {
                                 if (!e.target.files) return
 
                                 if (!e.target.files[0]) return
-                                console.log(e.target.files[0])
                                 field.onChange(e.target.files[0])
                               }}
                               type="file"
+                              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf"
                               className="w-full hover:cursor-pointer"
                             />
                           </FormControl>

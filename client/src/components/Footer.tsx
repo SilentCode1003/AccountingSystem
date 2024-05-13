@@ -15,7 +15,7 @@ function Footer() {
           <div className=" flex gap-1 pr-1">
             Copyright <FaRegCopyright />
           </div>
-          <div className="text-rose-800">
+          <div className="text-primary">
             5L Solutions Supply's & Allied Services Inc.
           </div>
         </div>

@@ -39,7 +39,18 @@ export const createInventoryEntrySchema = z.object({
     }
   }),
   invEntryType: z.enum(['INCOMING', 'OUTGOING']),
-  invEntryFile: z.instanceof(File, { message: 'Required' }),
+  invEntryFile: z.instanceof(File, { message: 'Required' }).refine(
+    (file) => {
+      if (
+        file.type ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        file.type === 'application/pdf'
+      )
+        return true
+      return false
+    },
+    { message: 'Only xlsx/pdf files are allowed!' },
+  ),
 })
 
 export const updateInventoryEntrySchema = z.object({
@@ -117,5 +128,19 @@ export const updateInventoryEntrySchema = z.object({
     })
     .optional(),
   invEntryType: z.enum(['INCOMING', 'OUTGOING']).optional(),
-  invEntryFile: z.instanceof(File, { message: 'Required' }).optional(),
+  invEntryFile: z
+    .instanceof(File, { message: 'Required' })
+    .refine(
+      (file) => {
+        if (
+          file.type ===
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+          file.type === 'application/pdf'
+        )
+          return true
+        return false
+      },
+      { message: 'Only xlsx/pdf files are allowed!' },
+    )
+    .optional(),
 })

@@ -71,7 +71,7 @@ function Home() {
                 CrudComponents={() => (
                   <Text variant={'heading3bold'}>Recent Transactions</Text>
                 )}
-                data={transactions.data.transactions}
+                data={transactions.data.transactions.slice(0, 3)}
                 filter={[
                   {
                     filterColumn: 'tranAmount',

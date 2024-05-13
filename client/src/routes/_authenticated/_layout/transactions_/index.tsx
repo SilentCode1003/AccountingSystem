@@ -98,6 +98,10 @@ function LoadingComponent() {
   )
 }
 
+function CrudComponents() {
+  return <Text variant={'heading1bold'}>Transactions</Text>
+}
+
 function TransactionsComponent() {
   const [file, setFile] = useState<File>()
   const [uploadOpen, setUploadOpen] = useState<boolean>(false)
@@ -153,6 +157,7 @@ function TransactionsComponent() {
           pageSize={5}
           className="w-full md:w-[70vw]"
           columns={transactionColumns}
+          CrudComponents={CrudComponents}
           data={transactions.data.transactions}
           filter={[
             {
@@ -402,10 +407,10 @@ function TransactionsComponent() {
                                 if (!e.target.files) return
 
                                 if (!e.target.files[0]) return
-                                console.log(e.target.files[0])
                                 field.onChange(e.target.files[0])
                               }}
                               type="file"
+                              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                               className="w-full hover:cursor-pointer"
                             />
                           </FormControl>
@@ -422,12 +427,20 @@ function TransactionsComponent() {
                           <FormControl>
                             {transactionTypes.isSuccess && (
                               <ComboBox
-                                data={transactionTypes.data.transactionTypes.map(
-                                  (t) => ({
+                                data={transactionTypes.data.transactionTypes
+                                  .filter((tranType) => {
+                                    if (
+                                      tranType.tranTypeName == 'PAYROLL' ||
+                                      tranType.tranTypeName == 'CHEQUE' ||
+                                      tranType.tranTypeName == 'INVENTORY'
+                                    )
+                                      return false
+                                    return true
+                                  })
+                                  .map((t) => ({
                                     label: t.tranTypeName,
                                     value: t.tranTypeId,
-                                  }),
-                                )}
+                                  }))}
                                 emptyLabel="Nothing Found"
                                 value={field.value}
                                 setValue={field.onChange}

@@ -32,11 +32,12 @@ export const addTransaction = async (input: {
   tranTypeId: string;
   tranFileMimeType?: string;
   tranOtherPartner?: string;
+  tranAccName?: string;
 }) => {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
   const newAccount = await addAccount({
-    accName: `ACCOUNT TRANSACTION`,
+    accName: input.tranAccName ?? `ACCOUNT TRANSACTION`,
     accAmount: input.tranAmount,
     accDescription: `TRANSACTION: ${input.tranDescription}`,
     accTypeId: input.tranAccTypeId,
@@ -94,6 +95,7 @@ export const editTransaction = async (input: {
   tranFileMimeType?: string;
   tranOtherPartner?: string;
   tranTypeId?: string;
+  tranAccName?: string;
 }) => {
   await db
     .update(transactions)
@@ -138,6 +140,7 @@ export const editTransaction = async (input: {
   await editAccount({
     accId: editedTran!.tranAccId as string,
     newData: {
+      accName: input.tranAccName,
       accTypeId: input.tranAccTypeId,
       accAmount: input.tranAmount,
     },

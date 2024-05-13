@@ -61,7 +61,9 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
       invId: row.original.invId,
       newData: {
         invAssetName: row.original.invAssetName,
-        invPricePerUnit: row.original.invPricePerUnit,
+        invPricePerUnit: Number.parseFloat(
+          String(row.original.invPricePerUnit),
+        ),
         invStocks: row.original.invStocks,
         invStatus: row.original.invStatus,
       },
@@ -75,8 +77,8 @@ export const StatusColumn = ({ row }: CellContext<Inventories, unknown>) => {
   }
 
   return (
-    <div className="flex justify-between ">
-      <div className="flex gap-4 items-center">
+    <div className="flex justify-between items-center ">
+      <div>
         <Badge
           className={cn(
             [

@@ -58,7 +58,7 @@ export const VendorEmailColumn = ({ row }: CellContext<Vendors, unknown>) => {
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{row.original.vdEmail}</div>
       <div>
         <Dialog>

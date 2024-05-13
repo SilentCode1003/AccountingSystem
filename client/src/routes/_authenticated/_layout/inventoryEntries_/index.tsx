@@ -214,6 +214,7 @@ function CrudComponents() {
                             field.onChange(e.target.files[0])
                           }}
                           type="file"
+                          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf"
                           className="w-full hover:cursor-pointer"
                         />
                       </FormControl>

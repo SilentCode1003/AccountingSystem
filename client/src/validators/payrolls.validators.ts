@@ -31,7 +31,18 @@ export const createPayrollSchema = z.object({
     }),
   prDateFrom: z.date(),
   prDateTo: z.date(),
-  prFile: z.instanceof(File, { message: 'Required' }),
+  prFile: z.instanceof(File, { message: 'Required' }).refine(
+    (file) => {
+      if (
+        file.type ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        file.type === 'application/pdf'
+      )
+        return true
+      return false
+    },
+    { message: 'Only xlsx/pdf files are allowed!' },
+  ),
 })
 
 export const updatePayrollSchema = z.object({
@@ -90,5 +101,19 @@ export const updatePayrollSchema = z.object({
     }),
   prDateFrom: z.date().optional(),
   prDateTo: z.date().optional(),
-  prFile: z.instanceof(File, { message: 'Required' }).optional(),
+  prFile: z
+    .instanceof(File, { message: 'Required' })
+    .refine(
+      (file) => {
+        if (
+          file.type ===
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+          file.type === 'application/pdf'
+        )
+          return true
+        return false
+      },
+      { message: 'Only xlsx/pdf files are allowed!' },
+    )
+    .optional(),
 })

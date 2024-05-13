@@ -13,8 +13,10 @@ import path from "path";
 export const getInventoryEntries = async (req: Request, res: Response) => {
   try {
     const inventoryEntries = await getAllInventoryEntries();
+    console.log("successfully fetched all inventory entries");
     return res.status(200).send({ inventoryEntries });
   } catch (error) {
+    console.log("error in fetching all inventory entries");
     console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
@@ -52,6 +54,8 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
         }`
       )
     );
+
+    console.log("successfully created inventory entry");
     return res.status(200).send({ inventoryEntry: newInventoryEntry });
   } catch (error) {
     const err = error as Error;
@@ -60,6 +64,8 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
       return res.status(400).send({
         error: "Not enough stocks",
       });
+    console.log("error in creating inventory entry");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -98,8 +104,10 @@ export const updateInventoryEntry = async (req: Request, res: Response) => {
         }`
       )
     );
+    console.log("successfully updated inventory entry");
     return res.status(200).send({ inventoryEntry: updatedInventoryEntry });
   } catch (error) {
+    console.log("error in updating inventory entry");
     console.log(error);
     return res.status(500).send({ error: "Server error" });
   }

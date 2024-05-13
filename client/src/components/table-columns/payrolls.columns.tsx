@@ -35,7 +35,10 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Employee Name
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -52,7 +55,10 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Total Deductions
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -70,7 +76,10 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Date From
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -88,7 +97,10 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Date To
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -105,7 +117,10 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Final Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

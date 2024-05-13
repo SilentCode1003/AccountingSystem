@@ -6,7 +6,7 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ context: { queryClient }, location }) => {
     const data = await queryClient.ensureQueryData({
-      queryKey: ['CurrentUser'],
+      queryKey: ['currentUser'],
       queryFn: async () => {
         const response = await fetch(
           `${import.meta.env.VITE_SERVER_URL}/login`,
@@ -42,6 +42,7 @@ export const Route = createFileRoute('/_authenticated')({
     }
   },
   loader: async ({ context }) => {
+    if (!context) return
     const accountTypes = context.queryClient.ensureQueryData(
       accountTypesOptions(),
     )

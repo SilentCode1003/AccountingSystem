@@ -14,6 +14,7 @@ import {
   TransactionTypeColumn,
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
+import { TransactionTypes } from './transactionTypes.columns'
 
 type AccountType = {
   accTypeId: string
@@ -48,11 +49,6 @@ export type Customer = {
   custIsActive: string
 }
 
-export type TransactionType = {
-  tranTypeId: string
-  tranTypeName: string
-}
-
 export type Transactions = {
   tranId: string
   tranAccId: string
@@ -71,19 +67,23 @@ export type Transactions = {
   tranFile: string
   tranOtherPartner?: string
   tranTypeId: string
-  transactionType: TransactionType
+  transactionType: TransactionTypes
 }
 
 export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranId',
+    accessorFn: (_, index) => index,
     meta: 'Transaction ID',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction ID
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -94,13 +94,17 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranAccId',
+    accessorFn: (row) => row.account.accName,
     meta: 'Account',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Account
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -112,7 +116,16 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranFile',
     meta: 'Transaction File',
-    header: () => <div className="whitespace-nowrap">Transaction File</div>,
+    header: () => (
+      <div
+        className={text({
+          variant: 'bodybold',
+          className: 'p-0 text-foreground whitespace-nowrap',
+        })}
+      >
+        Transaction File
+      </div>
+    ),
     cell: transactionFileColumn,
   },
   {
@@ -124,7 +137,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Type
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -141,7 +157,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -159,7 +178,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -173,7 +195,8 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
     accessorFn: (row) => {
       if (row.tranEmpId) return row.employee.empName
       else if (row.tranCustId) return row.customer.custName
-      else return row.vendor.vdName
+      else if (row.tranVdId) return row.vendor.vdName
+      else return row.tranOtherPartner
     },
     meta: 'Transaction Partner',
     header: ({ column }) => {
@@ -181,7 +204,10 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Partner
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -202,7 +228,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Account
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -219,7 +248,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -237,7 +269,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -251,7 +286,8 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
     accessorFn: (row) => {
       if (row.tranEmpId) return row.employee.empName
       else if (row.tranCustId) return row.customer.custName
-      else return row.vendor.vdName
+      else if (row.tranVdId) return row.vendor.vdName
+      else return row.tranOtherPartner
     },
     meta: 'Transaction Partner',
     header: ({ column }) => {
@@ -259,7 +295,10 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Transaction Partner
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
