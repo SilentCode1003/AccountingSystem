@@ -195,7 +195,8 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
     accessorFn: (row) => {
       if (row.tranEmpId) return row.employee.empName
       else if (row.tranCustId) return row.customer.custName
-      else return row.vendor.vdName
+      else if (row.tranVdId) return row.vendor.vdName
+      else return row.tranOtherPartner
     },
     meta: 'Transaction Partner',
     header: ({ column }) => {
@@ -285,7 +286,8 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
     accessorFn: (row) => {
       if (row.tranEmpId) return row.employee.empName
       else if (row.tranCustId) return row.customer.custName
-      else return row.vendor.vdName
+      else if (row.tranVdId) return row.vendor.vdName
+      else return row.tranOtherPartner
     },
     meta: 'Transaction Partner',
     header: ({ column }) => {
