@@ -219,7 +219,7 @@ export const TransactionWithColumn = ({
     }
   }
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{data.name}</div>
       <div>
         <MultiDialog>
@@ -526,10 +526,10 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                             if (!e.target.files) return
 
                             if (!e.target.files[0]) return
-                            console.log(e.target.files[0])
                             field.onChange(e.target.files[0])
                           }}
                           type="file"
+                          accept={`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, ${props.row.original.transactionType.tranTypeName !== 'LIQUIDATION' && '.pdf'}`}
                           className="w-full hover:cursor-pointer"
                         />
                       </FormControl>

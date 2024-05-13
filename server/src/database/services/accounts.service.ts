@@ -1,6 +1,7 @@
 import { sql, sum } from "drizzle-orm";
 import db from "../index";
 import accounts from "../schema/accounts.schema";
+import crypto from "crypto";
 import { eq, not } from "drizzle-orm";
 import { and } from "drizzle-orm";
 import accountTypes from "../schema/accountType.schema";

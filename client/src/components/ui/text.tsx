@@ -5,21 +5,21 @@ import { ComponentProps } from 'react'
 export const text = cva(['w-fit'], {
   variants: {
     variant: {
-      heading1: ['font-spinnaker', 'text-3xl'],
-      heading1bold: ['font-spinnaker', 'text-3xl', 'font-bold'],
-      heading1semibold: ['font-spinnaker', 'text-3xl', 'font-semibold'],
-      heading2: ['font-spinnaker', 'text-2xl'],
-      heading2bold: ['font-spinnaker', 'text-2xl', 'font-bold'],
-      heading2ghost: ['font-spinnaker', 'text-2xl', 'opacity-50'],
-      heading2semibold: ['font-spinnaker', 'text-2xl', 'font-semibold'],
-      heading3bold: ['font-spinnaker', 'text-xl', 'font-bold'],
-      heading3ghost: ['font-spinnaker', 'text-xl', 'opacity-80'],
-      heading4bold: ['font-spinnaker', 'text-lg', 'font-bold'],
-      heading4ghost: ['font-spinnaker', 'text-lg', 'opacity-50'],
-      body: ['font-galdeano', 'text-lg'],
-      bodybold: ['font-galdeano', 'text-lg', 'font-semibold'],
-      label: ['font-galdeano', 'text-lg', 'opacity-70'],
-      footer: ['font-spinnaker', 'font-bold', 'text-xs'],
+      heading1: ['font-primary', 'text-3xl'],
+      heading1bold: ['font-primary', 'text-3xl', 'font-bold'],
+      heading1semibold: ['font-primary', 'text-3xl', 'font-semibold'],
+      heading2: ['font-primary', 'text-2xl'],
+      heading2bold: ['font-primary', 'text-2xl', 'font-bold'],
+      heading2ghost: ['font-primary', 'text-2xl', 'opacity-50'],
+      heading2semibold: ['font-primary', 'text-2xl', 'font-semibold'],
+      heading3bold: ['font-primary', 'text-xl', 'font-bold'],
+      heading3ghost: ['font-primary', 'text-xl', 'opacity-80'],
+      heading4bold: ['font-primary', 'text-lg', 'font-bold'],
+      heading4ghost: ['font-primary', 'text-lg', 'opacity-50'],
+      body: ['font-secondary', 'text-lg', 'font-light'],
+      bodybold: ['font-secondary', 'text-lg', 'font-semibold'],
+      label: ['font-secondary', 'text-lg', 'opacity-70', 'font-light'],
+      footer: ['font-primary', 'font-bold', 'text-xs'],
     },
     style: {
       underline: [
@@ -37,7 +37,7 @@ export const text = cva(['w-fit'], {
       ],
     },
     defaultVariants: {
-      size: 'body',
+      variant: 'body',
     },
   },
 })

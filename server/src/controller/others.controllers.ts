@@ -28,12 +28,15 @@ export const getTransactionPartners = async (req: Request, res: Response) => {
     const customers = await getAllCustomers();
     const vendors = await getAllVendors();
 
+    console.log("successfully fetched all transaction partners");
     return res.status(200).send({
       employees,
       customers,
       vendors,
     });
   } catch (error) {
+    console.log("error in fetching all transaction partners");
+    console.log(error);
     return res.status(500).send({
       error: "Server error",
     });
@@ -62,10 +65,12 @@ export const getAccountTotal = async (req: Request, res: Response) => {
       )
       .groupBy(accounts.accDescription, sql`monthname(acc_created_at)`);
 
+    console.log("successfully fetched account total for given month and year");
     return res.status(200).send({
       data: account,
     });
   } catch (error) {
+    console.log("error in fetching account total for given month and year");
     console.log(error);
     return res.status(500).send({
       error: "Server error",
@@ -85,16 +90,27 @@ export const getIncomeStatementByMonth = async (
   if (!input.success)
     return res.status(400).send({ error: input.error.errors[0].message });
 
-  const accountByMonth = await getIncomeStatement(
-    input.data.month as Date,
-    input.data.accTypes
-      ? typeof input.data.accTypes === "string"
-        ? [input.data.accTypes]
-        : input.data.accTypes
-      : []
-  );
+  try {
+    const accountByMonth = await getIncomeStatement(
+      input.data.month as Date,
+      input.data.accTypes
+        ? typeof input.data.accTypes === "string"
+          ? [input.data.accTypes]
+          : input.data.accTypes
+        : []
+    );
 
-  return res.send(accountByMonth);
+    console.log(
+      "successfully fetched income statement for given month and year"
+    );
+    return res.send(accountByMonth);
+  } catch (error) {
+    console.log("error in fetching income statement for given month and year");
+    console.log(error);
+    return res.status(500).send({
+      error: "Server error",
+    });
+  }
 };
 
 export const getBalanceSheetByMonth = async (req: Request, res: Response) => {
@@ -105,17 +121,24 @@ export const getBalanceSheetByMonth = async (req: Request, res: Response) => {
 
   if (!input.success)
     return res.status(400).send({ error: input.error.errors[0].message });
-
-  const accountByMonth = await getBalanceSheet(
-    input.data.month as Date,
-    input.data.accTypes
-      ? typeof input.data.accTypes === "string"
-        ? [input.data.accTypes]
-        : input.data.accTypes
-      : []
-  );
-
-  return res.send(accountByMonth);
+  try {
+    const accountByMonth = await getBalanceSheet(
+      input.data.month as Date,
+      input.data.accTypes
+        ? typeof input.data.accTypes === "string"
+          ? [input.data.accTypes]
+          : input.data.accTypes
+        : []
+    );
+    console.log("successfully fetched balance sheet for given month and year");
+    return res.send(accountByMonth);
+  } catch (error) {
+    console.log("error in fetching balance sheet for given month and year");
+    console.log(error);
+    return res.status(500).send({
+      error: "Server error",
+    });
+  }
 };
 
 export const getAccountTypeTotalPerMonth = async (
@@ -148,6 +171,9 @@ export const getAccountTypeTotalPerMonth = async (
       ),
     });
 
+    console.log(
+      "successfully fetched account type total for given month and year"
+    );
     return res.status(200).send({
       accountTypeName: accTypeName!.accTypeName,
       total,
@@ -163,6 +189,10 @@ export const getAccountTypeTotalPerMonth = async (
             ),
     });
   } catch (error) {
+    console.log(
+      "error in fetching account type total for given month and year"
+    );
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -175,77 +205,87 @@ export const AccountTypeBarChartData = async (req: Request, res: Response) => {
 
   try {
     const data = await getAccountTypeBarChartData(input.data);
-
+    console.log("successfully fetched account type bar chart data");
     return res.status(200).send({
       data,
     });
   } catch (error) {
+    console.log("error in fetching account type bar chart data");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
 
 export const getBarChartCashFlowData = async (req: Request, res: Response) => {
-  const currentMonth = new Date().getMonth();
+  try {
+    const currentMonth = new Date().getMonth();
 
-  let data: Array<any> = [];
-  let aKeys: Array<any> = [];
+    let data: Array<any> = [];
+    let aKeys: Array<any> = [];
 
-  for (let i = 0; i < currentMonth + 1; i++) {
-    const d = await db
-      .select({
-        total: sum(accounts.accAmount),
-        accTypeId: accounts.accTypeId,
-      })
-      .from(accounts)
-      .where(
-        and(
-          eq(
-            sql`month(acc_created_at)`,
-            sql`month(${new Date(new Date().getFullYear(), i)})`
-          ),
-          eq(
-            sql`year(acc_created_at)`,
-            sql`year(${new Date(new Date().getFullYear(), i)})`
-          ),
-          inArray(accounts.accTypeId, [
-            "accTypeId 5176aa41-6659-46f7-a72b-56adfc1fa14f",
-            "accTypeId 42da30cc-96d8-4b4e-a718-1dffe25fb884",
-          ])
+    for (let i = 0; i < currentMonth + 1; i++) {
+      const d = await db
+        .select({
+          total: sum(accounts.accAmount),
+          accTypeId: accounts.accTypeId,
+        })
+        .from(accounts)
+        .where(
+          and(
+            eq(
+              sql`month(acc_created_at)`,
+              sql`month(${new Date(new Date().getFullYear(), i)})`
+            ),
+            eq(
+              sql`year(acc_created_at)`,
+              sql`year(${new Date(new Date().getFullYear(), i)})`
+            ),
+            inArray(accounts.accTypeId, [
+              "accTypeId 5176aa41-6659-46f7-a72b-56adfc1fa14f",
+              "accTypeId 42da30cc-96d8-4b4e-a718-1dffe25fb884",
+            ])
+          )
         )
-      )
-      .groupBy(accounts.accTypeId);
+        .groupBy(accounts.accTypeId);
 
-    const dz: any = {};
+      const dz: any = {};
 
-    await Promise.all(
-      d.map(async (item) => {
-        const accTypeName = await db.query.accountTypes.findFirst({
-          where: eq(accounts.accTypeId, item.accTypeId),
-        });
+      await Promise.all(
+        d.map(async (item) => {
+          const accTypeName = await db.query.accountTypes.findFirst({
+            where: eq(accounts.accTypeId, item.accTypeId),
+          });
 
-        dz[accTypeName!.accTypeName] = parseFloat(String(item.total));
-        aKeys.push(accTypeName?.accTypeName);
-      })
-    );
+          dz[accTypeName!.accTypeName] = parseFloat(String(item.total));
+          aKeys.push(accTypeName?.accTypeName);
+        })
+      );
 
-    data.push({
-      name: new Date(new Date().getFullYear(), i).toLocaleString("default", {
-        month: "long",
-      }),
-      ...dz,
-      total: d.reduce(
-        (acc, curr) =>
-          curr.accTypeId === "accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce"
-            ? acc - parseFloat(String(curr.total))
-            : acc + parseFloat(String(curr.total)),
-        0
-      ),
+      data.push({
+        name: new Date(new Date().getFullYear(), i).toLocaleString("default", {
+          month: "long",
+        }),
+        ...dz,
+        total: d.reduce(
+          (acc, curr) =>
+            curr.accTypeId === "accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce"
+              ? acc - parseFloat(String(curr.total))
+              : acc + parseFloat(String(curr.total)),
+          0
+        ),
+      });
+    }
+
+    console.log("successfully fetched bar chart cash flow data");
+    return res.send({
+      dataKeys: Array.from(new Set(aKeys)),
+      data,
     });
+  } catch (error) {
+    console.log("error in fetching bar chart cash flow data");
+    console.log(error);
+    return res.status(500).send({ error: "Server error" });
   }
-  return res.send({
-    dataKeys: Array.from(new Set(aKeys)),
-    data,
-  });
 };
 
 export const downloadFile = async (req: Request, res: Response) => {

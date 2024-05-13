@@ -1,24 +1,24 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useTerminateEmployee, useUpdateEmployee } from "@/hooks/mutations";
-import { updateEmployeeSchema } from "@/validators/employees.validator";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
-import { CellContext } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { PromptModal } from "../PromptModal";
-import { Employees } from "../table-columns/employees.columns";
-import { AlertDialog } from "../ui/alert-dialog";
-import { Button } from "../ui/button";
-import DatePicker from "../ui/DatePicker";
+} from '@/components/ui/tooltip'
+import { useTerminateEmployee, useUpdateEmployee } from '@/hooks/mutations'
+import { updateEmployeeSchema } from '@/validators/employees.validator'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
+import { CellContext } from '@tanstack/react-table'
+import { MoreHorizontal } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { PromptModal } from '../PromptModal'
+import { Employees } from '../table-columns/employees.columns'
+import { AlertDialog } from '../ui/alert-dialog'
+import { Button } from '../ui/button'
+import DatePicker from '../ui/DatePicker'
 import {
   Dialog,
   DialogClose,
@@ -26,7 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from '../ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +34,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from '../ui/dropdown-menu'
 import {
   Form,
   FormControl,
@@ -42,12 +42,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/Form";
-import { Input } from "../ui/input";
-import { Text } from "../ui/text";
+} from '../ui/Form'
+import { Input } from '../ui/input'
+import { Text } from '../ui/text'
 
 export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false)
   const form = useForm({
     defaultValues: {
       empId: row.original.empId,
@@ -62,23 +62,23 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
       },
     },
     resolver: zodResolver(updateEmployeeSchema),
-  });
+  })
 
-  const terminateEmployee = useTerminateEmployee();
+  const terminateEmployee = useTerminateEmployee()
 
-  const updateEmployee = useUpdateEmployee({ setOpen });
+  const updateEmployee = useUpdateEmployee({ setOpen })
 
   const handleSubmit = (values: z.infer<typeof updateEmployeeSchema>) => {
-    updateEmployee.mutate(values);
-  };
+    updateEmployee.mutate(values)
+  }
 
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "PHP",
-  }).format(parseFloat(row.getValue("empSalary")));
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'PHP',
+  }).format(parseFloat(row.getValue('empSalary')))
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{formatted}</div>
       <div>
         <AlertDialog>
@@ -243,7 +243,7 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                                   {...field}
                                   value={
                                     Number.isNaN(field.value)
-                                      ? ""
+                                      ? ''
                                       : Number.parseFloat(String(field.value))
                                   }
                                   onChange={(e) =>
@@ -304,16 +304,16 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                   />
                   <div className="flex gap-2">
                     <Button
-                      variant={"secondary"}
+                      variant={'secondary'}
                       onClick={() => {
-                        form.clearErrors();
-                        form.reset();
+                        form.clearErrors()
+                        form.reset()
                       }}
                     >
                       Clear
                     </Button>
                     <DialogClose asChild>
-                      <Button variant={"outline"}>Cancel</Button>
+                      <Button variant={'outline'}>Cancel</Button>
                     </DialogClose>
                   </div>
                 </div>
@@ -323,8 +323,8 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
         </AlertDialog>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export const DateTerminatedColumn = ({
   row,
@@ -333,16 +333,16 @@ export const DateTerminatedColumn = ({
     row.original.empDateTerminated && (
       <div>{new Date(row.original.empDateTerminated).toLocaleDateString()}</div>
     )
-  );
-};
+  )
+}
 
 export const DateHiredColumn = ({ row }: CellContext<Employees, unknown>) => {
-  return new Date(row.original.empDateHired).toLocaleDateString();
-};
+  return new Date(row.original.empDateHired).toLocaleDateString()
+}
 
 export const BirthdateColumn = ({ row }: CellContext<Employees, unknown>) => {
-  return new Date(row.original.empBirthdate).toLocaleDateString();
-};
+  return new Date(row.original.empBirthdate).toLocaleDateString()
+}
 
 export const AddressColumn = ({ row }: CellContext<Employees, unknown>) => (
   <div>
@@ -357,7 +357,7 @@ export const AddressColumn = ({ row }: CellContext<Employees, unknown>) => (
       </Tooltip>
     </TooltipProvider>
   </div>
-);
+)
 
 export const NameColumn = ({ row }: CellContext<Employees, unknown>) => {
   return (
@@ -370,5 +370,5 @@ export const NameColumn = ({ row }: CellContext<Employees, unknown>) => {
       </div>
       <div>{row.original.empName}</div>
     </div>
-  );
-};
+  )
+}

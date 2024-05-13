@@ -26,7 +26,10 @@ export const assetsColumn: ColumnDef<Asset>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Type
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -47,7 +50,10 @@ export const assetsColumn: ColumnDef<Asset>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -80,7 +86,10 @@ export const liabilitiesColumn: ColumnDef<Liability>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Type
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -100,7 +109,10 @@ export const liabilitiesColumn: ColumnDef<Liability>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

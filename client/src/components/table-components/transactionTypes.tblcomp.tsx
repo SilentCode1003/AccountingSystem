@@ -1,12 +1,14 @@
-import { useDeleteAccountType, useUpdateAccountType } from '@/hooks/mutations'
-import { useAccountTypes } from '@/hooks/queries'
-import { updateAccountTypeSchema } from '@/validators/accountTypes.validator'
+import { updateTransactionTypeSchema } from '@/validators/transactionTypes.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CellContext } from '@tanstack/react-table'
 import { MoreHorizontalIcon } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { AccountTypes } from '../table-columns/accountTypes.column'
+import { PromptModal } from '../PromptModal'
+import { TransactionTypes } from '../table-columns/transactionTypes.columns'
+import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
+import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import {
   Dialog,
@@ -33,65 +35,58 @@ import {
   FormMessage,
 } from '../ui/Form'
 import { Input } from '../ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select'
 import { Text } from '../ui/text'
-import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
-import { PromptModal } from '../PromptModal'
-import { useState } from 'react'
-import { Badge } from '../ui/badge'
+import {
+  useDeleteTransactionType,
+  useUpdateTransactionType,
+} from '@/hooks/mutations'
 
-export const AccountTypeNameColumn = ({
+export const TranTypeNameColumn = ({
   row,
-}: CellContext<AccountTypes, unknown>) => {
-  return <Badge variant={'secondary'}>{row.original.accTypeName}</Badge>
+}: CellContext<TransactionTypes, unknown>) => {
+  return <Badge variant={'secondary'}>{row.original.tranTypeName}</Badge>
 }
 
-export const AccountTypeAccountsColumn = ({
+export const TranTypeTransactionsColumn = ({
   row,
-}: CellContext<AccountTypes, unknown>) => {
+}: CellContext<TransactionTypes, unknown>) => {
   const [open, setOpen] = useState<boolean>(false)
-  const accountTypes = useAccountTypes()
 
   const form = useForm({
     defaultValues: {
-      accTypeId: row.original.accTypeId,
+      tranTypeId: row.original.tranTypeId,
       newData: {
-        accTypeName: row.original.accTypeName,
-        accTypeDefault: row.original.accTypeDefault,
+        tranTypeName: row.original.tranTypeName,
       },
     },
-    resolver: zodResolver(updateAccountTypeSchema),
+    resolver: zodResolver(updateTransactionTypeSchema),
   })
 
-  const updateAccountType = useUpdateAccountType({ setOpen })
+  const updateTranType = useUpdateTransactionType({ setOpen })
 
-  const deleteAccountType = useDeleteAccountType()
+  const deleteTransactionType = useDeleteTransactionType()
 
-  const handleSubmit = (values: z.infer<typeof updateAccountTypeSchema>) => {
-    updateAccountType.mutate(values)
+  const handleSubmit = (
+    values: z.infer<typeof updateTransactionTypeSchema>,
+  ) => {
+    updateTranType.mutate(values)
   }
 
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-col gap-4">
-        {row.original.accounts.length > 0 ? (
-          row.original.accounts.map((acc) => (
+        {row.original.transactions.length > 0 ? (
+          row.original.transactions.map((tran) => (
             <Badge
               variant={'outline'}
               className="w-fit whitespace-nowrap"
-              key={acc.accId}
+              key={tran.tranId}
             >
-              {acc.accName}
+              {tran.tranDescription}
             </Badge>
           ))
         ) : (
-          <div>No Accounts</div>
+          <div>No Result</div>
         )}
       </div>
 
@@ -109,39 +104,39 @@ export const AccountTypeAccountsColumn = ({
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() =>
-                    navigator.clipboard.writeText(row.original.accTypeId)
+                    navigator.clipboard.writeText(row.original.tranTypeId)
                   }
                 >
-                  Copy Account Type ID
+                  Copy Transaction Type ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DialogTrigger asChild>
-                  <DropdownMenuItem>Update Account Type</DropdownMenuItem>
+                  <DropdownMenuItem>Update Transaction Type</DropdownMenuItem>
                 </DialogTrigger>
 
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
-                  <DropdownMenuItem>Delete Account Type</DropdownMenuItem>
+                  <DropdownMenuItem>Delete Transaction Type</DropdownMenuItem>
                 </AlertDialogTrigger>
               </DropdownMenuContent>
             </DropdownMenu>
             <PromptModal
               callback={() =>
-                deleteAccountType.mutate({
-                  accTypeId: row.original.accTypeId,
+                deleteTransactionType.mutate({
+                  tranTypeId: row.original.tranTypeId,
                 })
               }
               nonButton
               dialogMessage="Continue?"
               prompType="DELETE"
-              dialogTitle="You are about to DELETE this account type! Data loss may occur and cannot be undone!"
-              triggerText="DELETE ACCOUNT TYPE"
+              dialogTitle="You are about to DELETE this transaction type! Data loss may occur and cannot be undone!"
+              triggerText="DELETE TRANSACTION TYPE"
             />
 
             <DialogContent className="scale-75 md:scale-100">
               <DialogHeader>
                 <DialogTitle>
-                  <Text variant="heading3bold">Update Account</Text>
+                  <Text variant="heading3bold">Update Transaction Type</Text>
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
@@ -151,7 +146,7 @@ export const AccountTypeAccountsColumn = ({
                       <div className="flex flex-col gap-4 overflow-y-auto max-h-96">
                         <FormField
                           control={form.control}
-                          name="accTypeId"
+                          name="tranTypeId"
                           render={({ field }) => (
                             <FormItem>
                               <div className="flex items-center justify-between">
@@ -166,7 +161,7 @@ export const AccountTypeAccountsColumn = ({
                         />
                         <FormField
                           control={form.control}
-                          name="newData.accTypeName"
+                          name="newData.tranTypeName"
                           render={({ field }) => (
                             <FormItem>
                               <div className="flex items-center justify-between">
@@ -183,41 +178,6 @@ export const AccountTypeAccountsColumn = ({
                             </FormItem>
                           )}
                         />
-                        <FormField
-                          name="newData.accTypeDefault"
-                          control={form.control}
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
-                              <div className="flex items-center justify-between">
-                                <FormLabel>Account Type Statement</FormLabel>
-                              </div>
-                              <FormControl>
-                                {accountTypes.isSuccess && (
-                                  <Select
-                                    defaultValue={field.value}
-                                    onValueChange={field.onChange}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Account type default" />
-                                    </SelectTrigger>
-                                    <SelectContent className="flex-1">
-                                      <SelectItem value="INCOMESTATEMENT">
-                                        Income Statement
-                                      </SelectItem>
-                                      <SelectItem value="BALANCESHEET">
-                                        Balance Sheet
-                                      </SelectItem>
-                                      <SelectItem value="CASHFLOW">
-                                        Cash Flow
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                )}
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
                       </div>
                     </div>
                   </form>
@@ -226,7 +186,7 @@ export const AccountTypeAccountsColumn = ({
                   <PromptModal
                     dialogMessage="Continue?"
                     prompType="UPDATE"
-                    dialogTitle="You are about to update this account type"
+                    dialogTitle="You are about to update this transaction type"
                     triggerText="Update"
                     callback={form.handleSubmit(handleSubmit)}
                   />

@@ -34,7 +34,18 @@ export const createChequeSchema = z.object({
       })
     }
   }),
-  chqFile: z.instanceof(File, { message: 'Required' }),
+  chqFile: z.instanceof(File, { message: 'Required' }).refine(
+    (file) => {
+      if (
+        file.type ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        file.type === 'application/pdf'
+      )
+        return true
+      return false
+    },
+    { message: 'Only xlsx/pdf files are allowed!' },
+  ),
 })
 
 export const chequeUpdateSchema = z.object({
@@ -81,5 +92,19 @@ export const chequeUpdateSchema = z.object({
       }
     })
     .optional(),
-  chqFile: z.instanceof(File, { message: 'Required' }).optional(),
+  chqFile: z
+    .instanceof(File, { message: 'Required' })
+    .refine(
+      (file) => {
+        if (
+          file.type ===
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+          file.type === 'application/pdf'
+        )
+          return true
+        return false
+      },
+      { message: 'Only xlsx/pdf files are allowed!' },
+    )
+    .optional(),
 })
