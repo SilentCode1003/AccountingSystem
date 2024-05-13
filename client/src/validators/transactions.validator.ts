@@ -63,7 +63,18 @@ export const createTransactionSchema = z.object({
       })
     }
   }),
-  tranFile: z.instanceof(File, { message: 'Required' }),
+  tranFile: z.instanceof(File, { message: 'Required' }).refine(
+    (file) => {
+      if (
+        file.type ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        file.type === 'application/pdf'
+      )
+        return true
+      return false
+    },
+    { message: 'Only xlsx/pdf files are allowed!' },
+  ),
 })
 
 //validator for PUT /transactions inputs
@@ -162,5 +173,19 @@ export const updateTransactionSchema = z.object({
       }
     })
     .optional(),
-  tranFile: z.instanceof(File).optional(),
+  tranFile: z
+    .instanceof(File, { message: 'Required' })
+    .refine(
+      (file) => {
+        if (
+          file.type ===
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+          file.type === 'application/pdf'
+        )
+          return true
+        return false
+      },
+      { message: 'Only xlsx/pdf files are allowed!' },
+    )
+    .optional(),
 })

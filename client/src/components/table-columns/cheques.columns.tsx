@@ -1,16 +1,16 @@
 import { ColumnDef } from '@tanstack/react-table'
 
+import { ArrowUpDownIcon } from 'lucide-react'
 import {
   AccountColumn,
+  ChequeAmountColumn,
   ChequeStatusColumn,
   CreatedAtColumn,
   IssueDateColumn,
-  PayeeNameColumn,
   UpdatedAtColumn,
 } from '../table-components/cheques.tblcomp'
 import { Button } from '../ui/button'
 import { text } from '../ui/text'
-import { ArrowUpDownIcon } from 'lucide-react'
 import { Transactions } from './transactions.columns'
 
 export type Cheques = {
@@ -38,7 +38,10 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Issue Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -55,7 +58,10 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Cheque Number
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -72,7 +78,10 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Payee Name
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -85,20 +94,24 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
   },
   {
     accessorKey: 'chqAmount',
+    accessorFn: (row) => Number(row.chqAmount),
     meta: 'Amount',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-    cell: PayeeNameColumn,
+    cell: ChequeAmountColumn,
   },
   {
     accessorKey: 'chqAccId',
@@ -108,7 +121,10 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Account
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -125,7 +141,10 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Status
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -142,7 +161,10 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Created At
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -159,7 +181,10 @@ export const chequeColumns: ColumnDef<Cheques>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Updated At
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

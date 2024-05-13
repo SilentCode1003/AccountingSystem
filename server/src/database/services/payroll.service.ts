@@ -1,11 +1,10 @@
-import db from "../index";
 import crypto from "crypto";
-import payrolls from "../schema/payrolls.schema";
 import { eq } from "drizzle-orm";
-import { addAccount, editAccount } from "./accounts.service";
+import db from "../index";
 import accountTypes from "../schema/accountType.schema";
-import { addTransaction, editTransaction } from "./transactions.service";
+import payrolls from "../schema/payrolls.schema";
 import tranTypes from "../schema/transactionTypes.schema";
+import { addTransaction, editTransaction } from "./transactions.service";
 
 export const getAllPayrolls = async () => {
   const payrolls = await db.query.payrolls.findMany({
@@ -52,6 +51,7 @@ export const addPayroll = async (input: {
     tranTransactionDate: input.prDateTo,
     tranTypeId: transactionType!.tranTypeId,
     tranFileMimeType: input.prTranFileMimeType,
+    tranAccName: "PAYROLL",
   });
 
   await db.insert(payrolls).values({

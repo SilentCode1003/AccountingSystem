@@ -52,7 +52,7 @@ export const IssueDateColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return new Date(row.original.chqIssueDate).toLocaleDateString()
 }
 
-export const PayeeNameColumn = ({ row }: CellContext<Cheques, unknown>) => {
+export const ChequeAmountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'PHP',
@@ -67,8 +67,8 @@ export const CreatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
 
 export const AccountColumn = ({ row }: CellContext<Cheques, unknown>) => {
   return (
-    <div className="flex justify-between">
-      <Badge variant={'outline'}>
+    <div className="flex justify-between items-center">
+      <Badge variant={'outline'} className="text-center">
         {row.original.transaction.account.accName}
       </Badge>
       <div>
@@ -184,7 +184,7 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
     updateCheque.mutate(fd)
   }
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{new Date(row.original.chqUpdatedAt).toLocaleDateString()}</div>
       <div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -317,10 +317,10 @@ export const UpdatedAtColumn = ({ row }: CellContext<Cheques, unknown>) => {
                                 if (!e.target.files) return
 
                                 if (!e.target.files[0]) return
-                                console.log(e.target.files[0])
                                 field.onChange(e.target.files[0])
                               }}
                               type="file"
+                              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf"
                               className="w-full hover:cursor-pointer"
                             />
                           </FormControl>

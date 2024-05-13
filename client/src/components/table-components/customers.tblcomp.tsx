@@ -60,7 +60,7 @@ export const CustomerEmailColumn = ({
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{row.original.custEmail}</div>
       <div>
         <Dialog>

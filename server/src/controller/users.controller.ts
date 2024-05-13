@@ -23,10 +23,13 @@ export const getUsers = async (
   if (req.query.userId) return next();
   try {
     const users = await getAllUsers();
+    console.log("successfully fetched all users");
     return res.status(200).send({
       users,
     });
   } catch (error) {
+    console.log("error in fetching all users");
+    console.log(error);
     return res.status(500).send({
       error: "Server error",
     });
@@ -41,10 +44,15 @@ export const getSingleUserById = async (req: Request, res: Response) => {
 
   try {
     const user = await getUserById(input.data);
+    console.log("successfully fetched single user");
     return res.status(200).send({
       user,
     });
   } catch (error) {
+    console.log(
+      "error in fetching single user with id: " + JSON.stringify(input.data)
+    );
+    console.log(error);
     return res.status(500).send({
       error: "Server error",
     });
@@ -60,8 +68,11 @@ export const createUser = async (req: Request, res: Response) => {
     });
   try {
     const newUser = await addUser(input.data);
+    console.log("successfully created an user");
     return res.status(200).send({ user: newUser });
   } catch (error) {
+    console.log("error creating an user");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -111,8 +122,11 @@ export const updateUser = async (req: Request, res: Response) => {
         userPassword: input.data.newData.userPassword,
       },
     });
+    console.log("successfully updated an user");
     return res.status(200).send({ user: updatedUser });
   } catch (error) {
+    console.log("error updating an user");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -124,8 +138,11 @@ export const toggleUserIsActive = async (req: Request, res: Response) => {
 
   try {
     const updatedUser = await toggleIsActive(input.data);
+    console.log("successfully toggled a user");
     return res.status(200).send({ user: updatedUser });
   } catch (error) {
+    console.log("error toggling a user");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };

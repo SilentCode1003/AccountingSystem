@@ -28,6 +28,7 @@ import { Route as AuthenticatedLayoutBalancesheetIndexImport } from './routes/_a
 import { Route as AuthenticatedLayoutSettingslayoutImport } from './routes/_authenticated/_layout/settings_/_layout'
 import { Route as AuthenticatedLayoutSettingslayoutIndexImport } from './routes/_authenticated/_layout/settings_/_layout/index'
 import { Route as AuthenticatedLayoutSettingslayoutVendorsImport } from './routes/_authenticated/_layout/settings_/_layout/vendors'
+import { Route as AuthenticatedLayoutSettingslayoutTransactionTypesImport } from './routes/_authenticated/_layout/settings_/_layout/transactionTypes'
 import { Route as AuthenticatedLayoutSettingslayoutReportsImport } from './routes/_authenticated/_layout/settings_/_layout/reports'
 import { Route as AuthenticatedLayoutSettingslayoutInventoryImport } from './routes/_authenticated/_layout/settings_/_layout/inventory'
 import { Route as AuthenticatedLayoutSettingslayoutEmployeesImport } from './routes/_authenticated/_layout/settings_/_layout/employees'
@@ -137,6 +138,12 @@ const AuthenticatedLayoutSettingslayoutIndexRoute =
 const AuthenticatedLayoutSettingslayoutVendorsRoute =
   AuthenticatedLayoutSettingslayoutVendorsImport.update({
     path: '/vendors',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutSettingslayoutTransactionTypesRoute =
+  AuthenticatedLayoutSettingslayoutTransactionTypesImport.update({
+    path: '/transactionTypes',
     getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
   } as any)
 
@@ -264,6 +271,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutReportsImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
+    '/_authenticated/_layout/settings/_layout/transactionTypes': {
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutTransactionTypesImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
     '/_authenticated/_layout/settings/_layout/vendors': {
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutVendorsImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
@@ -289,6 +300,7 @@ export const routeTree = rootRoute.addChildren([
           AuthenticatedLayoutSettingslayoutEmployeesRoute,
           AuthenticatedLayoutSettingslayoutInventoryRoute,
           AuthenticatedLayoutSettingslayoutReportsRoute,
+          AuthenticatedLayoutSettingslayoutTransactionTypesRoute,
           AuthenticatedLayoutSettingslayoutVendorsRoute,
           AuthenticatedLayoutSettingslayoutIndexRoute,
         ]),

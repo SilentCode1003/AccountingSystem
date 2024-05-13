@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import db from "..";
 import accountTypes from "../schema/accountType.schema";
+import crypto from "crypto";
 import inventory from "../schema/inventory.schema";
 import inventoryEntries from "../schema/inventoryEntries.schema";
 import tranTypes from "../schema/transactionTypes.schema";
@@ -79,6 +80,8 @@ export const addInventoryEntry = async (input: {
     tranTypeId: transactionType!.tranTypeId,
     tranFileMimeType: input.invEntryTranFileMimeType,
     tranTransactionDate: input.invEntryDate,
+    tranAccName:
+      input.invEntryType === "INCOMING" ? "BOUGHT INVENTORY" : "SOLD INVENTORY",
   });
 
   await db.insert(inventoryEntries).values({
@@ -158,6 +161,8 @@ export const editInventoryEntry = async (input: {
     tranPartner: input.invEntryPartner!,
     tranFileMimeType: input.invEntryTranFileMimeType,
     tranTransactionDate: input.invEntryDate,
+    tranAccName:
+      input.invEntryType === "INCOMING" ? "BOUGHT INVENTORY" : "SOLD INVENTORY",
   });
 
   const updatedInventoryEntry = await getInventoryEntryById(input.invEntryId);

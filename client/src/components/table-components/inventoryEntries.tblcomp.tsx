@@ -94,8 +94,8 @@ export const InventoryEntryAccountColumn = ({
   row,
 }: CellContext<InventoryEntries, unknown>) => {
   return (
-    <div className="flex justify-between">
-      <Badge variant={'outline'}>
+    <div className="flex justify-between items-center">
+      <Badge variant={'outline'} className="text-center">
         {row.original.transaction.account.accName}
       </Badge>
       <div>
@@ -168,7 +168,7 @@ export const InventoryEntryInventoryColumn = ({
   row,
 }: CellContext<InventoryEntries, unknown>) => {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <Badge variant={'outline'} className="text-center max-w-max">
         {row.original.inventory.invAssetName}
       </Badge>
@@ -280,7 +280,7 @@ export const InventoryEntryPartnerColumn = ({
     }
   }
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div>{data.name}</div>
       <div>
         <MultiDialog>
@@ -406,7 +406,6 @@ function UpdateFormDialog(props: DialogProps & { row: Row<InventoryEntries> }) {
   })
 
   const handleSubmit = (values: z.infer<typeof updateInventoryEntrySchema>) => {
-    console.log(values)
     const fd = new FormData()
 
     Object.keys(values).forEach((key) => {
@@ -545,6 +544,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<InventoryEntries> }) {
                           field.onChange(e.target.files[0])
                         }}
                         type="file"
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .pdf"
                         className="w-full hover:cursor-pointer"
                       />
                     </FormControl>

@@ -34,7 +34,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Employee Name
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -51,7 +54,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Address
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -68,7 +74,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Contact Info
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -84,7 +93,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Email
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -101,7 +113,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Birthdate
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -118,7 +133,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Date Hired
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -135,7 +153,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Date Terminated
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
@@ -152,7 +173,10 @@ export const employeeColumns: ColumnDef<Employees>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({ variant: 'body', className: 'p-0' })}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
         >
           Salary
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />

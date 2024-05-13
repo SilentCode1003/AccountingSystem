@@ -1,23 +1,22 @@
-import { ColumnDef } from '@tanstack/react-table'
+import { ArrowUpDownIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import { text } from '../ui/text'
-import { ArrowUpDownIcon } from 'lucide-react'
-import { Accounts } from './accounts.columns'
+import { Transactions } from './transactions.columns'
+import { ColumnDef } from '@tanstack/table-core'
 import {
-  AccountTypeAccountsColumn,
-  AccountTypeNameColumn,
-} from '../table-components/accountTypes.tblcomp'
+  TranTypeNameColumn,
+  TranTypeTransactionsColumn,
+} from '../table-components/transactionTypes.tblcomp'
 
-export type AccountTypes = {
-  accTypeId: string
-  accTypeName: string
-  accTypeDefault: string
-  accounts: Array<Accounts>
+export type TransactionTypes = {
+  tranTypeId: string
+  tranTypeName: string
+  transactions: Array<Transactions>
 }
 
-export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
+export const TransactionTypeColumns: ColumnDef<TransactionTypes>[] = [
   {
-    accessorKey: 'accTypeName',
+    accessorKey: 'tranTypeName',
     header: ({ column }) => {
       return (
         <Button
@@ -28,16 +27,16 @@ export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Account Type Name
+          Transaction Type Name
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-    cell: AccountTypeNameColumn,
-    meta: 'accTypeName',
+    cell: TranTypeNameColumn,
+    meta: 'tranTypeName',
   },
   {
-    accessorKey: 'accounts',
+    accessorKey: 'transactions',
     header: ({ column }) => {
       return (
         <Button
@@ -48,12 +47,12 @@ export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          accounts
+          Transactions
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-    meta: 'accTypeDefault',
-    cell: AccountTypeAccountsColumn,
+    meta: 'Transactions',
+    cell: TranTypeTransactionsColumn,
   },
 ]

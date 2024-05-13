@@ -7,6 +7,7 @@ import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
+import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
 import { Vendors } from '@/components/table-columns/vendors.columns'
 import { toast } from '@/components/ui/use-toast'
 import { updateAccountSchema } from '@/validators/accounts.validator'
@@ -29,6 +30,10 @@ import {
 } from '@/validators/inventory.validator'
 import { updatePayrollSchema } from '@/validators/payrolls.validators'
 import { createTransactionSchema } from '@/validators/transactions.validator'
+import {
+  createTransactionTypeSchema,
+  updateTransactionTypeSchema,
+} from '@/validators/transactionTypes.validator'
 import {
   createVendorSchema,
   updateVendorSchema,
@@ -54,7 +59,7 @@ export const useLogout = () => {
       })
     },
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['CurrentUser'] })
+      await queryClient.refetchQueries({ queryKey: ['currentUser'] })
       navigate({ to: '/login' })
     },
   })
@@ -315,6 +320,136 @@ export const useDeleteAccountType = () => {
   })
 }
 
+export const useUpdateTransactionType = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['useTransactionType'],
+    mutationFn: async (
+      payload: z.infer<typeof updateTransactionTypeSchema>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionTypes`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        transactionType: TransactionTypes
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['transactionTypes'],
+        (old: { transactionTypes: Array<TransactionTypes> }) => {
+          return {
+            transactionTypes: old.transactionTypes.map((tranType) => {
+              if (tranType.tranTypeId === data.transactionType.tranTypeId) {
+                return data.transactionType
+              }
+              return tranType
+            }),
+          }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Transaction type was updated successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update transaction type',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useDeleteTransactionType = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['deleteTransactionType'],
+    mutationFn: async (
+      payload: Pick<z.infer<typeof updateTransactionTypeSchema>, 'tranTypeId'>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionTypes/${payload.tranTypeId}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        deletedTranTypeId: string
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['transactionTypes'],
+        (old: { transactionTypes: Array<TransactionTypes> }) => {
+          return {
+            transactionTypes: old.transactionTypes.filter(
+              (tranType) => tranType.tranTypeId !== data.deletedTranTypeId,
+            ),
+          }
+        },
+      )
+      toast({
+        title: (
+          <div>
+            <div className="flex gap-2 items-centers">
+              <PartyPopperIcon />
+              Success
+            </div>
+          </div>
+        ),
+        description: 'Transaction type was deleted successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to delete transaction type ',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useUpdateCheque = ({
   setIsOpen,
   cell,
@@ -344,7 +479,7 @@ export const useUpdateCheque = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Cheques'],
+        ['cheques'],
         (old: { cheques: Array<Cheques> }) => {
           const newCheques = old.cheques.map((cheque) => {
             if (cheque.chqId === cell.row.original.chqId) {
@@ -360,7 +495,7 @@ export const useUpdateCheque = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -414,7 +549,7 @@ export const useTerminateEmployee = () => {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(
-        ['Employees'],
+        ['employees'],
         (old: { employees: Array<Employees> }) => {
           const newEmployees = old.employees.map((employee) => {
             if (employee.empId === data.employee.empId) {
@@ -479,14 +614,18 @@ export const useUpdateEmployee = ({
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({
-        queryKey: ['Employees'],
+        queryKey: ['employees'],
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Payrolls'],
+        queryKey: ['payrolls'],
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
         type: 'inactive',
       })
       setOpen(false)
@@ -562,7 +701,7 @@ export const useUpdateCustomer = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setOpen(false)
@@ -638,7 +777,7 @@ export const useUpdateVendor = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setOpen(false)
@@ -696,9 +835,17 @@ export const useUpdateInventory = ({
       return data
     },
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ['Inventories'] })
+      await queryClient.refetchQueries({ queryKey: ['inventories'] })
       await queryClient.invalidateQueries({
         queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
         type: 'inactive',
       })
       setOpen(false)
@@ -774,7 +921,7 @@ export const useUpdateInventoryEntry = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -836,7 +983,7 @@ export const useUpdatePayroll = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Payrolls'],
+        ['payrolls'],
         (old: { payrolls: Array<Payrolls> }) => {
           const newPayrolls = old.payrolls.map((payroll) => {
             if (payroll.prId === cell.row.original.prId) {
@@ -852,7 +999,7 @@ export const useUpdatePayroll = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -910,7 +1057,7 @@ export const useUpdateTransaction = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Transactions'],
+        ['transactions'],
         (old: { transactions: Array<Transactions> }) => {
           const newTransactions = old.transactions.map((transaction) => {
             if (transaction.tranId === cell.row.original.tranId) {
@@ -975,7 +1122,7 @@ export const useCreateCheque = ({
     onSuccess: async (data) => {
       setOpen(false)
       await queryClient.setQueryData(
-        ['Cheques'],
+        ['cheques'],
         (old: { cheques: Array<Cheques> }) => {
           return { cheques: [...old.cheques, data.cheque] }
         },
@@ -985,7 +1132,7 @@ export const useCreateCheque = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       toast({
@@ -1040,7 +1187,7 @@ export const useCreateEmployee = ({
     onSuccess: async (data) => {
       setOpen(false)
       await queryClient.setQueryData(
-        ['Employees'],
+        ['employees'],
         (old: { employees: Array<Employees> }) => {
           return {
             employees: [...old.employees, data.employee],
@@ -1219,7 +1366,7 @@ export const useCreateInventory = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Inventories'],
+        ['inventories'],
         (old: { inventories: Array<Inventories> }) => {
           return {
             inventories: [...old.inventories, data.inventory],
@@ -1290,7 +1437,7 @@ export const useCreateInventoryEntry = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       setOpen(false)
@@ -1305,7 +1452,6 @@ export const useCreateInventoryEntry = ({
       })
     },
     onError: (error) => {
-      console.log(error)
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -1344,7 +1490,7 @@ export const useCreatePayroll = ({
     onSuccess: async (data) => {
       setOpen(false)
       await queryClient.setQueryData(
-        ['Payrolls'],
+        ['payrolls'],
         (old: { payrolls: Array<Payrolls> }) => {
           return {
             payrolls: [...old.payrolls, data.payroll],
@@ -1356,7 +1502,7 @@ export const useCreatePayroll = ({
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['Transactions'],
+        queryKey: ['transactions'],
         type: 'inactive',
       })
       toast({
@@ -1437,6 +1583,69 @@ export const useCreateAccountType = ({
           </div>
         ),
         description: error.message ?? 'Failed to create account type',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateTransactionType = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (
+      payload: z.infer<typeof createTransactionTypeSchema>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/transactionTypes`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        transactionType: TransactionTypes
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['transactionTypes'],
+        (old: { transactionTypes: Array<TransactionTypes> }) => {
+          return {
+            transactionTypes: [...old.transactionTypes, data.transactionType],
+          }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Transaction type was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create transaction type',
         variant: 'destructive',
       })
     },
@@ -1533,7 +1742,6 @@ export const useCreateTransaction = (
   return useMutation({
     mutationKey: ['createTransaction'],
     mutationFn: async (payload: FormData) => {
-      console.log(payload)
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactions`,
         {
@@ -1549,7 +1757,7 @@ export const useCreateTransaction = (
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Transactions'],
+        ['transactions'],
         (old: { transactions: Array<Transactions> }) => {
           return { transactions: [...old.transactions, data.transaction] }
         },
@@ -1608,7 +1816,7 @@ export const useCreateTransactionByFile = ({
     },
     onSuccess: async (data) => {
       await queryClient.setQueryData(
-        ['Transactions'],
+        ['transactions'],
         (old: { transactions: Array<Transactions> }) => {
           return { transactions: [...old.transactions, data.transaction] }
         },

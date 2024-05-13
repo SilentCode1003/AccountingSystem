@@ -15,10 +15,13 @@ export const getAccounts = async (req: Request, res: Response) => {
   try {
     const accounts = await getAllAccounts();
 
+    if (accounts) console.log("successfully fetched all accounts");
     return res.status(200).send({
       accounts,
     });
   } catch (error) {
+    console.log("error in fetching all acounts");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -29,9 +32,11 @@ export const createAccount = async (req: Request, res: Response) => {
 
   try {
     const newAccount = await addAccount({ ...input.data });
-
+    console.log("successfully created an account");
     return res.status(200).send({ account: newAccount });
   } catch (error) {
+    console.log("error creating an account");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -46,9 +51,11 @@ export const updateAccount = async (req: Request, res: Response) => {
 
   try {
     const editedAccount = await editAccount(input.data);
-
+    console.log("successfully updated an account");
     return res.status(200).send({ account: editedAccount });
   } catch (error) {
+    console.log("error updating an account");
+    console.log(error);
     return res.status(500).send({ error: "Server error" });
   }
 };
@@ -60,9 +67,15 @@ export const toggleAccountIsActive = async (req: Request, res: Response) => {
       error: input.error.errors[0].message,
     });
 
-  const editedAccount = await updateAccountIsActive({ ...input.data });
-
-  return res.status(200).send({
-    account: editedAccount,
-  });
+  try {
+    const editedAccount = await updateAccountIsActive({ ...input.data });
+    console.log("successfully toggled an account");
+    return res.status(200).send({
+      account: editedAccount,
+    });
+  } catch (error) {
+    console.log("error toggling an account");
+    console.log(error);
+    return res.status(500).send({ error: "Server error" });
+  }
 };

@@ -18,8 +18,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        galdeano: ['Galdeano'],
-        spinnaker: ['Spinnaker'],
+        primary: ['Poppins'],
+        secondary: ['Arsenal'],
       },
       screens: {
         xs: '446px',

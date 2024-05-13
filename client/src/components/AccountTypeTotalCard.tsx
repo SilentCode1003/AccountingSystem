@@ -21,7 +21,10 @@ function AccountTypeTotalCard({ accTypeId }: { accTypeId: string }) {
               {accountTypeTotal.data.accountTypeName}{' '}
             </Text>
             <Text variant={'heading3bold'}>
-              ₱ {accountTypeTotal.data.total}
+              {new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'PHP',
+              }).format(Number(accountTypeTotal.data.total))}
             </Text>
           </div>
           <div className="flex flex-col gap-2 flex-1 ">

@@ -95,7 +95,7 @@ export const AccountIsActiveColumn = ({
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
       <div className="min-w-24">
         <Badge
           className={cn(
