@@ -25,7 +25,7 @@ function BarGraph({
   }
 }) {
   return (
-    <ResponsiveContainer className="py-4 px-4" width="100%" height="100%">
+    <ResponsiveContainer className="py-4 sm:px-4" width="100%" height="100%">
       <ComposedChart data={BarChartData.data} width={350} height={414}>
         <XAxis
           dataKey="name"
@@ -38,7 +38,13 @@ function BarGraph({
           tickLine={false}
           axisLine={false}
           stroke="#888888"
-          tickFormatter={(value) => `$${value}`}
+          width={100}
+          tickFormatter={(value) =>
+            new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'PHP',
+            }).format(Number(value))
+          }
         />
         {/* <Tooltip /> */}
         <Tooltip
