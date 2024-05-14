@@ -17,6 +17,7 @@ import {
   createValidator,
   updateValidator,
 } from "../utils/validators/transactions.validator";
+import crypto from "crypto";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -111,24 +112,19 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
   try {
     const file = validateFile.data.tranFile;
     const firstWordRegex = /^([\w]+)/;
-    const lq: {
-      tranPartner: string;
-      amount: number;
-      description?: string;
-      date: Date;
-      tranAccTypeId?: string;
-    } = {
-      tranPartner: "",
-      amount: 0,
-      description: file.name.match(firstWordRegex)?.[0],
-      date: new Date(),
-    };
+
+    const secondWordRegex = /[^\w]\w+/;
 
     const accountTypes = await getAllAccountTypes();
 
+    let entryAccType: string = "";
+
     accountTypes.map((accType) => {
-      if (file.name.startsWith(accType.accTypeName)) {
-        lq["tranAccTypeId"] = accType.accTypeId;
+      if (
+        file.name.match(secondWordRegex)![0].slice(1, file.name.length) ===
+        accType.accTypeName
+      ) {
+        entryAccType = accType.accTypeId;
         return;
       }
     });
@@ -137,41 +133,79 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
     const cells = Object.keys(f);
 
+    const excelEntries = [];
+    let count = 0;
     for (let i = 0; i < cells.length; i++) {
-      if (f[cells[i]].v === "SUB TOTAL:") {
-        lq["amount"] = f[cells[i + 1]].v;
-      }
+      count++;
 
-      if (f[cells[i]].v === "DATE :") {
-        lq["date"] = new Date(f[cells[i + 1]].w);
-      }
-
-      if (f[cells[i]].v === "NAME :") {
-        if (file.name.toLowerCase().includes("employee")) {
-          const tranPartner = await getEmployeeByName(f[cells[i + 1]].v);
-
-          lq["tranPartner"] = tranPartner?.empId as string;
-        } else if (file.name.includes("customer")) {
-          const tranPartner = await getCustomerByName(f[cells[i + 1]].v);
-          lq["tranPartner"] = tranPartner?.custId as string;
-        } else if (file.name.includes("vendor")) {
-          const tranPartner = await getVendorByName(f[cells[i + 1]].v);
-          lq["tranPartner"] = tranPartner?.vdId as string;
-        }
+      if (f[cells[i]].v === "RECEIVED BY :") {
+        excelEntries.push(cells.slice(i - (count - 1), i + 1));
+        count = 0;
       }
     }
 
+    const lq: Array<{
+      tranPartner?: string;
+      amount?: number;
+      description?: string;
+      date?: Date;
+      tranAccTypeId?: string;
+    }> = await Promise.all(
+      excelEntries.map(async (entry) => {
+        const entryObj: any = {};
+        for (let i = 0; i < entry.length; i++) {
+          if (f[entry[i]].v === "SUB TOTAL:") {
+            entryObj["amount"] = Number(f[entry[i + 1]].v);
+          }
+
+          if (f[entry[i]].v === "DATE :") {
+            entryObj["date"] = new Date(f[entry[i + 1]].w);
+          }
+
+          if (f[entry[i]].v === "NAME :") {
+            if (file.name.toLowerCase().includes("employee")) {
+              const tranPartner = await getEmployeeByName(f[entry[i + 1]].v);
+
+              entryObj["tranPartner"] = (tranPartner?.empId as string) ?? "xdd";
+            } else if (file.name.includes("customer")) {
+              const tranPartner = await getCustomerByName(f[entry[i + 1]].v);
+              entryObj["tranPartner"] = tranPartner?.custId as string;
+            } else if (file.name.includes("vendor")) {
+              const tranPartner = await getVendorByName(f[entry[i + 1]].v);
+              entryObj["tranPartner"] = tranPartner?.vdId as string;
+            }
+          }
+          if (f[entry[i]].v === "RECEIVED BY :") {
+            entryObj["tranAccTypeId"] = entryAccType;
+            entryObj["description"] = file.name.match(firstWordRegex)![0];
+          }
+        }
+        return entryObj;
+      })
+    );
+
     const transactionType = await db.query.tranTypes.findFirst({
-      where: (tranType) => eq(tranType.tranTypeName, "LIQUIDATION"),
+      where: (tranType) =>
+        eq(tranType.tranTypeName, file.name.match(firstWordRegex)![0]),
     });
-    const transaction = await addTransaction({
-      tranAccTypeId: lq.tranAccTypeId as string,
-      tranAmount: lq.amount,
-      tranDescription: lq.description ?? "FILE TRANSACTION",
-      tranTransactionDate: lq.date,
-      tranPartner: lq.tranPartner,
-      tranTypeId: transactionType?.tranTypeId as string,
-    });
+
+    const newMultiFileName = `multiFile ${crypto.randomUUID()}`;
+
+    const transactions = await Promise.all(
+      lq.map(async (tran) => {
+        const transaction = await addTransaction({
+          tranAccTypeId: tran.tranAccTypeId as string,
+          tranAmount: tran.amount!,
+          tranDescription: tran.description ?? "FILE TRANSACTION",
+          tranTransactionDate: tran.date!,
+          tranPartner: tran.tranPartner,
+          tranTypeId: transactionType?.tranTypeId as string,
+          tranFileName: newMultiFileName,
+        });
+
+        return transaction;
+      })
+    );
 
     file.mv(
       path.join(
@@ -179,13 +213,14 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
         "..",
         "..",
         "files/transactionfiles",
-        `${transaction?.tranId}.xlsx`
+        `${newMultiFileName}.xlsx`
       )
     );
-    console.log("successfully created an transaction by file");
-    return res.send({ transaction });
+
+    console.log("successfully created transaction by file");
+    return res.send({ transactions });
   } catch (error) {
-    console.log("error creating an transaction by file");
+    console.log("error creating transaction by file");
     console.log(error);
     return res.status(500).send({ error: "Server error" });
   }

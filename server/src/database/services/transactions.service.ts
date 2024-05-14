@@ -33,6 +33,7 @@ export const addTransaction = async (input: {
   tranFileMimeType?: string;
   tranOtherPartner?: string;
   tranAccName?: string;
+  tranFileName?: string;
 }) => {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
@@ -61,7 +62,9 @@ export const addTransaction = async (input: {
       input.tranPartner && input.tranPartner.split(" ")[0] === "vdId"
         ? input.tranPartner
         : null,
-    tranFile: `${newTransactionId}.${input.tranFileMimeType ?? "xlsx"}`,
+    tranFile: `${input.tranFileName ?? newTransactionId}.${
+      input.tranFileMimeType ?? "xlsx"
+    }`,
     tranTypeId: input.tranTypeId,
     tranOtherPartner: input.tranOtherPartner ?? null,
   });

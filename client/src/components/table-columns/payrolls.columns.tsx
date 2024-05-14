@@ -49,6 +49,7 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
   },
   {
     accessorKey: 'prTotalDeduction',
+    accessorFn: (row) => Number(row.prTotalDeduction),
     meta: 'Total Deductions',
     header: ({ column }) => {
       return (
@@ -111,6 +112,7 @@ export const payrollColumns: ColumnDef<Payrolls>[] = [
   },
   {
     accessorKey: 'prFinalAmount',
+    accessorFn: (row) => Number(row.prFinalAmount),
     meta: 'Final Amount',
     header: ({ column }) => {
       return (

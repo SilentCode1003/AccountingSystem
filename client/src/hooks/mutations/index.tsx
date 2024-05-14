@@ -1810,7 +1810,7 @@ export const useCreateTransactionByFile = ({
         },
       )
       const data = (await response.json()) as {
-        transaction: Transactions
+        transactions: Array<Transactions>
       }
       return data
     },
@@ -1818,7 +1818,7 @@ export const useCreateTransactionByFile = ({
       await queryClient.setQueryData(
         ['transactions'],
         (old: { transactions: Array<Transactions> }) => {
-          return { transactions: [...old.transactions, data.transaction] }
+          return { transactions: [...old.transactions, ...data.transactions] }
         },
       )
       await queryClient.invalidateQueries({
