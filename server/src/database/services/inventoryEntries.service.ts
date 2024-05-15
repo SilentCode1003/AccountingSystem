@@ -6,6 +6,10 @@ import inventory from "../schema/inventory.schema";
 import inventoryEntries from "../schema/inventoryEntries.schema";
 import tranTypes from "../schema/transactionTypes.schema";
 import { addTransaction, editTransaction } from "./transactions.service";
+import {
+  addInventoryEntryProducts,
+  editInventoryEntryProducts,
+} from "./inventoryEntryProducts.service";
 
 const INVENTORY_ENTRY_TYPE = {
   INCOMING: "INCOMING",
@@ -19,7 +23,6 @@ export type InventoryEntryType = ObjectTypes<typeof INVENTORY_ENTRY_TYPE>;
 export const getAllInventoryEntries = async () => {
   const entries = await db.query.inventoryEntries.findMany({
     with: {
-      inventory: true,
       transaction: { with: { account: { with: { accountType: true } } } },
       customer: true,
       vendor: true,
@@ -32,7 +35,6 @@ export const getInventoryEntryById = async (id: string) => {
   const entry = await db.query.inventoryEntries.findFirst({
     where: eq(inventoryEntries.invEntryId, id),
     with: {
-      inventory: true,
       transaction: { with: { account: { with: { accountType: true } } } },
       customer: true,
       vendor: true,
@@ -42,39 +44,30 @@ export const getInventoryEntryById = async (id: string) => {
 };
 
 export const addInventoryEntry = async (input: {
-  invEntryInvId: string;
-  invEntryQuantity: number;
   invEntryDate: Date;
   invEntryPartner: string;
   invEntryType: InventoryEntryType;
   invEntryTranFileMimeType: string;
+  invEntryTotalPrice: number;
+  iepProducts: Array<{
+    iepInvId: string;
+    iepQuantity: number;
+  }>;
 }) => {
   const newInventoryEntryId = `invEntryId ${crypto.randomUUID()}`;
 
-  const inv = await db.query.inventory.findFirst({
-    where: (inventory) => eq(inventory.invId, input.invEntryInvId),
-  });
-
-  if (inv!.invStocks < input.invEntryQuantity)
-    throw new Error("Not enough stocks");
-
-  const InvEntryTotalPrice =
-    parseFloat(String(inv!.invPricePerUnit)) * input.invEntryQuantity;
-
   const transactionType = await db.query.tranTypes.findFirst({
-    where: eq(tranTypes.tranTypeName, "INVENTORY"),
-  });
-
-  const accountType = await db.query.accountTypes.findFirst({
     where: eq(
-      accountTypes.accTypeName,
-      input.invEntryType === "INCOMING" ? "EXPENSE" : "REVENUE"
+      tranTypes.tranTypeName,
+      input.invEntryType === "OUTGOING"
+        ? "OUTGOING INVENTORY"
+        : "INCOMING INVENTORY"
     ),
   });
 
   const newTransaction = await addTransaction({
-    tranAccTypeId: accountType!.accTypeId,
-    tranAmount: inv!.invPricePerUnit * input.invEntryQuantity,
+    tranAccTypeId: transactionType!.tranTypeAccTypeId,
+    tranAmount: input.invEntryTotalPrice,
     tranDescription: "INVENTORY",
     tranPartner: input.invEntryPartner,
     tranTypeId: transactionType!.tranTypeId,
@@ -86,11 +79,9 @@ export const addInventoryEntry = async (input: {
 
   await db.insert(inventoryEntries).values({
     invEntryId: newInventoryEntryId,
-    invEntryTotalPrice: InvEntryTotalPrice,
+    invEntryTotalPrice: input.invEntryTotalPrice,
     invEntryTranId: newTransaction!.tranId,
     invEntryDate: input.invEntryDate,
-    invEntryInvId: input.invEntryInvId,
-    invEntryQuantity: input.invEntryQuantity,
     invEntryType: input.invEntryType,
     invEntryCustId:
       input.invEntryPartner.split(" ")[0] === "custId"
@@ -102,21 +93,16 @@ export const addInventoryEntry = async (input: {
         : null,
   });
 
-  await db
-    .update(inventory)
-    .set({
-      invStocks:
-        input.invEntryType === "INCOMING"
-          ? inv!.invStocks + input.invEntryQuantity
-          : inv!.invStocks - input.invEntryQuantity,
-    })
-    .where(eq(inventory.invId, input.invEntryInvId));
+  await addInventoryEntryProducts({
+    iepInvEntryId: newInventoryEntryId,
+    iepProducts: input.iepProducts,
+    iepType: input.invEntryType,
+  });
 
   const newInventoryEntry = await db.query.inventoryEntries.findFirst({
     where: (inventoryEntry) =>
       eq(inventoryEntry.invEntryId, newInventoryEntryId),
     with: {
-      inventory: true,
       transaction: { with: { account: { with: { accountType: true } } } },
       customer: true,
       vendor: true,
@@ -127,37 +113,43 @@ export const addInventoryEntry = async (input: {
 
 export const editInventoryEntry = async (input: {
   invEntryId: string;
-  invEntryInvId: string;
-  invEntryQuantity?: number;
+  invEntryTranId: string;
   invEntryDate?: Date;
   invEntryPartner?: string;
-  invEntryTranId: string;
+  invEntryTotalPrice?: number;
   invEntryType?: InventoryEntryType;
+  iepProducts: Array<{
+    iepInvId: string;
+    iepQuantity: number;
+  }>;
   invEntryTranFileMimeType?: string;
 }) => {
-  const inv = await db.query.inventory.findFirst({
-    where: eq(inventory.invId, input.invEntryInvId),
-  });
-
-  const accountType = await db.query.accountTypes.findFirst({
+  const transactionType = await db.query.tranTypes.findFirst({
     where: eq(
-      accountTypes.accTypeName,
-      input.invEntryType === "INCOMING" ? "EXPENSE" : "REVENUE"
+      tranTypes.tranTypeName,
+      input.invEntryType === "OUTGOING"
+        ? "OUTGOING INVENTORY"
+        : "INCOMING INVENTORY"
     ),
   });
 
-  const InvEntryTotalPrice =
-    parseFloat(String(inv!.invPricePerUnit)) * input.invEntryQuantity!!;
-  await db
-    .update(inventoryEntries)
-    .set({ ...input, invEntryTotalPrice: InvEntryTotalPrice })
-    .where(eq(inventoryEntries.invEntryId, input.invEntryId));
+  await editInventoryEntryProducts({
+    iepInvEntryId: input.invEntryId,
+    iepProducts: input.iepProducts,
+    iepType: input.invEntryType,
+  });
+
+  // await db
+  //   .update(inventoryEntries)
+  //   .set({ ...input, invEntryTotalPrice: input.invEntryTotalPrice })
+  //   .where(eq(inventoryEntries.invEntryId, input.invEntryId));
 
   await editTransaction({
     tranId: input.invEntryTranId,
-    tranAccTypeId: accountType!.accTypeId,
-    tranAmount: inv!.invPricePerUnit * input.invEntryQuantity!,
+    tranAccTypeId: transactionType!.tranTypeAccTypeId,
+    tranAmount: input.invEntryTotalPrice,
     tranDescription: "INVENTORY",
+    tranTypeId: transactionType!.tranTypeId,
     tranPartner: input.invEntryPartner!,
     tranFileMimeType: input.invEntryTranFileMimeType,
     tranTransactionDate: input.invEntryDate,

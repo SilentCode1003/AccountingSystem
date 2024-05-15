@@ -60,22 +60,22 @@ export const editInventory = async (input: {
     where: (inv) => eq(inv.invId, input.invId),
   });
 
-  if (Number(prevValues?.invPricePerUnit) !== input.newData.invPricePerUnit) {
-    const invEntriesId = await db.query.inventoryEntries.findMany({
-      where: eq(inventoryEntries.invEntryInvId, input.invId),
-    });
+  // if (Number(prevValues?.invPricePerUnit) !== input.newData.invPricePerUnit) {
+  //   const invEntriesId = await db.query.inventoryEntries.findMany({
+  //     where: eq(inventoryEntries.invEntryInvId, input.invId),
+  //   });
 
-    await Promise.all(
-      invEntriesId.map(async (invEntry) => {
-        await editInventoryEntry({
-          invEntryId: invEntry.invEntryId,
-          invEntryTranId: invEntry.invEntryTranId,
-          invEntryInvId: editedInv!.invId,
-          invEntryQuantity: invEntry.invEntryQuantity,
-          invEntryType: invEntry.invEntryType,
-        });
-      })
-    );
-  }
+  //   await Promise.all(
+  //     invEntriesId.map(async (invEntry) => {
+  //       await editInventoryEntry({
+  //         invEntryId: invEntry.invEntryId,
+  //         invEntryTranId: invEntry.invEntryTranId,
+  //         invEntryInvId: editedInv!.invId,
+  //         invEntryQuantity: invEntry.invEntryQuantity,
+  //         invEntryType: invEntry.invEntryType,
+  //       });
+  //     })
+  //   );
+  // }
   return editedInv;
 };

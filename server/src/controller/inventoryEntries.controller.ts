@@ -24,13 +24,12 @@ export const getInventoryEntries = async (req: Request, res: Response) => {
 export const createInventoryEntry = async (req: Request, res: Response) => {
   const input = createValidator.safeParse({
     ...req.body,
-    invEntryQuantity: parseInt(req.body.invEntryQuantity),
     invEntryFile: req.files?.invEntryFile,
     invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
 
   if (!input.success)
-    return res.status(400).send({ error: input.error.errors[0].message });
+    return res.status(400).send({ error: input.error.errors });
   try {
     const newInventoryEntry = await addInventoryEntry({
       ...input.data,
@@ -57,6 +56,7 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
 
     console.log("successfully created inventory entry");
     return res.status(200).send({ inventoryEntry: newInventoryEntry });
+    // return res.status(400).send({ input: input.data });
   } catch (error) {
     const err = error as Error;
 
@@ -72,7 +72,6 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
 export const updateInventoryEntry = async (req: Request, res: Response) => {
   const input = updateValidator.safeParse({
     ...req.body,
-    invEntryQuantity: parseInt(req.body.invEntryQuantity),
     invEntryFile: req.files?.invEntryFile,
     invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
