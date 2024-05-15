@@ -1,17 +1,16 @@
+import { relations } from "drizzle-orm";
 import {
   AnyMySqlColumn,
   date,
   decimal,
-  int,
   mysqlEnum,
   mysqlTable,
   varchar,
 } from "drizzle-orm/mysql-core";
-import transactions from "./transactions.schema";
-import inventory from "./inventory.schema";
-import { relations } from "drizzle-orm";
-import vendors from "./vendors.schema";
 import customers from "./customers.schema";
+import transactions from "./transactions.schema";
+import vendors from "./vendors.schema";
+import inventoryEntryProducts from "./inventoryEntriesProducts.schema";
 
 const inventoryEntries = mysqlTable("inventory_entries", {
   invEntryId: varchar("inv_entry_id", { length: 60 }).primaryKey(),
@@ -19,9 +18,6 @@ const inventoryEntries = mysqlTable("inventory_entries", {
     .references((): AnyMySqlColumn => transactions.tranId, {
       onDelete: "cascade",
     })
-    .notNull(),
-  invEntryInvId: varchar("inv_entry_inv_id", { length: 60 })
-    .references((): AnyMySqlColumn => inventory.invId, { onDelete: "cascade" })
     .notNull(),
   invEntryVdId: varchar("inv_entry_vd_id", { length: 60 }).references(
     (): AnyMySqlColumn => vendors.vdId,
@@ -39,18 +35,7 @@ const inventoryEntries = mysqlTable("inventory_entries", {
     .$type<number>()
     .notNull(),
   invEntryDate: date("inv_entry_date").notNull(),
-  invEntryQuantity: int("inv_entry_quantity").notNull(),
 });
-
-export const inventoryEntriesInventoryRelations = relations(
-  inventoryEntries,
-  ({ one }) => ({
-    inventory: one(inventory, {
-      fields: [inventoryEntries.invEntryInvId],
-      references: [inventory.invId],
-    }),
-  })
-);
 
 export const inventoryEntriesCustomerRelation = relations(
   inventoryEntries,
@@ -69,6 +54,13 @@ export const inventoryEntriesVendorRelation = relations(
       fields: [inventoryEntries.invEntryVdId],
       references: [vendors.vdId],
     }),
+  })
+);
+
+export const inventoryEntriesInventoryEntryProductsManyRelation = relations(
+  inventoryEntries,
+  ({ many }) => ({
+    inventoryEntryProducts: many(inventoryEntryProducts),
   })
 );
 

@@ -29,10 +29,14 @@ import tranTypes, {
 } from "./schema/transactionTypes.schema";
 import inventoryEntries, {
   inventoryEntriesCustomerRelation,
-  inventoryEntriesInventoryRelations,
+  inventoryEntriesInventoryEntryProductsManyRelation,
   inventoryEntriesTransactionRelation,
   inventoryEntriesVendorRelation,
 } from "./schema/inventoryEntries.schema";
+import inventoryEntryProducts, {
+  inventoryEntriesProductsInventoryEntryRelations,
+  inventoryEntriesProductsInventoryRelations,
+} from "./schema/inventoryEntriesProducts.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -69,6 +73,9 @@ const db = drizzle(connection, {
     payrolls,
     apiKeys,
     tranTypes,
+    inventoryEntryProducts,
+    inventoryEntriesProductsInventoryEntryRelations,
+    inventoryEntriesProductsInventoryRelations,
     tranTypeTransactionManyRelations,
     tranTypeRelation,
     chequesRelations,
@@ -82,8 +89,8 @@ const db = drizzle(connection, {
     payrollTransactionrelation,
     accountTypeRelation,
     inventoryEntries,
-    inventoryEntriesInventoryRelations,
     inventoryEntriesTransactionRelation,
+    inventoryEntriesInventoryEntryProductsManyRelation,
     inventoryEntriesVendorRelation,
     inventoryEntriesCustomerRelation,
   },
