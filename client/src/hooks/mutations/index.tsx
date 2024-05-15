@@ -1750,6 +1750,7 @@ export const useCreateTransaction = (
           body: payload,
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as {
         transaction: Transactions
       }
@@ -1809,6 +1810,7 @@ export const useCreateTransactionByFile = ({
           body: payload,
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as {
         transactions: Array<Transactions>
       }
