@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
 import {
   addTransactionType,
+  changeTransactionTypeIsActive,
   editTransactionType,
   getAllTransactionTypes,
-  removeTransactionType,
 } from "../database/services/transactionTypes.service";
 import {
   createValidator,
-  deleteValidator,
+  toggleIsActiveValidator,
   updateValidator,
 } from "../utils/validators/transactionTypes.validator";
-import db from "../database";
 
 export const getTransactionTypes = async (req: Request, res: Response) => {
   try {
@@ -73,8 +72,11 @@ export const updateTransactionType = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteTransactionType = async (req: Request, res: Response) => {
-  const input = deleteValidator.safeParse(req.params);
+export const toggleTransactionTypeIsActive = async (
+  req: Request,
+  res: Response
+) => {
+  const input = toggleIsActiveValidator.safeParse(req.params);
 
   if (!input.success)
     return res.status(400).send({
@@ -82,13 +84,13 @@ export const deleteTransactionType = async (req: Request, res: Response) => {
     });
 
   try {
-    await removeTransactionType(input.data);
-    console.log("successfully deleted a transaction type");
-    return res
-      .status(200)
-      .send({ success: true, deletedTranTypeId: input.data.tranTypeId });
+    const updatedTransactionType = await changeTransactionTypeIsActive(
+      input.data
+    );
+    console.log("successfully toggled a transaction type");
+    return res.status(200).send({ updatedTransactionType });
   } catch (error) {
-    console.log("error deleting a transaction type");
+    console.log("error toggling a transaction type");
     console.log(error);
     return res.status(500).send({
       error: "Server error",
