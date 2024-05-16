@@ -23,6 +23,9 @@ export type InventoryEntryType = ObjectTypes<typeof INVENTORY_ENTRY_TYPE>;
 export const getAllInventoryEntries = async () => {
   const entries = await db.query.inventoryEntries.findMany({
     with: {
+      inventoryEntryProducts: {
+        with: { inventory: true },
+      },
       transaction: { with: { account: { with: { accountType: true } } } },
       customer: true,
       vendor: true,
@@ -35,6 +38,9 @@ export const getInventoryEntryById = async (id: string) => {
   const entry = await db.query.inventoryEntries.findFirst({
     where: eq(inventoryEntries.invEntryId, id),
     with: {
+      inventoryEntryProducts: {
+        with: { inventory: true },
+      },
       transaction: { with: { account: { with: { accountType: true } } } },
       customer: true,
       vendor: true,
