@@ -88,7 +88,7 @@ export const toggleTransactionTypeIsActive = async (
       input.data
     );
     console.log("successfully toggled a transaction type");
-    return res.status(200).send({ updatedTransactionType });
+    return res.status(200).send({ transactionType: updatedTransactionType });
   } catch (error) {
     console.log("error toggling a transaction type");
     console.log(error);
