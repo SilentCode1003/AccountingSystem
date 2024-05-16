@@ -26,8 +26,10 @@ import { MoreHorizontalIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { ComboBox } from '../Combobox'
+import InventoryEntryProducsTable from '../inventoryEntryProductTable.'
 import { PromptModal } from '../PromptModal'
 import { InventoryEntries } from '../table-columns/inventoryEntries.columns'
+import { inventoryEntryProductsColumns } from '../table-columns/inventoryEntryProducts.columns'
 import { Badge } from '../ui/badge'
 import DatePicker from '../ui/DatePicker'
 import {
@@ -164,88 +166,88 @@ export const InventoryEntryAccountColumn = ({
   )
 }
 
-export const InventoryEntryInventoryColumn = ({
-  row,
-}: CellContext<InventoryEntries, unknown>) => {
-  return (
-    <div className="flex justify-between items-center">
-      <Badge variant={'outline'} className="text-center max-w-max">
-        {row.original.inventory.invAssetName}
-      </Badge>
-      <div>
-        <Dialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                className="hover:cursor-pointer"
-                onClick={() =>
-                  navigator.clipboard.writeText(row.original.inventory.invId)
-                }
-              >
-                Copy Inventory ID
-              </DropdownMenuItem>
-              <DialogTrigger asChild>
-                <DropdownMenuItem className="hover:cursor-pointer">
-                  View Inventory Details
-                </DropdownMenuItem>
-              </DialogTrigger>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DialogContent className="rounded-md w-fit sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Inventory Details</DialogTitle>
-            </DialogHeader>
+// export const InventoryEntryInventoryColumn = ({
+//   row,
+// }: CellContext<InventoryEntries, unknown>) => {
+//   return (
+//     <div className="flex justify-between items-center">
+//       <Badge variant={'outline'} className="text-center max-w-max">
+//         {row.original.inventory.invAssetName}
+//       </Badge>
+//       <div>
+//         <Dialog>
+//           <DropdownMenu>
+//             <DropdownMenuTrigger asChild>
+//               <Button variant="ghost" className="h-8 w-8 p-0">
+//                 <span className="sr-only">Open menu</span>
+//                 <MoreHorizontalIcon className="h-4 w-4" />
+//               </Button>
+//             </DropdownMenuTrigger>
+//             <DropdownMenuContent align="end">
+//               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+//               <DropdownMenuItem
+//                 className="hover:cursor-pointer"
+//                 onClick={() =>
+//                   navigator.clipboard.writeText(row.original.inventory.invId)
+//                 }
+//               >
+//                 Copy Inventory ID
+//               </DropdownMenuItem>
+//               <DialogTrigger asChild>
+//                 <DropdownMenuItem className="hover:cursor-pointer">
+//                   View Inventory Details
+//                 </DropdownMenuItem>
+//               </DialogTrigger>
+//             </DropdownMenuContent>
+//           </DropdownMenu>
+//           <DialogContent className="rounded-md w-fit sm:max-w-[500px]">
+//             <DialogHeader>
+//               <DialogTitle>Inventory Details</DialogTitle>
+//             </DialogHeader>
 
-            <div className="space-y-4 sm:space-y-0">
-              <div className="flex flex-col sm:flex-row sm:gap-32">
-                <Text className="w-full " variant={'body'}>
-                  Name
-                </Text>
-                <Text variant={'label'} className="flex-1 whitespace-nowrap">
-                  {row.original.inventory.invAssetName}
-                </Text>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:gap-8">
-                <Text className="w-full " variant={'body'}>
-                  Price Per Unit
-                </Text>
-                <Text variant={'label'} className="flex-1 whitespace-nowrap">
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'PHP',
-                  }).format(row.original.inventory.invPricePerUnit)}
-                </Text>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:gap-8">
-                <Text className="w-full " variant={'body'}>
-                  Stocks
-                </Text>
-                <Text variant={'label'} className="flex-1 whitespace-nowrap">
-                  {row.original.inventory.invStocks}
-                </Text>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:gap-8">
-                <Text className="w-full " variant={'body'}>
-                  Status
-                </Text>
-                <Badge variant={'secondary'}>
-                  {row.original.inventory.invStatus}
-                </Badge>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </div>
-  )
-}
+//             <div className="space-y-4 sm:space-y-0">
+//               <div className="flex flex-col sm:flex-row sm:gap-32">
+//                 <Text className="w-full " variant={'body'}>
+//                   Name
+//                 </Text>
+//                 <Text variant={'label'} className="flex-1 whitespace-nowrap">
+//                   {row.original.inventory.invAssetName}
+//                 </Text>
+//               </div>
+//               <div className="flex flex-col sm:flex-row sm:gap-8">
+//                 <Text className="w-full " variant={'body'}>
+//                   Price Per Unit
+//                 </Text>
+//                 <Text variant={'label'} className="flex-1 whitespace-nowrap">
+//                   {new Intl.NumberFormat('en-US', {
+//                     style: 'currency',
+//                     currency: 'PHP',
+//                   }).format(row.original.inventory.invPricePerUnit)}
+//                 </Text>
+//               </div>
+//               <div className="flex flex-col sm:flex-row sm:gap-8">
+//                 <Text className="w-full " variant={'body'}>
+//                   Stocks
+//                 </Text>
+//                 <Text variant={'label'} className="flex-1 whitespace-nowrap">
+//                   {row.original.inventory.invStocks}
+//                 </Text>
+//               </div>
+//               <div className="flex flex-col sm:flex-row sm:gap-8">
+//                 <Text className="w-full " variant={'body'}>
+//                   Status
+//                 </Text>
+//                 <Badge variant={'secondary'}>
+//                   {row.original.inventory.invStatus}
+//                 </Badge>
+//               </div>
+//             </div>
+//           </DialogContent>
+//         </Dialog>
+//       </div>
+//     </div>
+//   )
+// }
 
 export const InventoryEntryPartnerColumn = ({
   dashboard,
@@ -388,8 +390,6 @@ function UpdateFormDialog(props: DialogProps & { row: Row<InventoryEntries> }) {
         undefined,
       invEntryType: props.row.original.invEntryType,
       invEntryTranId: props.row.original.invEntryTranId,
-      invEntryInvId: props.row.original.invEntryInvId,
-      invEntryQuantity: props.row.original.invEntryQuantity,
     },
     resolver: zodResolver(updateInventoryEntrySchema),
   })
@@ -600,5 +600,18 @@ function UpdateFormDialog(props: DialogProps & { row: Row<InventoryEntries> }) {
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+export const InventoryEntriesSubComponent = ({
+  row,
+}: {
+  row: Row<InventoryEntries>
+}) => {
+  return (
+    <InventoryEntryProducsTable
+      columns={inventoryEntryProductsColumns}
+      data={row.original.inventoryEntryProducts}
+    />
   )
 }

@@ -2,6 +2,7 @@ import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
 import { PromptModal } from '@/components/PromptModal'
 import { inventoryEntriesColumns } from '@/components/table-columns/inventoryEntries.columns'
+import { InventoryEntriesSubComponent } from '@/components/table-components/inventoryEntries.tblcomp'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -282,6 +283,8 @@ function InventoryEntriesComponent() {
           className="w-full md:w-[70vw]"
           columns={inventoryEntriesColumns}
           data={inventoryEntries.data.inventoryEntries}
+          getRowCanExpand={() => true}
+          renderSubComponent={InventoryEntriesSubComponent}
           CrudComponents={CrudComponents}
           filter={[
             {
