@@ -1,8 +1,6 @@
 import { eq } from "drizzle-orm";
 import db from "..";
-import accountTypes from "../schema/accountType.schema";
 import crypto from "crypto";
-import inventory from "../schema/inventory.schema";
 import inventoryEntries from "../schema/inventoryEntries.schema";
 import tranTypes from "../schema/transactionTypes.schema";
 import { addTransaction, editTransaction } from "./transactions.service";
@@ -10,6 +8,7 @@ import {
   addInventoryEntryProducts,
   editInventoryEntryProducts,
 } from "./inventoryEntryProducts.service";
+import { getInventoriesByIds } from "./inventory.service";
 
 const INVENTORY_ENTRY_TYPE = {
   INCOMING: "INCOMING",
@@ -54,13 +53,23 @@ export const addInventoryEntry = async (input: {
   invEntryPartner: string;
   invEntryType: InventoryEntryType;
   invEntryTranFileMimeType: string;
-  invEntryTotalPrice: number;
   iepProducts: Array<{
     iepInvId: string;
     iepQuantity: number;
   }>;
 }) => {
   const newInventoryEntryId = `invEntryId ${crypto.randomUUID()}`;
+
+  const inventories = await getInventoriesByIds(
+    input.iepProducts.map((i) => i.iepInvId)
+  );
+  const invTotalPrice = inventories.reduce(
+    (acc, i) =>
+      acc +
+      i.invPricePerUnit *
+        input.iepProducts.find((p) => p.iepInvId === i.invId)!.iepQuantity,
+    0
+  );
 
   const transactionType = await db.query.tranTypes.findFirst({
     where: eq(
@@ -73,7 +82,7 @@ export const addInventoryEntry = async (input: {
 
   const newTransaction = await addTransaction({
     tranAccTypeId: transactionType!.tranTypeAccTypeId,
-    tranAmount: input.invEntryTotalPrice,
+    tranAmount: invTotalPrice,
     tranDescription: "INVENTORY",
     tranPartner: input.invEntryPartner,
     tranTypeId: transactionType!.tranTypeId,
@@ -85,7 +94,7 @@ export const addInventoryEntry = async (input: {
 
   await db.insert(inventoryEntries).values({
     invEntryId: newInventoryEntryId,
-    invEntryTotalPrice: input.invEntryTotalPrice,
+    invEntryTotalPrice: invTotalPrice,
     invEntryTranId: newTransaction!.tranId,
     invEntryDate: input.invEntryDate,
     invEntryType: input.invEntryType,
@@ -105,15 +114,7 @@ export const addInventoryEntry = async (input: {
     iepType: input.invEntryType,
   });
 
-  const newInventoryEntry = await db.query.inventoryEntries.findFirst({
-    where: (inventoryEntry) =>
-      eq(inventoryEntry.invEntryId, newInventoryEntryId),
-    with: {
-      transaction: { with: { account: { with: { accountType: true } } } },
-      customer: true,
-      vendor: true,
-    },
-  });
+  const newInventoryEntry = await getInventoryEntryById(newInventoryEntryId);
   return newInventoryEntry;
 };
 

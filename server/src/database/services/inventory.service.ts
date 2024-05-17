@@ -4,6 +4,7 @@ import inventory from "../schema/inventory.schema";
 import { eq, sql } from "drizzle-orm";
 import inventoryEntries from "../schema/inventoryEntries.schema";
 import { editInventoryEntry } from "./inventoryEntries.service";
+import { inArray } from "drizzle-orm";
 
 const INVENTORY_STATUS = {
   GOOD: "GOOD",
@@ -19,6 +20,13 @@ export const getAllInventories = async () => {
   const Inventories = await db.query.inventory.findMany();
 
   return Inventories;
+};
+
+export const getInventoriesByIds = async (invIds: string[]) => {
+  const inventories = await db.query.inventory.findMany({
+    where: inArray(inventory.invId, invIds),
+  });
+  return inventories;
 };
 
 export const addInventory = async (input: {
@@ -47,9 +55,9 @@ export const editInventory = async (input: {
     invPricePerUnit?: number;
   };
 }) => {
-  const prevValues = await db.query.inventory.findFirst({
-    where: (inv) => eq(inv.invId, input.invId),
-  });
+  // const prevValues = await db.query.inventory.findFirst({
+  //   where: (inv) => eq(inv.invId, input.invId),
+  // });
 
   await db
     .update(inventory)
