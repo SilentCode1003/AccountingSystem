@@ -8,7 +8,7 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -92,11 +92,8 @@ function InventoryEntryProducsTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <>
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
+                <Fragment key={row.id}>
+                  <TableRow data-state={row.getIsSelected() && 'selected'}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(
@@ -106,7 +103,7 @@ function InventoryEntryProducsTable<TData, TValue>({
                       </TableCell>
                     ))}
                   </TableRow>
-                </>
+                </Fragment>
               ))
             ) : (
               <TableRow>

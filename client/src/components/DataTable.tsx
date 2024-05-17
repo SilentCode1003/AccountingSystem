@@ -19,6 +19,7 @@ import { ChevronDownIcon, FilterIcon } from 'lucide-react'
 import {
   ComponentProps,
   ElementType,
+  Fragment,
   ReactElement,
   useEffect,
   useState,
@@ -358,11 +359,8 @@ function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <>
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
+                <Fragment key={row.id}>
+                  <TableRow data-state={row.getIsSelected() && 'selected'}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(
@@ -373,7 +371,7 @@ function DataTable<TData, TValue>({
                     ))}
                   </TableRow>
                   {row.getIsExpanded() && (
-                    <TableRow className="p-0">
+                    <TableRow key={row.id} className="p-0">
                       <TableCell
                         className="p-0"
                         colSpan={row.getVisibleCells().length}
@@ -384,7 +382,7 @@ function DataTable<TData, TValue>({
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </Fragment>
               ))
             ) : (
               <TableRow>

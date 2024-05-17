@@ -26,7 +26,6 @@ export const createValidator = z.object({
       });
     }
   }),
-  invEntryTotalPrice: z.coerce.number(),
   invEntryType: z.enum(["INCOMING", "OUTGOING"]),
   invEntryFile: z.custom<UploadedFile>().refine(
     (file) => {
