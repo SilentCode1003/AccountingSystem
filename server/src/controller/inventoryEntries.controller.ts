@@ -24,6 +24,9 @@ export const getInventoryEntries = async (req: Request, res: Response) => {
 export const createInventoryEntry = async (req: Request, res: Response) => {
   const input = createValidator.safeParse({
     ...req.body,
+    iepProducts: Array.isArray(req.body.iepProducts)
+      ? req.body.iepProducts
+      : [req.body.iepProducts],
     invEntryFile: req.files?.invEntryFile,
     invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
@@ -72,6 +75,9 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
 export const updateInventoryEntry = async (req: Request, res: Response) => {
   const input = updateValidator.safeParse({
     ...req.body,
+    iepProducts: Array.isArray(req.body.iepProducts)
+      ? req.body.iepProducts
+      : [req.body.iepProducts],
     invEntryFile: req.files?.invEntryFile,
     invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
