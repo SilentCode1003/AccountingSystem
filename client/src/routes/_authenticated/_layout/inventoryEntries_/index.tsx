@@ -167,7 +167,6 @@ function CrudComponents() {
       } else fd.append(key, values[key as keyof typeof values] as any)
     })
     createInventoryEntry.mutate(fd)
-    form.reset()
     form.clearErrors()
   }
 

@@ -507,7 +507,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<InventoryEntries> }) {
       } else fd.append(key, values[key as keyof typeof values] as any)
     })
     updateInventoryEntry.mutate(fd)
-    setSelected([])
+
     form.clearErrors()
   }
   return (
