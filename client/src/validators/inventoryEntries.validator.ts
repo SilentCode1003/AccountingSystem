@@ -66,23 +66,6 @@ export const createInventoryEntrySchema = z.object({
 })
 
 export const updateInventoryEntrySchema = z.object({
-  invEntryInvId: z
-    .string()
-    .superRefine((val, ctx) => {
-      if (val.split(' ')[0] !== 'invId') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an inventory id.`,
-        })
-      }
-      if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        })
-      }
-    })
-    .optional(),
   invEntryId: z.string().superRefine((val, ctx) => {
     if (val.split(' ')[0] !== 'invEntryId') {
       ctx.addIssue({
@@ -112,10 +95,6 @@ export const updateInventoryEntrySchema = z.object({
     }
   }),
 
-  invEntryQuantity: z
-    .number()
-    .positive({ message: 'must not be 0 or negative' })
-    .optional(),
   invEntryDate: z.date().optional(),
   invEntryPartner: z
     .string()
