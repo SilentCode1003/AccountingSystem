@@ -92,48 +92,67 @@ export const addInventoryEntryProducts = async (input: {
 export const editInventoryEntryProducts = async (input: {
   iepInvEntryId: string;
   iepType?: string;
+  prevInvEntryType: string;
   iepProducts: Array<{
     iepInvId: string;
     iepQuantity: number;
   }>;
 }) => {
-  await Promise.all(
-    input.iepProducts.map(async (product) => {
-      const inv = await db.query.inventory.findFirst({
-        where: (inventory) => eq(inventory.invId, product.iepInvId),
-      });
+  const previousProducts = await db.query.inventoryEntryProducts.findMany({
+    where: eq(inventoryEntryProducts.iepInvEntryId, input.iepInvEntryId),
+  });
 
-      const prevInvProduct = await db.query.inventoryEntryProducts.findFirst({
-        where: (iep) =>
-          and(
-            eq(iep.iepInvEntryId, input.iepInvEntryId),
-            eq(iep.iepInvId, product.iepInvId)
-          ),
-      });
+  await db
+    .delete(inventoryEntryProducts)
+    .where(eq(inventoryEntryProducts.iepInvEntryId, input.iepInvEntryId));
 
-      await db
-        .update(inventoryEntryProducts)
-        .set({
-          ...product,
-          iepTotalPrice: product.iepQuantity * inv!.invPricePerUnit,
-        })
-        .where(
-          and(
-            eq(inventoryEntryProducts.iepInvEntryId, input.iepInvEntryId),
-            eq(inventoryEntryProducts.iepInvId, product.iepInvId)
-          )
-        );
-
-      if (input.iepType) {
+  if (input.iepType !== input.prevInvEntryType) {
+    await Promise.all(
+      previousProducts.map(async (product) => {
+        const inv = await db.query.inventory.findFirst({
+          where: (inventory) => eq(inventory.invId, product.iepInvId),
+        });
         await db
           .update(inventory)
           .set({
             invStocks:
               input.iepType === "INCOMING"
-                ? inv!.invStocks +
-                  (product.iepQuantity - prevInvProduct!.iepQuantity)
-                : inv!.invStocks -
-                  (product.iepQuantity - prevInvProduct!.iepQuantity),
+                ? inv!.invStocks + product.iepQuantity
+                : inv!.invStocks - product.iepQuantity,
+          })
+          .where(eq(inventory.invId, product.iepInvId));
+      })
+    );
+  }
+
+  await Promise.all(
+    input.iepProducts.map(async (product) => {
+      const newInventoryEntryProductId = `iepId ${crypto.randomUUID()}`;
+
+      const inv = await db.query.inventory.findFirst({
+        where: (inventory) => eq(inventory.invId, product.iepInvId),
+      });
+      await db.insert(inventoryEntryProducts).values({
+        iepId: newInventoryEntryProductId,
+        iepInvEntryId: input.iepInvEntryId,
+        iepInvId: product.iepInvId,
+        iepQuantity: product.iepQuantity,
+        iepTotalPrice: product.iepQuantity * inv!.invPricePerUnit,
+      });
+
+      const updatedStocks =
+        input.iepType === "INCOMING"
+          ? inv!.invStocks + product.iepQuantity
+          : inv!.invStocks - product.iepQuantity;
+
+      if (
+        input.iepType !== input.prevInvEntryType ||
+        previousProducts.length !== input.iepProducts.length
+      ) {
+        await db
+          .update(inventory)
+          .set({
+            invStocks: updatedStocks,
           })
           .where(eq(inventory.invId, product.iepInvId));
       }

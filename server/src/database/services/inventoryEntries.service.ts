@@ -123,7 +123,6 @@ export const editInventoryEntry = async (input: {
   invEntryTranId: string;
   invEntryDate?: Date;
   invEntryPartner?: string;
-  invEntryTotalPrice?: number;
   invEntryType?: InventoryEntryType;
   iepProducts: Array<{
     iepInvId: string;
@@ -131,6 +130,17 @@ export const editInventoryEntry = async (input: {
   }>;
   invEntryTranFileMimeType?: string;
 }) => {
+  const inventories = await getInventoriesByIds(
+    input.iepProducts.map((i) => i.iepInvId)
+  );
+  const invTotalPrice = inventories.reduce(
+    (acc, i) =>
+      acc +
+      i.invPricePerUnit *
+        input.iepProducts.find((p) => p.iepInvId === i.invId)!.iepQuantity,
+    0
+  );
+
   const transactionType = await db.query.tranTypes.findFirst({
     where: eq(
       tranTypes.tranTypeName,
@@ -140,21 +150,35 @@ export const editInventoryEntry = async (input: {
     ),
   });
 
+  const prevInvEntry = await getInventoryEntryById(input.invEntryId);
+
   await editInventoryEntryProducts({
     iepInvEntryId: input.invEntryId,
     iepProducts: input.iepProducts,
+    prevInvEntryType: prevInvEntry!.invEntryType,
     iepType: input.invEntryType,
   });
 
-  // await db
-  //   .update(inventoryEntries)
-  //   .set({ ...input, invEntryTotalPrice: input.invEntryTotalPrice })
-  //   .where(eq(inventoryEntries.invEntryId, input.invEntryId));
+  await db
+    .update(inventoryEntries)
+    .set({
+      ...input,
+      invEntryTotalPrice: invTotalPrice,
+      invEntryCustId:
+        input.invEntryPartner!.split(" ")[0] === "custId"
+          ? input.invEntryPartner
+          : null,
+      invEntryVdId:
+        input.invEntryPartner!.split(" ")[0] === "vdId"
+          ? input.invEntryPartner
+          : null,
+    })
+    .where(eq(inventoryEntries.invEntryId, input.invEntryId));
 
   await editTransaction({
     tranId: input.invEntryTranId,
     tranAccTypeId: transactionType!.tranTypeAccTypeId,
-    tranAmount: input.invEntryTotalPrice,
+    tranAmount: invTotalPrice,
     tranDescription: "INVENTORY",
     tranTypeId: transactionType!.tranTypeId,
     tranPartner: input.invEntryPartner!,
