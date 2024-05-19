@@ -1,23 +1,6 @@
 import { z } from 'zod'
 
 export const createInventoryEntrySchema = z.object({
-  invEntryInvId: z.string().superRefine((val, ctx) => {
-    if (val.split(' ')[0] !== 'invId') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an inventory id.`,
-      })
-    }
-    if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      })
-    }
-  }),
-  invEntryQuantity: z
-    .number()
-    .positive({ message: 'must not be 0 or negative' }),
   invEntryDate: z.date(),
   invEntryPartner: z.string().superRefine((val, ctx) => {
     if (val === '')
@@ -51,26 +34,38 @@ export const createInventoryEntrySchema = z.object({
     },
     { message: 'Only xlsx/pdf files are allowed!' },
   ),
+  iepProducts: z
+    .array(
+      z.object({
+        iepInvId: z.string().superRefine((val, ctx) => {
+          if (val.split(' ')[0] !== 'invId') {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Not an inventory id.`,
+            })
+          }
+          if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Not valid uuid.`,
+            })
+          }
+        }),
+        iepQuantity: z
+          .union([
+            z.number().positive({ message: 'must not be 0 or negative' }),
+            z.nan(),
+          ])
+          .refine((val) => !Number.isNaN(val), {
+            message: 'required',
+          })
+          .optional(),
+      }),
+    )
+    .min(1, { message: 'required' }),
 })
 
 export const updateInventoryEntrySchema = z.object({
-  invEntryInvId: z
-    .string()
-    .superRefine((val, ctx) => {
-      if (val.split(' ')[0] !== 'invId') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an inventory id.`,
-        })
-      }
-      if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        })
-      }
-    })
-    .optional(),
   invEntryId: z.string().superRefine((val, ctx) => {
     if (val.split(' ')[0] !== 'invEntryId') {
       ctx.addIssue({
@@ -100,10 +95,6 @@ export const updateInventoryEntrySchema = z.object({
     }
   }),
 
-  invEntryQuantity: z
-    .number()
-    .positive({ message: 'must not be 0 or negative' })
-    .optional(),
   invEntryDate: z.date().optional(),
   invEntryPartner: z
     .string()
@@ -143,4 +134,27 @@ export const updateInventoryEntrySchema = z.object({
       { message: 'Only xlsx/pdf files are allowed!' },
     )
     .optional(),
+  iepProducts: z
+    .array(
+      z.object({
+        iepInvId: z.string().superRefine((val, ctx) => {
+          if (val.split(' ')[0] !== 'invId') {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Not an inventory id.`,
+            })
+          }
+          if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Not valid uuid.`,
+            })
+          }
+        }),
+        iepQuantity: z
+          .number()
+          .positive({ message: 'Must not be a negative number' }),
+      }),
+    )
+    .min(1, { message: 'required' }),
 })

@@ -4,6 +4,7 @@ import inventory from "../schema/inventory.schema";
 import { eq, sql } from "drizzle-orm";
 import inventoryEntries from "../schema/inventoryEntries.schema";
 import { editInventoryEntry } from "./inventoryEntries.service";
+import { inArray } from "drizzle-orm";
 
 const INVENTORY_STATUS = {
   GOOD: "GOOD",
@@ -19,6 +20,13 @@ export const getAllInventories = async () => {
   const Inventories = await db.query.inventory.findMany();
 
   return Inventories;
+};
+
+export const getInventoriesByIds = async (invIds: string[]) => {
+  const inventories = await db.query.inventory.findMany({
+    where: inArray(inventory.invId, invIds),
+  });
+  return inventories;
 };
 
 export const addInventory = async (input: {
@@ -47,9 +55,9 @@ export const editInventory = async (input: {
     invPricePerUnit?: number;
   };
 }) => {
-  const prevValues = await db.query.inventory.findFirst({
-    where: (inv) => eq(inv.invId, input.invId),
-  });
+  // const prevValues = await db.query.inventory.findFirst({
+  //   where: (inv) => eq(inv.invId, input.invId),
+  // });
 
   await db
     .update(inventory)
@@ -60,22 +68,22 @@ export const editInventory = async (input: {
     where: (inv) => eq(inv.invId, input.invId),
   });
 
-  if (Number(prevValues?.invPricePerUnit) !== input.newData.invPricePerUnit) {
-    const invEntriesId = await db.query.inventoryEntries.findMany({
-      where: eq(inventoryEntries.invEntryInvId, input.invId),
-    });
+  // if (Number(prevValues?.invPricePerUnit) !== input.newData.invPricePerUnit) {
+  //   const invEntriesId = await db.query.inventoryEntries.findMany({
+  //     where: eq(inventoryEntries.invEntryInvId, input.invId),
+  //   });
 
-    await Promise.all(
-      invEntriesId.map(async (invEntry) => {
-        await editInventoryEntry({
-          invEntryId: invEntry.invEntryId,
-          invEntryTranId: invEntry.invEntryTranId,
-          invEntryInvId: editedInv!.invId,
-          invEntryQuantity: invEntry.invEntryQuantity,
-          invEntryType: invEntry.invEntryType,
-        });
-      })
-    );
-  }
+  //   await Promise.all(
+  //     invEntriesId.map(async (invEntry) => {
+  //       await editInventoryEntry({
+  //         invEntryId: invEntry.invEntryId,
+  //         invEntryTranId: invEntry.invEntryTranId,
+  //         invEntryInvId: editedInv!.invId,
+  //         invEntryQuantity: invEntry.invEntryQuantity,
+  //         invEntryType: invEntry.invEntryType,
+  //       });
+  //     })
+  //   );
+  // }
   return editedInv;
 };

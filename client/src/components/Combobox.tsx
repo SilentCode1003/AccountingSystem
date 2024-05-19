@@ -26,17 +26,20 @@ export function ComboBox({
   value,
   setValue,
   emptyLabel,
+  selected,
 }: {
   data: Array<{
     value: string
     label: string
   }>
   value: string
+  selected?: Array<string>
   setValue: Function
   emptyLabel: string
 }) {
   const [open, setOpen] = React.useState(false)
 
+  // console.log(selected)
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -63,22 +66,43 @@ export function ComboBox({
               <CommandGroup>
                 {data.map((d) =>
                   d.value !== 'separator' ? (
-                    <CommandItem
-                      key={d.value}
-                      value={d.label}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? '' : d.value)
-                        setOpen(false)
-                      }}
-                    >
-                      {d.label}
-                      <CheckIcon
-                        className={cn(
-                          'ml-auto h-4 w-4',
-                          value === d.value ? 'opacity-100' : 'opacity-0',
-                        )}
-                      />
-                    </CommandItem>
+                    selected ? (
+                      !selected.includes(d.value) && (
+                        <CommandItem
+                          key={d.value}
+                          value={d.label}
+                          onSelect={(currentValue) => {
+                            setValue(currentValue === value ? '' : d.value)
+                            setOpen(false)
+                          }}
+                        >
+                          {d.label}
+                          <CheckIcon
+                            className={cn(
+                              'ml-auto h-4 w-4',
+                              value === d.value ? 'opacity-100' : 'opacity-0',
+                            )}
+                          />
+                        </CommandItem>
+                      )
+                    ) : (
+                      <CommandItem
+                        key={d.value}
+                        value={d.label}
+                        onSelect={(currentValue) => {
+                          setValue(currentValue === value ? '' : d.value)
+                          setOpen(false)
+                        }}
+                      >
+                        {d.label}
+                        <CheckIcon
+                          className={cn(
+                            'ml-auto h-4 w-4',
+                            value === d.value ? 'opacity-100' : 'opacity-0',
+                          )}
+                        />
+                      </CommandItem>
+                    )
                   ) : (
                     <CommandSeparator />
                   ),

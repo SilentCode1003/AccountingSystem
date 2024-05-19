@@ -5,16 +5,25 @@ import {
   FilterFn,
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  Row,
   SortingState,
   Table as TableType,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
 import { ChevronDownIcon, FilterIcon } from 'lucide-react'
-import { ComponentProps, ElementType, useEffect, useState } from 'react'
+import {
+  ComponentProps,
+  ElementType,
+  Fragment,
+  ReactElement,
+  useEffect,
+  useState,
+} from 'react'
 import { Button } from './ui/button'
 import DatePicker from './ui/DatePicker'
 import {
@@ -52,6 +61,8 @@ declare module '@tanstack/table-core' {
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  renderSubComponent?: (props: { row: Row<TData> }) => ReactElement
+  getRowCanExpand?: (row: Row<TData>) => boolean
 } & ComponentProps<'div'> & {
     pageSize?: number
     filter?: Array<{
@@ -242,6 +253,8 @@ function DataTable<TData, TValue>({
   CrudComponents,
   showVisibility,
   showFooter,
+  renderSubComponent,
+  getRowCanExpand,
   ...props
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -257,6 +270,8 @@ function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
+    getRowCanExpand,
+    getExpandedRowModel: getExpandedRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
@@ -344,19 +359,30 @@ function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <Fragment key={row.id}>
+                  <TableRow data-state={row.getIsSelected() && 'selected'}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {row.getIsExpanded() && (
+                    <TableRow key={row.id} className="p-0">
+                      <TableCell
+                        className="p-0"
+                        colSpan={row.getVisibleCells().length}
+                      >
+                        {renderSubComponent
+                          ? renderSubComponent({ row })
+                          : null}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </Fragment>
               ))
             ) : (
               <TableRow>

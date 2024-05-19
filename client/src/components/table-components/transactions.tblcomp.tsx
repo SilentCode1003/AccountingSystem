@@ -147,7 +147,7 @@ export const TransactionTypeColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
   return (
-    <Badge variant={'secondary'}>
+    <Badge variant={'secondary'} className="w-fit whitespace-nowrap ">
       {row.original.transactionType.tranTypeName}
     </Badge>
   )

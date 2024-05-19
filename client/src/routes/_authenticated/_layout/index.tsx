@@ -3,11 +3,13 @@ import AccountTypeTotalCard from '@/components/AccountTypeTotalCard'
 import RecentTransactions from '@/components/RecentTransactions'
 import { recentTransactionsColumns } from '@/components/table-columns/transactions.columns'
 import { Card } from '@/components/ui/card'
+import MonthPicker from '@/components/ui/month-picker'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Text } from '@/components/ui/text'
 import { useAccountTypes, useTransactions } from '@/hooks/queries'
 import { transactionsOptions } from '@/hooks/queries/options'
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_authenticated/_layout/')({
   loader: async ({ context }) => {
@@ -41,17 +43,20 @@ function LoadingComponent() {
 function Home() {
   const accountTypes = useAccountTypes()
   const transactions = useTransactions()
+  const [month, setMonth] = useState<Date>(new Date())
 
   return (
     <div className="max-h-[85vh] px-4 overflow-y-auto w-screens">
-      <div className="border-b-2 border-foreground pb-4 mb-4 mt-4">
+      <div className="border-b-2 border-foreground pb-4 mb-4 mt-4 flex justify-between">
         <Text variant={'heading1bold'}>Dashboard</Text>
+        <MonthPicker currentMonth={month} onMonthChange={setMonth} />
       </div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-4 md:flex-row md:flex-wrap">
           {accountTypes.isSuccess &&
             accountTypes.data.accountTypes.map((accountType) => (
               <AccountTypeTotalCard
+                month={month}
                 accTypeId={accountType.accTypeId}
                 key={accountType.accTypeId}
               />
