@@ -1,3 +1,4 @@
+import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
@@ -20,7 +21,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Text } from '@/components/ui/text'
 import { useCreateTransactionType } from '@/hooks/mutations'
-import { useTransactionTypes } from '@/hooks/queries'
+import { useAccountTypes, useTransactionTypes } from '@/hooks/queries'
 import { transactionTypesOptions } from '@/hooks/queries/options'
 import { createTransactionTypeSchema } from '@/validators/transactionTypes.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -54,11 +55,13 @@ function LoadingComponent() {
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
 
+  const accountTypes = useAccountTypes()
   const createTransactionType = useCreateTransactionType({ setOpen })
 
   const form = useForm<z.infer<typeof createTransactionTypeSchema>>({
     defaultValues: {
       tranTypeName: '',
+      tranTypeAccTypeId: '',
     },
     resolver: zodResolver(createTransactionTypeSchema),
   })
@@ -99,6 +102,29 @@ const CrudComponents = () => {
                           {...field}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tranTypeAccTypeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Account Type</FormLabel>
+                      <FormControl>
+                        {accountTypes.isSuccess && (
+                          <ComboBox
+                            data={accountTypes.data.accountTypes.map((t) => ({
+                              label: t.accTypeName,
+                              value: t.accTypeId,
+                            }))}
+                            emptyLabel="Nothing Found"
+                            value={field.value as string}
+                            setValue={field.onChange}
+                          />
+                        )}
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

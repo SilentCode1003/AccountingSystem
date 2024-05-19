@@ -37,9 +37,11 @@ import {
 import { Input } from '../ui/input'
 import { Text } from '../ui/text'
 import {
-  useDeleteTransactionType,
+  useToggleTransactionType,
   useUpdateTransactionType,
 } from '@/hooks/mutations'
+import { useAccountTypes } from '@/hooks/queries'
+import { ComboBox } from '../Combobox'
 
 export const TranTypeNameColumn = ({
   row,
@@ -47,16 +49,19 @@ export const TranTypeNameColumn = ({
   return <Badge variant={'secondary'}>{row.original.tranTypeName}</Badge>
 }
 
-export const TranTypeTransactionsColumn = ({
+export const TranTypeAccountTypeColumn = ({
   row,
 }: CellContext<TransactionTypes, unknown>) => {
   const [open, setOpen] = useState<boolean>(false)
+
+  const accountTypes = useAccountTypes()
 
   const form = useForm({
     defaultValues: {
       tranTypeId: row.original.tranTypeId,
       newData: {
         tranTypeName: row.original.tranTypeName,
+        tranTypeAccTypeId: row.original.tranTypeAccTypeId,
       },
     },
     resolver: zodResolver(updateTransactionTypeSchema),
@@ -64,7 +69,7 @@ export const TranTypeTransactionsColumn = ({
 
   const updateTranType = useUpdateTransactionType({ setOpen })
 
-  const deleteTransactionType = useDeleteTransactionType()
+  const toggleTransactionType = useToggleTransactionType()
 
   const handleSubmit = (
     values: z.infer<typeof updateTransactionTypeSchema>,
@@ -75,19 +80,9 @@ export const TranTypeTransactionsColumn = ({
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-col gap-4">
-        {row.original.transactions.length > 0 ? (
-          row.original.transactions.map((tran) => (
-            <Badge
-              variant={'outline'}
-              className="w-fit whitespace-nowrap"
-              key={tran.tranId}
-            >
-              {tran.tranDescription}
-            </Badge>
-          ))
-        ) : (
-          <div>No Result</div>
-        )}
+        <Badge variant={'secondary'}>
+          {row.original.accountType.accTypeName}
+        </Badge>
       </div>
 
       <div>
@@ -116,13 +111,15 @@ export const TranTypeTransactionsColumn = ({
 
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
-                  <DropdownMenuItem>Delete Transaction Type</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    Toggle Transaction Type Status
+                  </DropdownMenuItem>
                 </AlertDialogTrigger>
               </DropdownMenuContent>
             </DropdownMenu>
             <PromptModal
               callback={() =>
-                deleteTransactionType.mutate({
+                toggleTransactionType.mutate({
                   tranTypeId: row.original.tranTypeId,
                 })
               }
@@ -175,6 +172,31 @@ export const TranTypeTransactionsColumn = ({
                                   {...field}
                                 />
                               </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="newData.tranTypeAccTypeId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Account Type</FormLabel>
+                              <FormControl>
+                                {accountTypes.isSuccess && (
+                                  <ComboBox
+                                    data={accountTypes.data.accountTypes.map(
+                                      (t) => ({
+                                        label: t.accTypeName,
+                                        value: t.accTypeId,
+                                      }),
+                                    )}
+                                    emptyLabel="Nothing Found"
+                                    value={field.value as string}
+                                    setValue={field.onChange}
+                                  />
+                                )}
+                              </FormControl>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />

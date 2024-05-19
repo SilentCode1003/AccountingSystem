@@ -3,21 +3,6 @@ import z from "zod";
 
 //validator for POST /inventoryEntries input
 export const createValidator = z.object({
-  invEntryInvId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "invId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an inventory id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
-  }),
-  invEntryQuantity: z.number(),
   invEntryDate: z
     .string()
     .datetime()
@@ -56,6 +41,31 @@ export const createValidator = z.object({
       message: "Only xlsx/pdf files are allowed",
     }
   ),
+  iepProducts: z.array(
+    z
+      .string()
+      .regex(/\w+\s\S+\?(\d+)/)
+      .superRefine((val, ctx) => {
+        if (val.split("?")[0].split(" ")[0] !== "invId") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not an inventory entry id.`,
+          });
+        }
+        if (
+          !z.string().uuid().safeParse(val.split("?")[0].split(" ")[1]).success
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not valid uuid.`,
+          });
+        }
+      })
+      .transform((val) => ({
+        iepInvId: val.split("?")[0],
+        iepQuantity: Number(val.split("?")[1]),
+      }))
+  ),
 });
 
 //validator for PUT /inventoryEntries input
@@ -65,20 +75,6 @@ export const updateValidator = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not an inventory entry id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
-  }),
-  invEntryInvId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "invId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an inventory id.`,
       });
     }
     if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
@@ -102,7 +98,6 @@ export const updateValidator = z.object({
       });
     }
   }),
-  invEntryQuantity: z.number().optional(),
   invEntryDate: z
     .string()
     .datetime()
@@ -148,4 +143,29 @@ export const updateValidator = z.object({
       }
     )
     .optional(),
+  iepProducts: z.array(
+    z
+      .string()
+      .regex(/\w+\s\S+\?(\d+)/)
+      .superRefine((val, ctx) => {
+        if (val.split("?")[0].split(" ")[0] !== "invId") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not an inventory entry id.`,
+          });
+        }
+        if (
+          !z.string().uuid().safeParse(val.split("?")[0].split(" ")[1]).success
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Not valid uuid.`,
+          });
+        }
+      })
+      .transform((val) => ({
+        iepInvId: val.split("?")[0],
+        iepQuantity: Number(val.split("?")[1]),
+      }))
+  ),
 });

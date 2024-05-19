@@ -390,17 +390,17 @@ export const useUpdateTransactionType = ({
   })
 }
 
-export const useDeleteTransactionType = () => {
+export const useToggleTransactionType = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationKey: ['deleteTransactionType'],
+    mutationKey: ['toggleTransactionType'],
     mutationFn: async (
       payload: Pick<z.infer<typeof updateTransactionTypeSchema>, 'tranTypeId'>,
     ) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactionTypes/${payload.tranTypeId}`,
         {
-          method: 'DELETE',
+          method: 'PUT',
           credentials: 'include',
         },
       )
@@ -408,7 +408,7 @@ export const useDeleteTransactionType = () => {
       if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
-        deletedTranTypeId: string
+        transactionType: TransactionTypes
       }>
       return data
     },
@@ -417,9 +417,12 @@ export const useDeleteTransactionType = () => {
         ['transactionTypes'],
         (old: { transactionTypes: Array<TransactionTypes> }) => {
           return {
-            transactionTypes: old.transactionTypes.filter(
-              (tranType) => tranType.tranTypeId !== data.deletedTranTypeId,
-            ),
+            transactionTypes: old.transactionTypes.map((tranType) => {
+              if (tranType.tranTypeId === data.transactionType.tranTypeId) {
+                return data.transactionType
+              }
+              return tranType
+            }),
           }
         },
       )
@@ -432,7 +435,7 @@ export const useDeleteTransactionType = () => {
             </div>
           </div>
         ),
-        description: 'Transaction type was deleted successfully',
+        description: 'Transaction type was toggled successfully',
       })
     },
     onError: (error) => {
@@ -443,7 +446,7 @@ export const useDeleteTransactionType = () => {
             Something went wrong!
           </div>
         ),
-        description: error.message ?? 'Failed to delete transaction type ',
+        description: error.message ?? 'Failed to toggle transaction type ',
         variant: 'destructive',
       })
     },
@@ -1750,6 +1753,7 @@ export const useCreateTransaction = (
           body: payload,
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as {
         transaction: Transactions
       }
@@ -1809,6 +1813,7 @@ export const useCreateTransactionByFile = ({
           body: payload,
         },
       )
+      if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as {
         transactions: Array<Transactions>
       }

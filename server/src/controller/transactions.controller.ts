@@ -184,6 +184,11 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       })
     );
 
+    if (lq.every((l) => l.tranPartner !== undefined))
+      return res.status(404).send({
+        error: "Transaction partner not found",
+      });
+
     const transactionType = await db.query.tranTypes.findFirst({
       where: (tranType) =>
         eq(tranType.tranTypeName, file.name.match(firstWordRegex)![0]),
