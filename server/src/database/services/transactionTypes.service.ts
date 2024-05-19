@@ -2,11 +2,12 @@ import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import db from "..";
 import tranTypes from "../schema/transactionTypes.schema";
+import { not } from "drizzle-orm";
 
 export const getAllTransactionTypes = async () => {
   const transactionTypes = await db.query.tranTypes.findMany({
     with: {
-      transactions: true,
+      accountType: true,
     },
   });
 
@@ -17,13 +18,16 @@ export const getTransactionTypeById = async (tranTypeId: string) => {
   const transactionType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeId, tranTypeId),
     with: {
-      transactions: true,
+      accountType: true,
     },
   });
   return transactionType;
 };
 
-export const addTransactionType = async (input: { tranTypeName: string }) => {
+export const addTransactionType = async (input: {
+  tranTypeName: string;
+  tranTypeAccTypeId: string;
+}) => {
   const newTransactionTypeId = `tranTypeId ${crypto.randomUUID()}`;
   await db
     .insert(tranTypes)
@@ -36,6 +40,7 @@ export const editTransactionType = async (input: {
   tranTypeId: string;
   newData: {
     tranTypeName?: string;
+    tranTypeAccTypeId?: string;
   };
 }) => {
   await db
@@ -46,6 +51,15 @@ export const editTransactionType = async (input: {
   return editedTransactionType;
 };
 
-export const removeTransactionType = async (input: { tranTypeId: string }) => {
-  await db.delete(tranTypes).where(eq(tranTypes.tranTypeId, input.tranTypeId));
+export const changeTransactionTypeIsActive = async (input: {
+  tranTypeId: string;
+}) => {
+  await db
+    .update(tranTypes)
+    .set({
+      tranTypeIsActive: not(tranTypes.tranTypeIsActive),
+    })
+    .where(eq(tranTypes.tranTypeId, input.tranTypeId));
+  const editedTransactionType = await getTransactionTypeById(input.tranTypeId);
+  return editedTransactionType;
 };

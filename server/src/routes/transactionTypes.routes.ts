@@ -2,8 +2,8 @@ import { Router } from "express";
 
 import {
   createTransactionType,
-  deleteTransactionType,
   getTransactionTypes,
+  toggleTransactionTypeIsActive,
   updateTransactionType,
 } from "../controller/transactionTypes.controller";
 
@@ -19,6 +19,6 @@ transactionTypesRouter.post("/", createTransactionType);
 transactionTypesRouter.put("/", updateTransactionType);
 
 //delete a transaction type
-transactionTypesRouter.delete("/:tranTypeId", deleteTransactionType);
+transactionTypesRouter.put("/:tranTypeId", toggleTransactionTypeIsActive);
 
 export default transactionTypesRouter;

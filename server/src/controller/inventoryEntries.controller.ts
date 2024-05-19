@@ -22,15 +22,18 @@ export const getInventoryEntries = async (req: Request, res: Response) => {
   }
 };
 export const createInventoryEntry = async (req: Request, res: Response) => {
+  console.log("test");
   const input = createValidator.safeParse({
     ...req.body,
-    invEntryQuantity: parseInt(req.body.invEntryQuantity),
+    iepProducts: Array.isArray(req.body.iepProducts)
+      ? req.body.iepProducts
+      : [req.body.iepProducts],
     invEntryFile: req.files?.invEntryFile,
     invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
 
   if (!input.success)
-    return res.status(400).send({ error: input.error.errors[0].message });
+    return res.status(400).send({ error: input.error.errors });
   try {
     const newInventoryEntry = await addInventoryEntry({
       ...input.data,
@@ -57,12 +60,13 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
 
     console.log("successfully created inventory entry");
     return res.status(200).send({ inventoryEntry: newInventoryEntry });
+    // return res.status(400).send({ input: input.data });
   } catch (error) {
     const err = error as Error;
 
-    if (err.message === "Not enough stocks")
+    if (err.message.includes("Not enough stocks"))
       return res.status(400).send({
-        error: "Not enough stocks",
+        error: err.message,
       });
     console.log("error in creating inventory entry");
     console.log(error);
@@ -72,7 +76,9 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
 export const updateInventoryEntry = async (req: Request, res: Response) => {
   const input = updateValidator.safeParse({
     ...req.body,
-    invEntryQuantity: parseInt(req.body.invEntryQuantity),
+    iepProducts: Array.isArray(req.body.iepProducts)
+      ? req.body.iepProducts
+      : [req.body.iepProducts],
     invEntryFile: req.files?.invEntryFile,
     invEntryDate: new Date(req.body.invEntryDate).toISOString(),
   });
@@ -107,6 +113,12 @@ export const updateInventoryEntry = async (req: Request, res: Response) => {
     console.log("successfully updated inventory entry");
     return res.status(200).send({ inventoryEntry: updatedInventoryEntry });
   } catch (error) {
+    const err = error as Error;
+
+    if (err.message.includes("Not enough stocks"))
+      return res.status(400).send({
+        error: err.message,
+      });
     console.log("error in updating inventory entry");
     console.log(error);
     return res.status(500).send({ error: "Server error" });

@@ -4,7 +4,6 @@ import "dotenv";
 
 export default {
   schema: "./src/database/schema/*",
-
   out: "./src/database/drizzle",
   dialect: "mysql",
   dbCredentials: {
