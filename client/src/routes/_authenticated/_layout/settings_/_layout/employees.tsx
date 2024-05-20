@@ -1,4 +1,5 @@
 import DataTable from '@/components/DataTable'
+import { Dropzone } from '@/components/Dropzone'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
 import {
@@ -22,8 +23,15 @@ import {
   FormMessage,
 } from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
-import { useCreateEmployee } from '@/hooks/mutations'
+import { useCreateEmployee, useSyncEmployeeByAPI } from '@/hooks/mutations'
 import { useEmployees } from '@/hooks/queries'
 import { employeesOptions } from '@/hooks/queries/options'
 import { createEmployeeSchema } from '@/validators/employees.validator'
@@ -53,6 +61,54 @@ function LoadingComponent() {
     </div>
   )
 }
+
+const SyncEmployees = () => {
+  const [open, setOpen] = useState<boolean>(false)
+  const [file, setFile] = useState<File>()
+  const [employeeApi, setEmployeeApi] = useState<string>('')
+  const [syncType, setSyncType] = useState<string>('api')
+
+  const syncEmployeesByApi = useSyncEmployeeByAPI({ setOpen })
+
+  const handleSubmit = () => {
+    syncEmployeesByApi.mutate({ employeeApi })
+    setEmployeeApi('')
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <Button onClick={() => setOpen(true)}>Sync Employees</Button>
+      <AlertDialogContent className="scale-75 sm:scale-100">
+        <AlertDialogHeader>
+          <div className="flex justify-between items-center">
+            <Text variant={'heading3bold'}>Sync Employees</Text>
+            <Select value={syncType} onValueChange={setSyncType}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Sync Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="api">API</SelectItem>
+                <SelectItem value="xlsx">XLSX</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </AlertDialogHeader>
+        {syncType === 'api' ? (
+          <Input
+            value={employeeApi}
+            className="w-full"
+            placeholder='eg. "http://172.16.2.200:3005/employee/load"'
+            onChange={(e) => setEmployeeApi(e.target.value)}
+          />
+        ) : (
+          <Dropzone onChange={setFile} fileExtension="xlsx" />
+        )}
+
+        <Button onClick={handleSubmit}> Sync </Button>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
   const createEmployee = useCreateEmployee({ setOpen })
@@ -76,9 +132,12 @@ const CrudComponents = () => {
     <div className="flex flex-col gap-4">
       <Text variant={'heading1bold'}>Employees</Text>
       <AlertDialog open={open} onOpenChange={setOpen}>
-        <Button className="flex gap-2" onClick={() => setOpen(true)}>
-          Add Employee <CircleUserIcon />
-        </Button>
+        <div className="flex gap-4">
+          <Button className="flex gap-2" onClick={() => setOpen(true)}>
+            Add Employee <CircleUserIcon />
+          </Button>
+          <SyncEmployees />
+        </div>
         <AlertDialogContent className="scale-75 sm:scale-100">
           <AlertDialogHeader>
             <Text variant={'heading3bold'}>Create Employee</Text>
