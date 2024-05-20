@@ -19,9 +19,11 @@ import {
   accounTypeIdValidator,
   getAccountTypeTotalPerMonthValidator,
   IncomeStatementByMonthValidator,
+  syncEmployeesByAPIValidator,
 } from "../utils/validators/others.validator";
 import path from "path";
 import employees from "../database/schema/employees.schema";
+import z from "zod";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -302,9 +304,13 @@ export const downloadFile = async (req: Request, res: Response) => {
 };
 
 export const syncEmployeesByAPI = async (req: Request, res: Response) => {
-  const api = req.query.employeeApi as string;
+  const input = syncEmployeesByAPIValidator.safeParse(req.query);
+
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
+
   try {
-    const data = await fetch(api).then(
+    const data = await fetch(input.data.employeeApi).then(
       (res) =>
         res.json() as Promise<{
           msg: string;
