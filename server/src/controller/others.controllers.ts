@@ -243,11 +243,7 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
             eq(
               sql`year(acc_created_at)`,
               sql`year(${new Date(new Date().getFullYear(), i)})`
-            ),
-            inArray(accounts.accTypeId, [
-              "accTypeId 5176aa41-6659-46f7-a72b-56adfc1fa14f",
-              "accTypeId 42da30cc-96d8-4b4e-a718-1dffe25fb884",
-            ])
+            )
           )
         )
         .groupBy(accounts.accTypeId);
@@ -270,13 +266,7 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
           month: "long",
         }),
         ...dz,
-        total: d.reduce(
-          (acc, curr) =>
-            curr.accTypeId === "accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce"
-              ? acc - parseFloat(String(curr.total))
-              : acc + parseFloat(String(curr.total)),
-          0
-        ),
+        total: d.reduce((acc, curr) => acc + parseFloat(String(curr.total)), 0),
       });
     }
 
