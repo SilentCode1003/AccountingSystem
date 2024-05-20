@@ -348,6 +348,7 @@ export const syncEmployeesByAPI = async (req: Request, res: Response) => {
         //insert employee
         const newEmployee = await db.insert(employees).values({
           ...emp,
+          empId: `empId ${emp.empId}`,
           empDateHired: new Date(),
         });
 
@@ -420,6 +421,7 @@ export const syncEmployeesByFile = async (req: Request, res: Response) => {
         //insert employee
         const newEmployee = await db.insert(employees).values({
           ...emp,
+          empId: `empId ${emp.empId}`,
           empDateHired: new Date(),
         });
 

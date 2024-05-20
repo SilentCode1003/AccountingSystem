@@ -2,7 +2,14 @@ import z from "zod";
 
 //validator for POST /employees input
 export const createValidator = z.object({
-  empId: z.string(),
+  empId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "empId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an employee id.`,
+      });
+    }
+  }),
   empName: z.string(),
   empContactInfo: z.string(),
   empJobStatus: z.string(),
@@ -18,7 +25,14 @@ export const createValidator = z.object({
 
 //validator for PUT /employees input
 export const updateValidator = z.object({
-  empId: z.string(),
+  empId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "empId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an employee id.`,
+      });
+    }
+  }),
   newData: z.object({
     empName: z.string().optional(),
     empContactInfo: z.string().optional(),
@@ -42,5 +56,12 @@ export const updateValidator = z.object({
 
 //validator for PUT /employees/:empId params
 export const terminateEmpValidator = z.object({
-  empId: z.string(),
+  empId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "empId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an employee id.`,
+      });
+    }
+  }),
 });
