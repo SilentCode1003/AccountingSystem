@@ -8,6 +8,7 @@ import {
   getBarChartCashFlowData,
   getIncomeStatementByMonth,
   syncEmployeesByAPI,
+  syncEmployeesByFile,
 } from "../controller/others.controllers";
 
 const othersRouter = Router();
@@ -32,6 +33,9 @@ othersRouter.get("/cashFlowBarChart", getBarChartCashFlowData);
 
 //sync employees
 othersRouter.post("/syncEmployeesByAPI", syncEmployeesByAPI);
+
+//sync employees
+othersRouter.post("/syncEmployeesByFile", syncEmployeesByFile);
 
 //download file
 othersRouter.get("/download", downloadFile);
