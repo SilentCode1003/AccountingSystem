@@ -193,7 +193,6 @@ export const TransactionWithColumn = ({
       name: row.original.employee.empName,
       contactInfo: row.original.employee.empContactInfo,
       email: row.original.employee.empEmail,
-      address: row.original.employee.empAddress,
     }
   } else if (row.original.tranCustId) {
     data = {

@@ -49,7 +49,10 @@ export const createValidator = z.object({
         message: `Not valid employee/customer/vendor id.`,
       });
     }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+    if (
+      val.split(" ")[0] !== "empId" &&
+      !z.string().uuid().safeParse(val.split(" ")[1]).success
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not valid uuid.`,
@@ -162,7 +165,10 @@ export const updateValidator = z.object({
           message: `Not valid employee/customer/vendor id.`,
         });
       }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      if (
+        val.split(" ")[0] !== "empId" &&
+        !z.string().uuid().safeParse(val.split(" ")[1]).success
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Not valid uuid.`,

@@ -14,12 +14,6 @@ export const createPayrollSchema = z.object({
         message: `Not an employee id.`,
       })
     }
-    if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      })
-    }
   }),
   prTotalDeduction: z
     .union([
@@ -81,12 +75,6 @@ export const updatePayrollSchema = z.object({
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Not an employee id.`,
-        })
-      }
-      if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
         })
       }
     })
