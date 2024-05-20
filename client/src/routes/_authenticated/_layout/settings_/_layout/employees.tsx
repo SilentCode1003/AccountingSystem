@@ -31,7 +31,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
-import { useCreateEmployee, useSyncEmployeeByAPI } from '@/hooks/mutations'
+import {
+  useCreateEmployee,
+  useSyncEmployeeByAPI,
+  useSyncEmployeeByFile,
+} from '@/hooks/mutations'
 import { useEmployees } from '@/hooks/queries'
 import { employeesOptions } from '@/hooks/queries/options'
 import { createEmployeeSchema } from '@/validators/employees.validator'
@@ -70,8 +74,19 @@ const SyncEmployees = () => {
 
   const syncEmployeesByApi = useSyncEmployeeByAPI({ setOpen })
 
+  const syncEmployeeByFile = useSyncEmployeeByFile({ setOpen })
+
   const handleSubmit = () => {
-    syncEmployeesByApi.mutate({ employeeApi })
+    if (syncType === 'api' && employeeApi && employeeApi !== '') {
+      syncEmployeesByApi.mutate({ employeeApi })
+    }
+    if (syncType === 'xlsx' && file) {
+      const payload = new FormData()
+
+      payload.append('file', file as File)
+
+      syncEmployeeByFile.mutate(payload)
+    }
     setEmployeeApi('')
   }
 
