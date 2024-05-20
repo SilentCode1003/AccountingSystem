@@ -21,6 +21,7 @@ import users from "./schema/users.schema";
 import vendors from "./schema/vendors.schema";
 import accountTypes, {
   accountTypesAccountManyRelations,
+  accountTypeTransactionTypeManyRelations,
 } from "./schema/accountType.schema";
 import apiKeys from "./schema/apiKeyStore.schema";
 import tranTypes, {
@@ -91,6 +92,7 @@ const db = drizzle(connection, {
     inventoryEntries,
     inventoryEntriesTransactionRelation,
     inventoryEntriesInventoryEntryProductsManyRelation,
+    accountTypeTransactionTypeManyRelations,
     inventoryEntriesVendorRelation,
     inventoryEntriesCustomerRelation,
   },
