@@ -21,6 +21,7 @@ import {
   IncomeStatementByMonthValidator,
 } from "../utils/validators/others.validator";
 import path from "path";
+import employees from "../database/schema/employees.schema";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -298,4 +299,59 @@ export const downloadFile = async (req: Request, res: Response) => {
   );
 
   res.download(filePath);
+};
+
+export const syncEmployeesByAPI = async (req: Request, res: Response) => {
+  const data = await fetch(`http://172.16.2.200:3005/employee/load`).then(
+    (res) =>
+      res.json() as Promise<{
+        msg: string;
+        data: Array<{
+          newEmployeeId: string;
+          firstname: string;
+          phone: string;
+          email: string;
+          jobstatus: string;
+          me_department: string;
+          me_position: string;
+        }>;
+      }>
+  );
+
+  const shapeDataToDB = data.data.map((emp) => ({
+    empId: emp.newEmployeeId,
+    empName: emp.firstname,
+    empContactInfo: emp.phone,
+    empEmail: emp.email,
+    empJobStatus: emp.jobstatus,
+    empDepartment: emp.me_department,
+    empPosition: emp.me_position,
+  }));
+  // console.log(shapeDataToDB);
+
+  await Promise.all(
+    shapeDataToDB.map(async (emp) => {
+      //check if employee exists
+      const empExists = await db.query.employees.findFirst({
+        where: eq(employees.empId, emp.empId),
+      });
+
+      //early return if employee does not exist
+      if (empExists) return;
+
+      //insert employee
+      const newEmployee = await db.insert(employees).values({
+        ...emp,
+        empDateHired: new Date(),
+      });
+
+      return newEmployee;
+    })
+  );
+
+  //query all synced employees
+  const syncedEmployees = await db.query.employees.findMany();
+
+  //return synced employees
+  return res.status(200).send({ syncedEmployees });
 };
