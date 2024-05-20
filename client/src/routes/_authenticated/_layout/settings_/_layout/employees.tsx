@@ -131,10 +131,12 @@ const CrudComponents = () => {
   const form = useForm<z.infer<typeof createEmployeeSchema>>({
     defaultValues: {
       empName: '',
-      empAddress: '',
       empEmail: '',
       empSalary: 0,
       empContactInfo: '',
+      empDepartment: '',
+      empPosition: '',
+      empJobStatus: '',
     },
     resolver: zodResolver(createEmployeeSchema),
   })
@@ -162,6 +164,25 @@ const CrudComponents = () => {
               <div className="flex flex-col gap-4">
                 <FormField
                   control={form.control}
+                  name="empId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Employee ID</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Employee ID"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="empName"
                   render={({ field }) => (
                     <FormItem>
@@ -181,17 +202,55 @@ const CrudComponents = () => {
                 />
                 <FormField
                   control={form.control}
-                  name="empAddress"
+                  name="empPosition"
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Employee Address</FormLabel>
+                        <FormLabel>Employee Position</FormLabel>
                         <FormMessage />
                       </div>
                       <FormControl>
                         <Input
                           className="w-full"
-                          placeholder="Employee Address"
+                          placeholder="Employee Position"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="empJobStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Employee Job Status</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Employee Job Status"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="empDepartment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Employee Department</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="Employee Department"
                           {...field}
                         />
                       </FormControl>
@@ -256,24 +315,6 @@ const CrudComponents = () => {
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="empBirthdate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between">
-                        <FormLabel>Employee Birthdate</FormLabel>
-                        <FormMessage />
-                      </div>
-                      <FormControl>
-                        <DatePicker
-                          date={field.value}
-                          setDate={field.onChange}
                         />
                       </FormControl>
                     </FormItem>
