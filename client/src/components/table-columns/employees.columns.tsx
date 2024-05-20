@@ -1,28 +1,27 @@
 import { ColumnDef } from '@tanstack/react-table'
 
+import { ArrowUpDownIcon } from 'lucide-react'
 import {
-  AddressColumn,
-  BirthdateColumn,
   DateHiredColumn,
   DateTerminatedColumn,
   NameColumn,
   SalaryColumn,
 } from '../table-components/employees.tblcomp'
-import { ArrowUpDownIcon } from 'lucide-react'
-import { text } from '../ui/text'
 import { Button } from '../ui/button'
+import { text } from '../ui/text'
 
 export type Employees = {
   empId: string
   empName: string
   empContactInfo: string
-  empAddress: string
   empEmail: string
   empDateHired: string
   empDateTerminated: string
   empImage: string
-  empBirthdate: string
   empSalary: number
+  empJobStatus: string
+  empPosition: string
+  empDepartment: string
 }
 
 export const employeeColumns: ColumnDef<Employees>[] = [
@@ -45,26 +44,6 @@ export const employeeColumns: ColumnDef<Employees>[] = [
       )
     },
     cell: NameColumn,
-  },
-  {
-    accessorKey: 'empAddress',
-    meta: 'Address',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className={text({
-            variant: 'bodybold',
-            className: 'p-0 text-foreground',
-          })}
-        >
-          Address
-          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: AddressColumn,
   },
   {
     accessorKey: 'empContactInfo',
@@ -105,9 +84,8 @@ export const employeeColumns: ColumnDef<Employees>[] = [
     },
   },
   {
-    accessorKey: 'empBirthdate',
-    filterFn: 'dateBetweenFilter',
-    meta: 'Birthdate',
+    accessorKey: 'empJobStatus',
+    meta: 'Job Status',
     header: ({ column }) => {
       return (
         <Button
@@ -118,12 +96,49 @@ export const employeeColumns: ColumnDef<Employees>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Birthdate
+          Job Status
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-    cell: BirthdateColumn,
+  },
+  {
+    accessorKey: 'empPosition',
+    meta: 'Position',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Position
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: 'empDepartment',
+    meta: 'Department',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Department
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'empDateHired',
