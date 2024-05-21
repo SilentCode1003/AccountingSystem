@@ -137,3 +137,19 @@ export const updateValidator = z.object({
     )
     .optional(),
 });
+
+export const createPayrollByFileValidator = z.object({
+  prFile: z.custom<UploadedFile>().refine(
+    (file) => {
+      if (
+        file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+        return true;
+      return false;
+    },
+    {
+      message: "Only xlsx files are allowed",
+    }
+  ),
+});

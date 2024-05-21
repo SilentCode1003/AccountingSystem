@@ -24,6 +24,7 @@ export const addPayroll = async (input: {
   prDateTo: Date;
   prTranFileMimeType: string;
   prMopId: string;
+  prFileName?: string;
 }) => {
   const newPayrollId = `prId ${crypto.randomUUID()}`;
 
@@ -49,6 +50,7 @@ export const addPayroll = async (input: {
     tranFileMimeType: input.prTranFileMimeType,
     tranAccName: "PAYROLL",
     tranMopId: input.prMopId,
+    tranFileName: input.prFileName,
   });
 
   await db.insert(payrolls).values({
