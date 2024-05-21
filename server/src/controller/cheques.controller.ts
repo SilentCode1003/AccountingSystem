@@ -189,8 +189,6 @@ export const createChequeByFile = async (req: Request, res: Response) => {
 
     const newMultiFileName = `multiFile ${crypto.randomUUID()}`;
 
-    console.log(shapeDataToDB);
-
     const newCheques = await Promise.all(
       shapeDataToDB.map(async (chq) => {
         const modeOfPayment = await db.query.modesOfPayment.findFirst({
@@ -206,7 +204,9 @@ export const createChequeByFile = async (req: Request, res: Response) => {
         const newChq = await addCheque({
           chqAccTypeId: accType?.accTypeId as string,
           chqAmount: chq.chqAmount,
-          chqIssueDate: new Date(chq.chqIssueDate),
+          chqIssueDate: new Date(
+            Math.round((Number(chq.chqIssueDate) - 25569) * 86400 * 1000)
+          ),
           chqNumber: chq.chqNumber,
           chqPayeeName: chq.chqPayeeName,
           chqFileName: newMultiFileName,

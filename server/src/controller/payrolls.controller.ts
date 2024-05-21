@@ -176,8 +176,12 @@ export const createPayrollByFile = async (req: Request, res: Response) => {
 
         //insert payroll
         const newPayroll = await addPayroll({
-          prDateFrom: new Date(pr.prDateFrom),
-          prDateTo: new Date(pr.prDateTo),
+          prDateFrom: new Date(
+            Math.round((Number(pr.prDateFrom) - 25569) * 86400 * 1000)
+          ),
+          prDateTo: new Date(
+            Math.round((Number(pr.prDateTo) - 25569) * 86400 * 1000)
+          ),
           prEmployeeId: pr.empId,
           prMopId: modeOfPayment.mopId,
           prTranFileMimeType: "xlsx",
