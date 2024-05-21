@@ -42,6 +42,7 @@ export const addTransaction = async (input: {
     accAmount: input.tranAmount,
     accDescription: `TRANSACTION: ${input.tranDescription}`,
     accTypeId: input.tranAccTypeId,
+    accCreatedAt: input.tranTransactionDate,
   });
 
   await db.insert(transactions).values({
@@ -146,6 +147,7 @@ export const editTransaction = async (input: {
       accName: input.tranAccName,
       accTypeId: input.tranAccTypeId,
       accAmount: input.tranAmount,
+      accCreatedAt: input.tranTransactionDate,
     },
   });
 

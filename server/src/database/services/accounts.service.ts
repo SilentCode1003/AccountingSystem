@@ -94,6 +94,7 @@ export const addAccount = async (input: {
   accTypeId: string;
   accDescription: string;
   accAmount: number;
+  accCreatedAt?: Date;
 }) => {
   const newAccountId = `accId ${crypto.randomUUID()}`;
 
@@ -116,6 +117,7 @@ export const editAccount = async (input: {
     accTypeId?: string;
     accDescription?: string;
     accAmount?: number;
+    accCreatedAt?: Date;
   };
 }) => {
   await db

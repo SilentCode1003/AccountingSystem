@@ -24,7 +24,10 @@ export const getEmployees = async (req: Request, res: Response) => {
   }
 };
 export const createEmployee = async (req: Request, res: Response) => {
-  const input = createValidator.safeParse(req.body);
+  const input = createValidator.safeParse({
+    ...req.body,
+    empId: `empId ${req.body.empId}`,
+  });
 
   if (!input.success)
     return res.status(400).send({
@@ -42,7 +45,10 @@ export const createEmployee = async (req: Request, res: Response) => {
   }
 };
 export const updateEmployee = async (req: Request, res: Response) => {
-  const input = updateValidator.safeParse(req.body);
+  const input = updateValidator.safeParse({
+    ...req.body,
+    empId: `empId ${req.body.empId}`,
+  });
 
   if (!input.success)
     return res.status(400).send({

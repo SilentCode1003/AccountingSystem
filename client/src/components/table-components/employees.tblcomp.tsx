@@ -1,10 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 import { useTerminateEmployee, useUpdateEmployee } from '@/hooks/mutations'
 import { updateEmployeeSchema } from '@/validators/employees.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -53,10 +47,11 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
       empId: row.original.empId,
       newData: {
         empName: row.original.empName,
-        empAddress: row.original.empAddress,
+        empJobStatus: row.original.empJobStatus,
+        empPosition: row.original.empPosition,
+        empDepartment: row.original.empDepartment,
         empContactInfo: row.original.empContactInfo,
         empEmail: row.original.empEmail,
-        empBirthdate: new Date(row.original.empBirthdate),
         empDateHired: new Date(row.original.empDateHired),
         empSalary: Number.parseFloat(String(row.original.empSalary)),
       },
@@ -170,17 +165,55 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                         />
                         <FormField
                           control={form.control}
-                          name="newData.empAddress"
+                          name="newData.empPosition"
                           render={({ field }) => (
                             <FormItem>
                               <div className="flex items-center justify-between">
-                                <FormLabel>Employee Address</FormLabel>
+                                <FormLabel>Employee Position</FormLabel>
                                 <FormMessage />
                               </div>
                               <FormControl>
                                 <Input
                                   className="w-full"
-                                  placeholder="Employee Address"
+                                  placeholder="Employee Position"
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="newData.empJobStatus"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Employee Job Status</FormLabel>
+                                <FormMessage />
+                              </div>
+                              <FormControl>
+                                <Input
+                                  className="w-full"
+                                  placeholder="Employee Job Status"
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="newData.empDepartment"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Employee Department</FormLabel>
+                                <FormMessage />
+                              </div>
+                              <FormControl>
+                                <Input
+                                  className="w-full"
+                                  placeholder="Employee Department"
                                   {...field}
                                 />
                               </FormControl>
@@ -256,24 +289,6 @@ export const SalaryColumn = ({ row }: CellContext<Employees, unknown>) => {
                         />
                         <FormField
                           control={form.control}
-                          name="newData.empBirthdate"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="flex items-center justify-between">
-                                <FormLabel>Employee Birthdate</FormLabel>
-                                <FormMessage />
-                              </div>
-                              <FormControl>
-                                <DatePicker
-                                  date={new Date(field.value)}
-                                  setDate={field.onChange}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
                           name="newData.empDateHired"
                           render={({ field }) => (
                             <FormItem>
@@ -340,24 +355,24 @@ export const DateHiredColumn = ({ row }: CellContext<Employees, unknown>) => {
   return new Date(row.original.empDateHired).toLocaleDateString()
 }
 
-export const BirthdateColumn = ({ row }: CellContext<Employees, unknown>) => {
-  return new Date(row.original.empBirthdate).toLocaleDateString()
-}
+// export const BirthdateColumn = ({ row }: CellContext<Employees, unknown>) => {
+//   return new Date(row.original.empBirthdate).toLocaleDateString()
+// }
 
-export const AddressColumn = ({ row }: CellContext<Employees, unknown>) => (
-  <div>
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
-          <div className="line-clamp-2 max-w-60 text-left">
-            {row.original.empAddress}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>{row.original.empAddress}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  </div>
-)
+// export const AddressColumn = ({ row }: CellContext<Employees, unknown>) => (
+//   <div>
+//     <TooltipProvider>
+//       <Tooltip>
+//         <TooltipTrigger>
+//           <div className="line-clamp-2 max-w-60 text-left">
+//             {row.original.empAddress}
+//           </div>
+//         </TooltipTrigger>
+//         <TooltipContent>{row.original.empAddress}</TooltipContent>
+//       </Tooltip>
+//     </TooltipProvider>
+//   </div>
+// )
 
 export const NameColumn = ({ row }: CellContext<Employees, unknown>) => {
   return (
