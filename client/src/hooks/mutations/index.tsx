@@ -1918,3 +1918,112 @@ export const useDownloadFile = (fileName: string) => {
     },
   })
 }
+
+export const useSyncEmployeeByAPI = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: ['syncEmployeeByAPI'],
+    mutationFn: async (payload: { employeeApi: string }) => {
+      const params = new URLSearchParams({ employeeApi: payload.employeeApi })
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/others/syncEmployeesByAPI/?` +
+          params,
+        {
+          method: 'POST',
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        syncedEmployees: Array<Employees>
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      setOpen(false)
+      await queryClient.setQueryData(['employees'], () => ({
+        employees: data.syncedEmployees,
+      }))
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Employees synced successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to sync employees',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useSyncEmployeeByFile = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['syncEmployeeByFile'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/others/syncEmployeesByFile`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: payload,
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as {
+        syncedEmployees: Array<Employees>
+      }
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(['employees'], () => ({
+        employees: data.syncedEmployees,
+      }))
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Employees synced successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to sync employees',
+        variant: 'destructive',
+      })
+    },
+  })
+}

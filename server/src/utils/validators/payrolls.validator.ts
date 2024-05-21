@@ -10,12 +10,6 @@ export const createValidator = z.object({
         message: `Not an employee id.`,
       });
     }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
   }),
   prTotalDeduction: z.number(),
   prDateFrom: z
@@ -79,12 +73,6 @@ export const updateValidator = z.object({
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Not an employee id.`,
-        });
-      }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
         });
       }
     })

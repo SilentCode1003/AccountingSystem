@@ -18,6 +18,7 @@ export const getAllAccountTypes = async () => {
   const accountTypes = await db.query.accountTypes.findMany({
     with: {
       accounts: true,
+      transactionTypes: true,
     },
   });
   return accountTypes;
@@ -28,6 +29,7 @@ export const getAccountTypeById = async (input: { accTypeId: string }) => {
     where: (accType) => eq(accType.accTypeId, input.accTypeId),
     with: {
       accounts: true,
+      transactionTypes: true,
     },
   });
   return accountType;

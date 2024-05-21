@@ -61,3 +61,7 @@ export const accounTypeIdValidator = z.object({
     }
   }),
 });
+
+export const syncEmployeesByAPIValidator = z.object({
+  employeeApi: z.string().url({ message: "Invalid api url" }),
+});
