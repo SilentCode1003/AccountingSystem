@@ -47,10 +47,19 @@ export const addCheque = async (input: {
   chqNumber: string;
   chqTranFileMimeType?: string;
   chqMopId: string;
+  chqFileName?: string;
 }) => {
   const tranType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeName, "CHEQUE"),
   });
+
+  const checkIfChqExists = await db.query.cheques.findFirst({
+    where: (cheque) => eq(cheque.chqNumber, input.chqNumber),
+  });
+
+  if (checkIfChqExists) {
+    throw new Error("Cheque number already exists");
+  }
 
   const transaction = await addTransaction({
     tranAccTypeId: input.chqAccTypeId,
@@ -61,6 +70,7 @@ export const addCheque = async (input: {
     tranTransactionDate: input.chqIssueDate,
     tranFileMimeType: input.chqTranFileMimeType,
     tranAccName: "CHEQUE",
+    tranFileName: input.chqFileName ?? undefined,
     tranMopId: input.chqMopId,
   });
 

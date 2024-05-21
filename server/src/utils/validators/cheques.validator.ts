@@ -170,3 +170,19 @@ export const approveChequeValidator = z.object({
     }
   }),
 });
+
+export const createChequeByFileValidator = z.object({
+  chqFile: z.custom<UploadedFile>().refine(
+    (file) => {
+      if (
+        file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+        return true;
+      return false;
+    },
+    {
+      message: "Only xlsx files are allowed",
+    }
+  ),
+});
