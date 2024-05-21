@@ -12,6 +12,7 @@ import customers from "./customers.schema";
 import { decimal } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 import tranTypes from "./transactionTypes.schema";
+import modesOfPayment from "./modeOfPayment";
 
 const transactions = mysqlTable("transactions", {
   tranId: varchar("tran_id", { length: 60 }).primaryKey(),
@@ -34,6 +35,11 @@ const transactions = mysqlTable("transactions", {
     (): AnyMySqlColumn => customers.custId,
     { onDelete: "cascade" }
   ),
+  tranMopId: varchar("tran_mop", { length: 60 })
+    .notNull()
+    .references((): AnyMySqlColumn => modesOfPayment.mopId, {
+      onDelete: "cascade",
+    }),
   tranTransactionDate: datetime("tran_transaction_date").notNull(),
   tranOtherPartner: text("tran_other_partner"),
   tranCreatedAt: datetime("tran_created_at").notNull().default(new Date()),
@@ -51,6 +57,16 @@ export const tranTypeRelation = relations(transactions, ({ one }) => ({
     references: [tranTypes.tranTypeId],
   }),
 }));
+
+export const transactionModeOfPaymentRelation = relations(
+  transactions,
+  ({ one }) => ({
+    modeOfPayment: one(modesOfPayment, {
+      fields: [transactions.tranMopId],
+      references: [modesOfPayment.mopId],
+    }),
+  })
+);
 
 export const transactionAccountRelation = relations(
   transactions,
