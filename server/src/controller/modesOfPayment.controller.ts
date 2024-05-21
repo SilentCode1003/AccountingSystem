@@ -80,7 +80,7 @@ export const toggleModeOfPaymentIsActive = async (
   try {
     const updatedModeOfPayment = await changeModeOfPaymentIsActive(input.data);
     console.log("successfully toggled a mode of payment");
-    return res.status(200).send({ transactionType: updatedModeOfPayment });
+    return res.status(200).send({ modeOfPayment: updatedModeOfPayment });
   } catch (error) {
     console.log("error toggling a mode of payment");
     console.log(error);
