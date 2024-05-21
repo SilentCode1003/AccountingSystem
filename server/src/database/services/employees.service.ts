@@ -19,20 +19,20 @@ export const getEmployeeByName = async (empName: string) => {
 };
 
 export const addEmployee = async (input: {
+  empId: string;
   empName: string;
   empContactInfo: string;
-  empAddress: string;
   empEmail: string;
-  empBirthdate: Date;
   empDateHired: Date;
   empSalary: number;
+  empJobStatus: string;
+  empDepartment: string;
+  empPosition: string;
 }) => {
-  const newEmployeeId = `empId ${crypto.randomUUID()}`;
-
-  await db.insert(employees).values({ ...input, empId: newEmployeeId });
+  await db.insert(employees).values(input);
 
   const newEmployee = await db.query.employees.findFirst({
-    where: (employee) => eq(employee.empId, newEmployeeId),
+    where: (employee) => eq(employee.empId, input.empId),
   });
 
   return newEmployee;
@@ -43,11 +43,12 @@ export const editEmployee = async (input: {
   newData: {
     empName?: string;
     empContactInfo?: string;
-    empAddress?: string;
     empEmail?: string;
-    empBirthdate?: Date;
     empDateHired?: Date;
     empDateTerminated?: Date;
+    empJobStatus?: string;
+    empDepartment?: string;
+    empPosition?: string;
     empSalary?: number;
   };
 }) => {

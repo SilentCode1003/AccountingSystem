@@ -86,7 +86,7 @@ function BarGraph({
               dataKey={data}
               maxBarSize={80}
               radius={[4, 4, 0, 0]}
-              fill={colors[data]}
+              fill={randomColor({ luminosity: 'bright' })}
               key={index}
             />
           )

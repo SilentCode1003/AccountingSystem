@@ -19,8 +19,12 @@ import {
   accounTypeIdValidator,
   getAccountTypeTotalPerMonthValidator,
   IncomeStatementByMonthValidator,
+  syncEmployeesByAPIValidator,
 } from "../utils/validators/others.validator";
 import path from "path";
+import employees from "../database/schema/employees.schema";
+import { createTransactionByFileValidator } from "../utils/validators/transactions.validator";
+import * as xlsx from "xlsx";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -239,11 +243,7 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
             eq(
               sql`year(acc_created_at)`,
               sql`year(${new Date(new Date().getFullYear(), i)})`
-            ),
-            inArray(accounts.accTypeId, [
-              "accTypeId 5176aa41-6659-46f7-a72b-56adfc1fa14f",
-              "accTypeId 42da30cc-96d8-4b4e-a718-1dffe25fb884",
-            ])
+            )
           )
         )
         .groupBy(accounts.accTypeId);
@@ -266,13 +266,7 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
           month: "long",
         }),
         ...dz,
-        total: d.reduce(
-          (acc, curr) =>
-            curr.accTypeId === "accTypeId 922671fa-06eb-4069-8c1a-eed9960f80ce"
-              ? acc - parseFloat(String(curr.total))
-              : acc + parseFloat(String(curr.total)),
-          0
-        ),
+        total: d.reduce((acc, curr) => acc + parseFloat(String(curr.total)), 0),
       });
     }
 
@@ -298,4 +292,151 @@ export const downloadFile = async (req: Request, res: Response) => {
   );
 
   res.download(filePath);
+};
+
+export const syncEmployeesByAPI = async (req: Request, res: Response) => {
+  const input = syncEmployeesByAPIValidator.safeParse(req.query);
+
+  if (!input.success)
+    return res.status(400).send({ error: input.error.errors[0].message });
+
+  try {
+    const data = await fetch(input.data.employeeApi).then(
+      (res) =>
+        res.json() as Promise<{
+          msg: string;
+          data: Array<{
+            newEmployeeId: string;
+            firstname: string;
+            phone: string;
+            email: string;
+            jobstatus: string;
+            me_department: string;
+            me_position: string;
+          }>;
+        }>
+    );
+
+    const shapeDataToDB: Array<{
+      empId: string;
+      empName: string;
+      empContactInfo: string;
+      empEmail: string;
+      empJobStatus: string;
+      empDepartment: string;
+      empPosition: string;
+    }> = data.data.map((emp) => ({
+      empId: emp.newEmployeeId,
+      empName: emp.firstname,
+      empContactInfo: emp.phone,
+      empEmail: emp.email,
+      empJobStatus: emp.jobstatus,
+      empDepartment: emp.me_department,
+      empPosition: emp.me_position,
+    }));
+
+    await Promise.all(
+      shapeDataToDB.map(async (emp) => {
+        //check if employee exists
+        const empExists = await db.query.employees.findFirst({
+          where: eq(employees.empId, emp.empId),
+        });
+
+        //early return if employee does not exist
+        if (empExists) return;
+
+        //insert employee
+        const newEmployee = await db.insert(employees).values({
+          ...emp,
+          empId: `empId ${emp.empId}`,
+          empDateHired: new Date(),
+        });
+
+        return newEmployee;
+      })
+    );
+
+    //query all synced employees
+    const syncedEmployees = await db.query.employees.findMany();
+
+    //return synced employees
+    return res.status(200).send({ syncedEmployees });
+  } catch (error) {
+    console.log("error in syncing employees");
+    console.log(error);
+
+    return res.status(500).send({ error: "Server error" });
+  }
+};
+
+export const syncEmployeesByFile = async (req: Request, res: Response) => {
+  if (!req.files?.file)
+    return res.status(400).send({ error: "No file uploaded" });
+
+  const validateFile = createTransactionByFileValidator.safeParse({
+    tranFile: req.files!.file,
+  });
+
+  if (!validateFile.success)
+    return res
+      .status(400)
+      .send({ error: validateFile.error.errors[0].message });
+  try {
+    const file = validateFile.data.tranFile;
+
+    const f = xlsx.read(file.data, { type: "buffer" }).Sheets["Sheet1"];
+
+    const shapeDataToDB: Array<{
+      empId: string;
+      empName: string;
+      empContactInfo: string;
+      empEmail: string;
+      empJobStatus: string;
+      empDepartment: string;
+      empPosition: string;
+    }> = xlsx.utils.sheet_to_json(f, {
+      header: [
+        "empId",
+        "empName",
+        "empContactInfo",
+        "empEmail",
+        "empJobStatus",
+        "empDepartment",
+        "empPosition",
+      ],
+    });
+
+    shapeDataToDB.shift();
+
+    await Promise.all(
+      shapeDataToDB.map(async (emp) => {
+        //check if employee exists
+        const empExists = await db.query.employees.findFirst({
+          where: eq(employees.empId, emp.empId),
+        });
+
+        //early return if employee does not exist
+        if (empExists) return;
+
+        //insert employee
+        const newEmployee = await db.insert(employees).values({
+          ...emp,
+          empId: `empId ${emp.empId}`,
+          empDateHired: new Date(),
+        });
+
+        return newEmployee;
+      })
+    );
+
+    //query all synced employees
+    const syncedEmployees = await db.query.employees.findMany();
+
+    //return synced employees
+    return res.status(200).send({ syncedEmployees });
+  } catch (error) {
+    console.log("error creating transaction by file");
+    console.log(error);
+    return res.status(500).send({ error: "Server error" });
+  }
 };

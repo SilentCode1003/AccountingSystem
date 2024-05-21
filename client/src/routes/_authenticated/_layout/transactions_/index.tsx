@@ -32,7 +32,6 @@ import {
   useAccountTypes,
   useTransactionPartners,
   useTransactions,
-  useTransactionTypes,
 } from '@/hooks/queries'
 import {
   transactionPartnersOptions,
@@ -124,8 +123,6 @@ function TransactionsComponent() {
     resolver: zodResolver(createTransactionSchema),
   })
   const createTransaction = useCreateTransaction(form)
-
-  const transactionTypes = useTransactionTypes()
 
   const createTransactionByFile = useCreateTransactionByFile({
     setOpen: setUploadOpen,
@@ -425,22 +422,25 @@ function TransactionsComponent() {
                         <FormItem className="flex-1">
                           <FormLabel>Transaction Type</FormLabel>
                           <FormControl>
-                            {transactionTypes.isSuccess && (
+                            {accountTypes.isSuccess && (
                               <ComboBox
-                                data={transactionTypes.data.transactionTypes
-                                  .filter((tranType) => {
-                                    if (
-                                      tranType.tranTypeName == 'PAYROLL' ||
-                                      tranType.tranTypeName == 'CHEQUE' ||
-                                      tranType.tranTypeName == 'INVENTORY'
-                                    )
-                                      return false
-                                    return true
-                                  })
-                                  .map((t) => ({
-                                    label: t.tranTypeName,
-                                    value: t.tranTypeId,
-                                  }))}
+                                data={
+                                  form.watch('tranAccTypeId')
+                                    ? accountTypes.data.accountTypes
+                                        .filter(
+                                          (at) =>
+                                            at.accTypeId ===
+                                            form.watch('tranAccTypeId'),
+                                        )[0]
+                                        .transactionTypes.map((t) => ({
+                                          label: t.tranTypeName,
+                                          value: t.tranTypeId,
+                                        }))
+                                    : ([] satisfies {
+                                        label: string
+                                        value: string
+                                      }[])
+                                }
                                 emptyLabel="Nothing Found"
                                 value={field.value}
                                 setValue={field.onChange}

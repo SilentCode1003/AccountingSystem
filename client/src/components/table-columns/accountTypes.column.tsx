@@ -4,12 +4,14 @@ import { AccountTypeNameColumn } from '../table-components/accountTypes.tblcomp'
 import { Button } from '../ui/button'
 import { text } from '../ui/text'
 import { Accounts } from './accounts.columns'
+import { TransactionTypes } from './transactionTypes.columns'
 
 export type AccountTypes = {
   accTypeId: string
   accTypeName: string
   accTypeDefault: string
   accounts: Array<Accounts>
+  transactionTypes: Array<TransactionTypes>
 }
 
 export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
