@@ -32,6 +32,7 @@ import transactions, {
   transactionAccountRelation,
   transactionCustomerRelation,
   transactionEmployeeRelation,
+  transactionModeOfPaymentRelation,
   transactionVendorRelation,
   tranTypeRelation,
 } from "./schema/transactions.schema";
@@ -100,6 +101,7 @@ const db = drizzle(connection, {
     inventoryEntriesCustomerRelation,
     modesOfPayment,
     modesOfPaymentTransactionRelations,
+    transactionModeOfPaymentRelation,
   },
   mode: "default",
 });
