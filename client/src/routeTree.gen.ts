@@ -30,6 +30,7 @@ import { Route as AuthenticatedLayoutSettingslayoutIndexImport } from './routes/
 import { Route as AuthenticatedLayoutSettingslayoutVendorsImport } from './routes/_authenticated/_layout/settings_/_layout/vendors'
 import { Route as AuthenticatedLayoutSettingslayoutTransactionTypesImport } from './routes/_authenticated/_layout/settings_/_layout/transactionTypes'
 import { Route as AuthenticatedLayoutSettingslayoutReportsImport } from './routes/_authenticated/_layout/settings_/_layout/reports'
+import { Route as AuthenticatedLayoutSettingslayoutModesOfPaymentImport } from './routes/_authenticated/_layout/settings_/_layout/modesOfPayment'
 import { Route as AuthenticatedLayoutSettingslayoutInventoryImport } from './routes/_authenticated/_layout/settings_/_layout/inventory'
 import { Route as AuthenticatedLayoutSettingslayoutEmployeesImport } from './routes/_authenticated/_layout/settings_/_layout/employees'
 import { Route as AuthenticatedLayoutSettingslayoutCustomersImport } from './routes/_authenticated/_layout/settings_/_layout/customers'
@@ -150,6 +151,12 @@ const AuthenticatedLayoutSettingslayoutTransactionTypesRoute =
 const AuthenticatedLayoutSettingslayoutReportsRoute =
   AuthenticatedLayoutSettingslayoutReportsImport.update({
     path: '/reports',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutSettingslayoutModesOfPaymentRoute =
+  AuthenticatedLayoutSettingslayoutModesOfPaymentImport.update({
+    path: '/modesOfPayment',
     getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
   } as any)
 
@@ -327,6 +334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutInventoryImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
+    '/_authenticated/_layout/settings/_layout/modesOfPayment': {
+      id: '/_authenticated/_layout/settings/_layout/modesOfPayment'
+      path: '/modesOfPayment'
+      fullPath: '/settings/modesOfPayment'
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutModesOfPaymentImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
     '/_authenticated/_layout/settings/_layout/reports': {
       id: '/_authenticated/_layout/settings/_layout/reports'
       path: '/reports'
@@ -373,6 +387,7 @@ export const routeTree = rootRoute.addChildren({
               AuthenticatedLayoutSettingslayoutCustomersRoute,
               AuthenticatedLayoutSettingslayoutEmployeesRoute,
               AuthenticatedLayoutSettingslayoutInventoryRoute,
+              AuthenticatedLayoutSettingslayoutModesOfPaymentRoute,
               AuthenticatedLayoutSettingslayoutReportsRoute,
               AuthenticatedLayoutSettingslayoutTransactionTypesRoute,
               AuthenticatedLayoutSettingslayoutVendorsRoute,

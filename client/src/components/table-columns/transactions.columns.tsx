@@ -15,6 +15,7 @@ import {
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
 import { TransactionTypes } from './transactionTypes.columns'
+import { ModesOfPayment } from './modesOfPayment.columns'
 
 type AccountType = {
   accTypeId: string
@@ -67,6 +68,8 @@ export type Transactions = {
   tranFile: string
   tranOtherPartner?: string
   tranTypeId: string
+  tranMopId: string
+  modeOfPayment: ModesOfPayment
   transactionType: TransactionTypes
 }
 
@@ -85,7 +88,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction ID
+          ID
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -123,7 +126,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
           className: 'p-0 text-foreground whitespace-nowrap',
         })}
       >
-        Transaction File
+        File
       </div>
     ),
     cell: transactionFileColumn,
@@ -162,12 +165,32 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Amount
+          Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
     cell: TransactionAmountColumn,
+  },
+  {
+    accessorKey: 'tranMopId',
+    accessorFn: (row) => row.modeOfPayment.mopName,
+    meta: 'Mode Of Payment',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Mode of Payment
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'tranTransactionDate',
@@ -183,7 +206,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Date
+          Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -241,6 +264,27 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
     cell: TransactionAccountIDColumn,
   },
   {
+    accessorKey: 'tranTypeId',
+    meta: 'Transaction Type',
+    accessorFn: (row) => row.transactionType.tranTypeName,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Transaction Type
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: TransactionTypeColumn,
+  },
+  {
     accessorKey: 'tranAmount',
     meta: 'Transaction Amount',
     header: ({ column }) => {
@@ -253,12 +297,32 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Amount
+          Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
     },
     cell: TransactionAmountColumn,
+  },
+  {
+    accessorKey: 'tranMopId',
+    accessorFn: (row) => row.modeOfPayment.mopName,
+    meta: 'Mode Of Payment',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Mode of Payment
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: 'tranTransactionDate',
@@ -274,7 +338,7 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Date
+          Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )

@@ -5,6 +5,7 @@ import { Customers } from '@/components/table-columns/customers.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
+import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import {
   Customer,
@@ -129,6 +130,24 @@ export const transactionTypesOptions = () =>
       if (!response.ok) throw new Error((await response.json()).error)
       const data = (await response.json()) as Promise<{
         transactionTypes: Array<TransactionTypes>
+      }>
+      return data
+    },
+  })
+
+export const modesOfPaymentOptions = () =>
+  queryOptions({
+    queryKey: ['modesOfPayment'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/modesOfPayment`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as Promise<{
+        modesOfPayment: Array<ModesOfPayment>
       }>
       return data
     },
