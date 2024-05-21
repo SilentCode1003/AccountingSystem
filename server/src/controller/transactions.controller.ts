@@ -18,6 +18,7 @@ import {
   updateValidator,
 } from "../utils/validators/transactions.validator";
 import crypto from "crypto";
+import modesOfPayment from "../database/schema/modeOfPayment";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -138,7 +139,9 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
     for (let i = 0; i < cells.length; i++) {
       count++;
 
-      if (f[cells[i]].v === "RECEIVED BY :") {
+      const val = String(f[cells[i]].v).replaceAll(/\s/g, "");
+
+      if (val === "RECEIVEDBY:") {
         excelEntries.push(cells.slice(i - (count - 1), i + 1));
         count = 0;
       }
@@ -150,32 +153,42 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       description?: string;
       date?: Date;
       tranAccTypeId?: string;
+      tranMopName?: string;
     }> = await Promise.all(
       excelEntries.map(async (entry) => {
         const entryObj: any = {};
         for (let i = 0; i < entry.length; i++) {
-          if (f[entry[i]].v === "SUB TOTAL:") {
-            entryObj["amount"] = Number(f[entry[i + 1]].v);
+          const val = String(f[entry[i]].v).replaceAll(/\s/g, "");
+
+          const targetVal = f[entry[i + 1]];
+
+          if (val === "SUBTOTAL:") {
+            entryObj["amount"] = Number(targetVal.v);
           }
 
-          if (f[entry[i]].v === "DATE :") {
-            entryObj["date"] = new Date(f[entry[i + 1]].w);
+          if (val === "DATE:") {
+            entryObj["date"] = new Date(targetVal.w);
           }
 
-          if (f[entry[i]].v === "NAME :") {
+          if (val === "NAME:") {
             if (file.name.toLowerCase().includes("employee")) {
-              const tranPartner = await getEmployeeByName(f[entry[i + 1]].v);
+              const tranPartner = await getEmployeeByName(targetVal.v);
 
-              entryObj["tranPartner"] = (tranPartner?.empId as string) ?? "xdd";
+              entryObj["tranPartner"] = tranPartner?.empId as string;
             } else if (file.name.includes("customer")) {
-              const tranPartner = await getCustomerByName(f[entry[i + 1]].v);
+              const tranPartner = await getCustomerByName(targetVal.v);
               entryObj["tranPartner"] = tranPartner?.custId as string;
             } else if (file.name.includes("vendor")) {
-              const tranPartner = await getVendorByName(f[entry[i + 1]].v);
+              const tranPartner = await getVendorByName(targetVal.v);
               entryObj["tranPartner"] = tranPartner?.vdId as string;
             }
           }
-          if (f[entry[i]].v === "RECEIVED BY :") {
+
+          if (val === "MODEOFPAYMENT:") {
+            entryObj["tranMopName"] = targetVal.v;
+          }
+
+          if (val === "RECEIVEDBY:") {
             entryObj["tranAccTypeId"] = entryAccType;
             entryObj["description"] = file.name.match(firstWordRegex)![0];
           }
@@ -184,7 +197,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       })
     );
 
-    if (lq.every((l) => l.tranPartner !== undefined))
+    if (lq.some((l) => l.tranPartner === undefined))
       return res.status(404).send({
         error: "Transaction partner not found",
       });
@@ -198,7 +211,10 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
     const transactions = await Promise.all(
       lq.map(async (tran) => {
-        //@ts-expect-error
+        const tranMop = await db.query.modesOfPayment.findFirst({
+          where: eq(modesOfPayment.mopName, tran.tranMopName!),
+        });
+
         const transaction = await addTransaction({
           tranAccTypeId: tran.tranAccTypeId as string,
           tranAmount: tran.amount!,
@@ -207,6 +223,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
           tranPartner: tran.tranPartner,
           tranTypeId: transactionType?.tranTypeId as string,
           tranFileName: newMultiFileName,
+          tranMopId: tranMop?.mopId as string,
         });
 
         return transaction;
