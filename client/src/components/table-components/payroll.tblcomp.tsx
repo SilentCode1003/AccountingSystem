@@ -91,12 +91,7 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
               </Text>
               <div className="flex-1">{row.original.employee.empId}</div>
             </DialogDescription>
-            <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
-                Address
-              </Text>
-              <div className="flex-1">{row.original.employee.empAddress}</div>
-            </DialogDescription>
+
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
               <Text variant={'body'} className="w-full sm:w-[33%]">
                 Contact Info
@@ -111,16 +106,7 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
               </Text>
               <div className="flex-1">{row.original.employee.empEmail}</div>
             </DialogDescription>
-            <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
-                Birthdate
-              </Text>
-              <div className="flex-1">
-                {new Date(
-                  row.original.employee.empBirthdate,
-                ).toLocaleDateString()}
-              </div>
-            </DialogDescription>
+
             <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
               <Text variant={'body'} className="w-full sm:w-[33%]">
                 Date Hired

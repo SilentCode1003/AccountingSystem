@@ -198,6 +198,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
     const transactions = await Promise.all(
       lq.map(async (tran) => {
+        //@ts-expect-error
         const transaction = await addTransaction({
           tranAccTypeId: tran.tranAccTypeId as string,
           tranAmount: tran.amount!,

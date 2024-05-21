@@ -25,7 +25,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Text } from '@/components/ui/text'
 import { useCreatePayroll } from '@/hooks/mutations'
-import { useEmployees, usePayrolls } from '@/hooks/queries'
+import { useEmployees, useModesOfPayment, usePayrolls } from '@/hooks/queries'
 import { employeesOptions, payrollsOptions } from '@/hooks/queries/options'
 import { createPayrollSchema } from '@/validators/payrolls.validators'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -58,12 +58,14 @@ function LoadingComponent() {
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
   const employees = useEmployees()
+  const modesOfPayment = useModesOfPayment()
   const createPayroll = useCreatePayroll({ setOpen })
 
   const form = useForm<z.infer<typeof createPayrollSchema>>({
     defaultValues: {
       prEmployeeId: '',
       prTotalDeduction: 0,
+      prMopId: '',
     },
     resolver: zodResolver(createPayrollSchema),
   })
@@ -138,6 +140,33 @@ const CrudComponents = () => {
                             field.onChange(parseFloat(e.target.value))
                           }
                         />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="prMopId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Mode of Payment</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        {modesOfPayment.isSuccess && (
+                          <ComboBox
+                            data={modesOfPayment.data.modesOfPayment.map(
+                              (mop) => ({
+                                value: mop.mopId,
+                                label: mop.mopName,
+                              }),
+                            )}
+                            emptyLabel="Nothing Selected"
+                            value={field.value}
+                            setValue={field.onChange}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}

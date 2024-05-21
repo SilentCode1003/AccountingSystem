@@ -29,9 +29,10 @@ import {
   useCreateTransactionByFile,
 } from '@/hooks/mutations'
 import {
-  useAccountTypes,
+  useModesOfPayment,
   useTransactionPartners,
   useTransactions,
+  useTransactionTypes,
 } from '@/hooks/queries'
 import {
   transactionPartnersOptions,
@@ -106,7 +107,8 @@ function TransactionsComponent() {
   const [uploadOpen, setUploadOpen] = useState<boolean>(false)
   const transactions = useTransactions()
 
-  const accountTypes = useAccountTypes()
+  const modesOfPayment = useModesOfPayment()
+  const transactionTypes = useTransactionTypes()
 
   const transactionPartners = useTransactionPartners()
 
@@ -119,6 +121,7 @@ function TransactionsComponent() {
       tranAmount: 0,
       tranDescription: '',
       tranPartner: '',
+      tranMopId: '',
     },
     resolver: zodResolver(createTransactionSchema),
   })
@@ -265,7 +268,7 @@ function TransactionsComponent() {
                               <Input
                                 className="w-full"
                                 type="number"
-                                placeholder="Total Deduction"
+                                placeholder="Amount"
                                 step="0.01"
                                 {...field}
                                 value={
@@ -364,27 +367,29 @@ function TransactionsComponent() {
                       )}
                     />
                     <FormField
-                      name="tranAccTypeId"
                       control={form.control}
+                      name="tranMopId"
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel>Account Type</FormLabel>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Mode of Payment</FormLabel>
+                            <FormMessage />
+                          </div>
                           <FormControl>
-                            {accountTypes.isSuccess && (
+                            {modesOfPayment.isSuccess && (
                               <ComboBox
-                                data={accountTypes.data.accountTypes.map(
-                                  (t) => ({
-                                    label: t.accTypeName,
-                                    value: t.accTypeId,
+                                data={modesOfPayment.data.modesOfPayment.map(
+                                  (mop) => ({
+                                    value: mop.mopId,
+                                    label: mop.mopName,
                                   }),
                                 )}
-                                emptyLabel="Nothing Found"
+                                emptyLabel="Nothing Selected"
                                 value={field.value}
                                 setValue={field.onChange}
                               />
                             )}
                           </FormControl>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -422,25 +427,14 @@ function TransactionsComponent() {
                         <FormItem className="flex-1">
                           <FormLabel>Transaction Type</FormLabel>
                           <FormControl>
-                            {accountTypes.isSuccess && (
+                            {transactionTypes.isSuccess && (
                               <ComboBox
-                                data={
-                                  form.watch('tranAccTypeId')
-                                    ? accountTypes.data.accountTypes
-                                        .filter(
-                                          (at) =>
-                                            at.accTypeId ===
-                                            form.watch('tranAccTypeId'),
-                                        )[0]
-                                        .transactionTypes.map((t) => ({
-                                          label: t.tranTypeName,
-                                          value: t.tranTypeId,
-                                        }))
-                                    : ([] satisfies {
-                                        label: string
-                                        value: string
-                                      }[])
-                                }
+                                data={transactionTypes.data?.transactionTypes.map(
+                                  (t) => ({
+                                    label: t.tranTypeName,
+                                    value: t.tranTypeId,
+                                  }),
+                                )}
                                 emptyLabel="Nothing Found"
                                 value={field.value}
                                 setValue={field.onChange}

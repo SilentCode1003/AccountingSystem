@@ -36,16 +36,11 @@ export const addPayroll = async (input: {
       ? 0
       : (employee!.empSalary as number) - input.prTotalDeduction;
 
-  const accountType = await db.query.accountTypes.findFirst({
-    where: eq(accountTypes.accTypeName, "EXPENSE"),
-  });
-
   const transactionType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeName, "PAYROLL"),
   });
 
   const newTransaction = await addTransaction({
-    tranAccTypeId: accountType!.accTypeId,
     tranAmount: finalAmount,
     tranDescription: "PAYROLL",
     tranPartner: employee!.empId,

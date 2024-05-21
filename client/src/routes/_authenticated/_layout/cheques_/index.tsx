@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
 import { useCreateCheque } from '@/hooks/mutations'
-import { useAccountTypes, useCheques } from '@/hooks/queries'
+import { useAccountTypes, useCheques, useModesOfPayment } from '@/hooks/queries'
 import { chequesOptions } from '@/hooks/queries/options'
 import { createChequeSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -63,6 +63,7 @@ function LoadingComponent() {
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
   const accountTypes = useAccountTypes()
+  const modesOfPayment = useModesOfPayment()
   const createCheque = useCreateCheque({ setOpen })
   const form = useForm<z.infer<typeof createChequeSchema>>({
     defaultValues: {
@@ -70,6 +71,7 @@ const CrudComponents = () => {
       chqPayeeName: '',
       chqStatus: 'PENDING',
       chqNumber: '',
+      chqMopId: '',
     },
     resolver: zodResolver(createChequeSchema),
   })
@@ -156,6 +158,33 @@ const CrudComponents = () => {
                             field.onChange(parseFloat(e.target.value))
                           }
                         />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="chqMopId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Mode of Payment</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        {modesOfPayment.isSuccess && (
+                          <ComboBox
+                            data={modesOfPayment.data.modesOfPayment.map(
+                              (mop) => ({
+                                value: mop.mopId,
+                                label: mop.mopName,
+                              }),
+                            )}
+                            emptyLabel="Nothing Selected"
+                            value={field.value}
+                            setValue={field.onChange}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}

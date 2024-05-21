@@ -3,6 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import db from "../index";
 import transactions from "../schema/transactions.schema";
 import { addAccount, editAccount } from "./accounts.service";
+import { getTransactionTypeById } from "./transactionTypes.service";
 
 export const getAllTransactions = async () => {
   const allTransactions = await db.query.transactions.findMany({
@@ -16,6 +17,7 @@ export const getAllTransactions = async () => {
       employee: true,
       customer: true,
       vendor: true,
+      modeOfPayment: true,
     },
     orderBy: desc(transactions.tranTransactionDate),
   });
@@ -27,8 +29,8 @@ export const addTransaction = async (input: {
   tranDescription: string;
   tranAmount: number;
   tranPartner?: string;
+  tranAccTypeId?: string;
   tranTransactionDate: Date;
-  tranAccTypeId: string;
   tranTypeId: string;
   tranFileMimeType?: string;
   tranOtherPartner?: string;
@@ -38,11 +40,19 @@ export const addTransaction = async (input: {
 }) => {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
+  const transactionType = await getTransactionTypeById(input.tranTypeId);
+
   const newAccount = await addAccount({
     accName: input.tranAccName ?? `ACCOUNT TRANSACTION`,
     accAmount: input.tranAmount,
     accDescription: `TRANSACTION: ${input.tranDescription}`,
-    accTypeId: input.tranAccTypeId,
+    accTypeId:
+      input.tranAccTypeId ??
+      (
+        transactionType as typeof transactionType & {
+          accountType: { accTypeId: string };
+        }
+      ).accountType.accTypeId,
     accCreatedAt: input.tranTransactionDate,
   });
 
@@ -81,6 +91,7 @@ export const addTransaction = async (input: {
       employee: true,
       customer: true,
       vendor: true,
+      modeOfPayment: true,
     },
   });
 
@@ -91,9 +102,9 @@ export const editTransaction = async (input: {
   tranId: string;
   tranAccId?: string;
   tranDescription?: string;
+  tranAccTypeId?: string;
   tranAmount?: number;
   tranPartner?: string;
-  tranAccTypeId?: string;
   tranTransactionDate?: Date;
   tranFileMimeType?: string;
   tranOtherPartner?: string;
@@ -101,6 +112,7 @@ export const editTransaction = async (input: {
   tranAccName?: string;
   tranMopId?: string;
 }) => {
+  const transactionType = await getTransactionTypeById(input.tranTypeId!);
   await db
     .update(transactions)
     .set({
@@ -139,6 +151,7 @@ export const editTransaction = async (input: {
       employee: true,
       customer: true,
       vendor: true,
+      modeOfPayment: true,
     },
   });
 
@@ -146,7 +159,13 @@ export const editTransaction = async (input: {
     accId: editedTran!.tranAccId as string,
     newData: {
       accName: input.tranAccName,
-      accTypeId: input.tranAccTypeId,
+      accTypeId:
+        input.tranAccTypeId ??
+        (
+          transactionType as typeof transactionType & {
+            accountType: { accTypeId: string };
+          }
+        ).accountType.accTypeId,
       accAmount: input.tranAmount,
       accCreatedAt: input.tranTransactionDate,
     },

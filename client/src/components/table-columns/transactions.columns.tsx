@@ -11,6 +11,7 @@ import {
   TransactionDate,
   transactionFileColumn,
   TransactionIndexColumn,
+  TransactionModeOfPaymentColumn,
   TransactionTypeColumn,
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
@@ -191,6 +192,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
         </Button>
       )
     },
+    cell: TransactionModeOfPaymentColumn,
   },
   {
     accessorKey: 'tranTransactionDate',

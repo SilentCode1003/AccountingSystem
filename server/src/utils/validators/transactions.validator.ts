@@ -5,20 +5,6 @@ import z from "zod";
 export const createValidator = z.object({
   tranDescription: z.string(),
   tranAmount: z.coerce.number(),
-  tranAccTypeId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accTypeId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an account type id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      });
-    }
-  }),
   tranTypeId: z.string().superRefine((val, ctx) => {
     if (val.split(" ")[0] !== "tranTypeId") {
       ctx.addIssue({
@@ -143,23 +129,6 @@ export const updateValidator = z.object({
     })
     .optional(),
   tranDescription: z.string().optional(),
-  tranAccTypeId: z
-    .string()
-    .superRefine((val, ctx) => {
-      if (val.split(" ")[0] !== "accTypeId") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not an account type id.`,
-        });
-      }
-      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
-        });
-      }
-    })
-    .optional(),
   tranAmount: z.coerce.number().optional(),
   tranTypeId: z
     .string()
