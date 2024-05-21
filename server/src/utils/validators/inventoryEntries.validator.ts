@@ -41,6 +41,20 @@ export const createValidator = z.object({
       message: "Only xlsx/pdf files are allowed",
     }
   ),
+  invEntryMopId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "mopId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not a mode of payment id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
   iepProducts: z.array(
     z
       .string()
@@ -126,6 +140,23 @@ export const updateValidator = z.object({
     })
     .optional(),
   invEntryType: z.enum(["INCOMING", "OUTGOING"]).optional(),
+  invEntryMopId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val.split(" ")[0] !== "mopId") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not a mode of payment id.`,
+        });
+      }
+      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        });
+      }
+    })
+    .optional(),
   invEntryFile: z
     .custom<UploadedFile>()
     .refine(

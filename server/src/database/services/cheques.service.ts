@@ -46,6 +46,7 @@ export const addCheque = async (input: {
   chqAccTypeId: string;
   chqNumber: string;
   chqTranFileMimeType?: string;
+  chqMopId: string;
 }) => {
   const tranType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeName, "CHEQUE"),
@@ -60,6 +61,7 @@ export const addCheque = async (input: {
     tranTransactionDate: input.chqIssueDate,
     tranFileMimeType: input.chqTranFileMimeType,
     tranAccName: "CHEQUE",
+    tranMopId: input.chqMopId,
   });
 
   const newChqId = `chqId ${crypto.randomUUID()}`;
@@ -95,6 +97,7 @@ export const editCheque = async (input: {
   chqNumber?: string;
   chqTranId: string;
   chqTranFileMimeType?: string;
+  chqMopId?: string;
 }) => {
   await Promise.all([
     db
@@ -121,6 +124,7 @@ export const editCheque = async (input: {
       tranOtherPartner: input.chqPayeeName,
       tranTransactionDate: input.chqIssueDate,
       tranFileMimeType: input.chqTranFileMimeType,
+      tranMopId: input.chqMopId,
     }),
   ]);
 

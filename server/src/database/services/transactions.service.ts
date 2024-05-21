@@ -34,6 +34,7 @@ export const addTransaction = async (input: {
   tranOtherPartner?: string;
   tranAccName?: string;
   tranFileName?: string;
+  tranMopId: string;
 }) => {
   const newTransactionId = `tranId ${crypto.randomUUID()}`;
 
@@ -46,11 +47,9 @@ export const addTransaction = async (input: {
   });
 
   await db.insert(transactions).values({
+    ...input,
     tranId: newTransactionId,
     tranAccId: newAccount!.accId,
-    tranAmount: input.tranAmount,
-    tranDescription: input.tranDescription,
-    tranTransactionDate: input.tranTransactionDate,
     tranEmpId:
       input.tranPartner && input.tranPartner.split(" ")[0] === "empId"
         ? input.tranPartner
@@ -100,6 +99,7 @@ export const editTransaction = async (input: {
   tranOtherPartner?: string;
   tranTypeId?: string;
   tranAccName?: string;
+  tranMopId?: string;
 }) => {
   await db
     .update(transactions)
@@ -123,6 +123,7 @@ export const editTransaction = async (input: {
       tranFile: `${input.tranId}.${input.tranFileMimeType ?? "xlsx"}`,
       tranTypeId: input.tranTypeId,
       tranOtherPartner: input.tranOtherPartner,
+      tranMopId: input.tranMopId,
     })
     .where(eq(transactions.tranId, input.tranId));
 

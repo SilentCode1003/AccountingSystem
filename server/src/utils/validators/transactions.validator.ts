@@ -33,6 +33,20 @@ export const createValidator = z.object({
       });
     }
   }),
+  tranMopId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "mopId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not a mode of payment id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
   tranPartner: z.string().superRefine((val, ctx) => {
     if (val === "")
       ctx.addIssue({
@@ -101,6 +115,23 @@ export const updateValidator = z.object({
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Not an account id.`,
+        });
+      }
+      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        });
+      }
+    })
+    .optional(),
+  tranMopId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val.split(" ")[0] !== "mopId") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not a mode of payment id.`,
         });
       }
       if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {

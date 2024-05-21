@@ -39,6 +39,20 @@ export const createValidator = z.object({
       message: "Only xlsx/pdf files are allowed",
     }
   ),
+  chqMopId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "mopId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not a mode of payment id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
 });
 
 //validor for PUT /cheques input
@@ -104,6 +118,23 @@ export const updateValidator = z.object({
       });
     }
   }),
+  chqMopId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val.split(" ")[0] !== "mopId") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not a mode of payment id.`,
+        });
+      }
+      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        });
+      }
+    })
+    .optional(),
   chqFile: z
     .custom<UploadedFile>()
     .refine(

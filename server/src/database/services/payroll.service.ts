@@ -23,6 +23,7 @@ export const addPayroll = async (input: {
   prDateFrom: Date;
   prDateTo: Date;
   prTranFileMimeType: string;
+  prMopId: string;
 }) => {
   const newPayrollId = `prId ${crypto.randomUUID()}`;
 
@@ -52,6 +53,7 @@ export const addPayroll = async (input: {
     tranTypeId: transactionType!.tranTypeId,
     tranFileMimeType: input.prTranFileMimeType,
     tranAccName: "PAYROLL",
+    tranMopId: input.prMopId,
   });
 
   await db.insert(payrolls).values({
@@ -80,6 +82,7 @@ export const editPayroll = async (input: {
   prDateFrom?: Date;
   prDateTo?: Date;
   prTranFileMimeType?: string;
+  prMopId?: string;
 }) => {
   const employee = await db.query.employees.findFirst({
     where: (employee) => eq(employee.empId, input.prEmployeeId as string),
@@ -104,6 +107,7 @@ export const editPayroll = async (input: {
     tranAmount: finalAmount,
     tranFileMimeType: input.prTranFileMimeType,
     tranPartner: input.prEmployeeId,
+    tranMopId: input.prMopId,
   });
 
   const updatedPr = await db.query.payrolls.findFirst({
