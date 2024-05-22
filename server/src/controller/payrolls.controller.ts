@@ -15,6 +15,7 @@ import {
   createValidator,
   updateValidator,
 } from "../utils/validators/payrolls.validator";
+import crypto from "crypto";
 
 export const getPayrolls = async (req: Request, res: Response) => {
   try {
