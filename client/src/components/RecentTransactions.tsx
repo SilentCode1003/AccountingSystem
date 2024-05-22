@@ -295,7 +295,7 @@ function RecentTransactions<TData, TValue>({
             </div>
           )}
           <Button variant={'secondary'}>
-            <Link to="/transactions">
+            <Link to="/transactions/">
               <SquareArrowUpRightIcon />
             </Link>
           </Button>
