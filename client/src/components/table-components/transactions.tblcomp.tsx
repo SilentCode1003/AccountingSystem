@@ -59,7 +59,10 @@ export const TransactionIndexColumn = ({
 export const transactionFileColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
-  const downloadFile = useDownloadFile(row.original.tranFile)
+  const downloadFile = useDownloadFile(
+    row.original.tranFile,
+    'transactionfiles',
+  )
   return (
     <Badge
       onClick={() => downloadFile.mutate()}

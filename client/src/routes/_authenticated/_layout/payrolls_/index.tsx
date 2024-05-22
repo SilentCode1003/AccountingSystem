@@ -103,6 +103,7 @@ const CrudComponents = () => {
                 setOpen={setUploadOpen}
                 fileName="prFile"
                 label="Upload an xlsx file to add payrolls!"
+                template
                 mutate={createPayrollByFile.mutate}
               />
             </div>

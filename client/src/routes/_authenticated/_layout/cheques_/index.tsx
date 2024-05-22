@@ -105,6 +105,7 @@ const CrudComponents = () => {
                 setOpen={setUploadOpen}
                 setFile={setFile}
                 file={file}
+                template
                 fileName="chqFile"
                 label="Upload an xlsx file to create cheques!"
                 mutate={createChequeByFile.mutate}

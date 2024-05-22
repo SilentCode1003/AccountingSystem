@@ -1,9 +1,10 @@
 import { UseMutateFunction } from '@tanstack/react-query'
-import { FileUpIcon } from 'lucide-react'
+import { DownloadIcon, FileUpIcon } from 'lucide-react'
 import { Dropzone } from './Dropzone'
 import { Button } from './ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from './ui/dialog'
 import { Text } from './ui/text'
+import { useDownloadFile } from '@/hooks/mutations'
 
 type CreateByFileUploadProps = {
   file: File | undefined
@@ -13,6 +14,7 @@ type CreateByFileUploadProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   fileName: string
   label: string
+  template?: boolean
 }
 
 export const CreateByFileUpload = ({
@@ -23,7 +25,9 @@ export const CreateByFileUpload = ({
   setOpen,
   fileName,
   label,
+  template,
 }: CreateByFileUploadProps) => {
+  const download = useDownloadFile(fileName.concat('.xlsx'), '/fileformats')
   const handleSubmitFile = () => {
     const payload = new FormData()
 
@@ -47,6 +51,15 @@ export const CreateByFileUpload = ({
         </DialogHeader>
 
         <Dropzone onChange={setFile} fileExtension="xlsx" />
+        {template && (
+          <Button
+            onClick={() => download.mutate()}
+            variant={'outline'}
+            className="flex gap-2"
+          >
+            Download Template <DownloadIcon />
+          </Button>
+        )}
 
         <Button onClick={handleSubmitFile}>Upload</Button>
       </DialogContent>
