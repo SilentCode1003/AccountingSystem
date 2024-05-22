@@ -2224,11 +2224,11 @@ export const useLogin = () => {
   })
 }
 
-export const useDownloadFile = (fileName: string) => {
+export const useDownloadFile = (fileName: string, dirPath: string) => {
   return useMutation({
     mutationKey: ['downloadFile'],
     mutationFn: async () => {
-      const params = new URLSearchParams({ fileName })
+      const params = new URLSearchParams({ fileName, dirPath })
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/others/download/?` + params,
         {
@@ -2240,7 +2240,7 @@ export const useDownloadFile = (fileName: string) => {
       return { data, fileName }
     },
     onSuccess: (data) => {
-      fileDownload(data.data, data.fileName.split(' ')[1])
+      fileDownload(data.data, data.fileName.split(' ')[1] ?? fileName)
     },
   })
 }

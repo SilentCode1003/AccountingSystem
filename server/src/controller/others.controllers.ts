@@ -284,11 +284,12 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
 
 export const downloadFile = async (req: Request, res: Response) => {
   const fileName = req.query.fileName as string;
+  const dirPath = req.query.dirPath as string;
   const filePath = path.join(
     __dirname,
     "..",
     "..",
-    `/files/transactionfiles/${fileName}`
+    `/files/${dirPath}/${fileName}`
   );
 
   res.download(filePath);
