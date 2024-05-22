@@ -2054,6 +2054,134 @@ export const useCreateTransactionByFile = ({
   })
 }
 
+export const useCreatePayrollByFile = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['createPayrollByFile'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/payrolls/file`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: payload,
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as {
+        payrolls: Array<Payrolls>
+      }
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['payrolls'],
+        (old: { payrolls: Array<Payrolls> }) => {
+          return { payrolls: [...old.payrolls, ...data.payrolls] }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Payroll was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create Payroll',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateChequeByFile = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['createChequeByFile'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/cheques/file`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: payload,
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as {
+        cheques: Array<Cheques>
+      }
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['cheques'],
+        (old: { cheques: Array<Cheques> }) => {
+          return { cheques: [...old.cheques, ...data.cheques] }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Cheque was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create cheque',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useLogin = () => {
   type LoginPayload = {
     username: string
