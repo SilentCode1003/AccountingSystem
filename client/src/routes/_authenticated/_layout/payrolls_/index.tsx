@@ -1,5 +1,6 @@
 import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
+import { CreateByFileUpload } from '@/components/FileDropZone'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
 import {
@@ -24,7 +25,7 @@ import {
 } from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
 import { Text } from '@/components/ui/text'
-import { useCreatePayroll } from '@/hooks/mutations'
+import { useCreatePayroll, useCreatePayrollByFile } from '@/hooks/mutations'
 import { useEmployees, useModesOfPayment, usePayrolls } from '@/hooks/queries'
 import { employeesOptions, payrollsOptions } from '@/hooks/queries/options'
 import { createPayrollSchema } from '@/validators/payrolls.validators'
@@ -60,6 +61,10 @@ const CrudComponents = () => {
   const employees = useEmployees()
   const modesOfPayment = useModesOfPayment()
   const createPayroll = useCreatePayroll({ setOpen })
+  const [file, setFile] = useState<File>()
+  const [uploadOpen, setUploadOpen] = useState(false)
+
+  const createPayrollByFile = useCreatePayrollByFile({ setOpen: setUploadOpen })
 
   const form = useForm<z.infer<typeof createPayrollSchema>>({
     defaultValues: {
@@ -89,7 +94,18 @@ const CrudComponents = () => {
         </Button>
         <AlertDialogContent className="scale-75 sm:scale-100">
           <AlertDialogHeader>
-            <Text variant={'heading3bold'}>Create Payroll</Text>
+            <div className="flex justify-between">
+              <Text variant={'heading3bold'}>Create Payroll</Text>
+              <CreateByFileUpload
+                file={file}
+                setFile={setFile}
+                open={uploadOpen}
+                setOpen={setUploadOpen}
+                fileName="prFile"
+                label="Upload an xlsx file to add payrolls!"
+                mutate={createPayrollByFile.mutate}
+              />
+            </div>
           </AlertDialogHeader>
           <Form {...form}>
             <form>

@@ -1,5 +1,6 @@
 import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
+import { CreateByFileUpload } from '@/components/FileDropZone'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
 import {
@@ -32,7 +33,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
-import { useCreateCheque } from '@/hooks/mutations'
+import { useCreateCheque, useCreateChequeByFile } from '@/hooks/mutations'
 import { useAccountTypes, useCheques, useModesOfPayment } from '@/hooks/queries'
 import { chequesOptions } from '@/hooks/queries/options'
 import { createChequeSchema } from '@/validators/cheques.validator'
@@ -65,6 +66,9 @@ const CrudComponents = () => {
   const accountTypes = useAccountTypes()
   const modesOfPayment = useModesOfPayment()
   const createCheque = useCreateCheque({ setOpen })
+  const [file, setFile] = useState<File>()
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const createChequeByFile = useCreateChequeByFile({ setOpen: setUploadOpen })
   const form = useForm<z.infer<typeof createChequeSchema>>({
     defaultValues: {
       chqAmount: 0,
@@ -94,7 +98,18 @@ const CrudComponents = () => {
         </Button>
         <AlertDialogContent className="scale-75 sm:scale-100">
           <AlertDialogHeader>
-            <Text variant={'heading3bold'}>Create Cheque</Text>
+            <div className="flex justify-between">
+              <Text variant={'heading3bold'}>Create Cheque</Text>
+              <CreateByFileUpload
+                open={uploadOpen}
+                setOpen={setUploadOpen}
+                setFile={setFile}
+                file={file}
+                fileName="chqFile"
+                label="Upload an xlsx file to create cheques!"
+                mutate={createChequeByFile.mutate}
+              />
+            </div>
           </AlertDialogHeader>
           <Form {...form}>
             <form>
