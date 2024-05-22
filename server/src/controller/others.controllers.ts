@@ -339,11 +339,11 @@ export const syncEmployeesByAPI = async (req: Request, res: Response) => {
       shapeDataToDB.map(async (emp) => {
         //check if employee exists
         const empExists = await db.query.employees.findFirst({
-          where: eq(employees.empId, emp.empId),
+          where: eq(employees.empId, `empId ${emp.empId}`),
         });
 
         //early return if employee does not exist
-        if (empExists) return;
+        if (!empExists) return;
 
         //insert employee
         const newEmployee = await db.insert(employees).values({
@@ -412,7 +412,7 @@ export const syncEmployeesByFile = async (req: Request, res: Response) => {
       shapeDataToDB.map(async (emp) => {
         //check if employee exists
         const empExists = await db.query.employees.findFirst({
-          where: eq(employees.empId, emp.empId),
+          where: eq(employees.empId, `empId ${emp.empId}`),
         });
 
         //early return if employee does not exist
