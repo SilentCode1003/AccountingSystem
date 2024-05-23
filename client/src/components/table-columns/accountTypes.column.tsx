@@ -10,6 +10,7 @@ export type AccountTypes = {
   accTypeId: string
   accTypeName: string
   accTypeDefault: string
+  accTypeIsProfit: boolean
   accounts: Array<Accounts>
   transactionTypes: Array<TransactionTypes>
 }

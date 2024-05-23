@@ -45,6 +45,7 @@ import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
 import { PromptModal } from '../PromptModal'
 import { useState } from 'react'
 import { Badge } from '../ui/badge'
+import { Checkbox } from '../ui/checkbox'
 
 export const AccountTypeNameColumn = ({
   row,
@@ -58,6 +59,7 @@ export const AccountTypeNameColumn = ({
       newData: {
         accTypeName: row.original.accTypeName,
         accTypeDefault: row.original.accTypeDefault,
+        accTypeIsProfit: row.original.accTypeIsProfit,
       },
     },
     resolver: zodResolver(updateAccountTypeSchema),
@@ -193,6 +195,26 @@ export const AccountTypeNameColumn = ({
                                 )}
                               </FormControl>
                               <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="newData.accTypeIsProfit"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className=" flex gap-2 items-center">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <div className="flex items-center justify-between">
+                                  <FormLabel>Profitable</FormLabel>
+                                  <FormMessage />
+                                </div>
+                              </div>
                             </FormItem>
                           )}
                         />
