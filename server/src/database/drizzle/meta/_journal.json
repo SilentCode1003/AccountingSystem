@@ -253,6 +253,20 @@
       "when": 1716427416846,
       "tag": "0035_lean_blindfold",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1716433880796,
+      "tag": "0036_fresh_vision",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1716433953378,
+      "tag": "0037_gifted_stick",
+      "breakpoints": true
     }
   ]
 }
