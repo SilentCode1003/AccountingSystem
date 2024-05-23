@@ -638,6 +638,14 @@ export const useUpdateCheque = ({
         queryKey: ['transactions'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -1064,6 +1072,14 @@ export const useUpdateInventoryEntry = ({
         queryKey: ['transactions'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -1142,6 +1158,14 @@ export const useUpdatePayroll = ({
         queryKey: ['transactions'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -1211,6 +1235,14 @@ export const useUpdateTransaction = ({
       await queryClient.invalidateQueries({
         queryKey: ['accounts'],
         type: 'inactive',
+      }),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
       })
       setOpenUpdate(false)
       toast({
@@ -1273,6 +1305,14 @@ export const useCreateCheque = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       toast({
@@ -1579,6 +1619,14 @@ export const useCreateInventoryEntry = ({
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
         type: 'inactive',
+      }),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
       })
       setOpen(false)
       toast({
@@ -1643,6 +1691,14 @@ export const useCreatePayroll = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
+        type: 'inactive',
+      }),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       toast({
@@ -2028,6 +2084,14 @@ export const useCreateTransactionByFile = ({
         queryKey: ['accounts'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -2092,6 +2156,14 @@ export const useCreatePayrollByFile = ({
         queryKey: ['transactions'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -2154,6 +2226,14 @@ export const useCreateChequeByFile = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       setOpen(false)
