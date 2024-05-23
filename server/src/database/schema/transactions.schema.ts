@@ -1,5 +1,6 @@
 import {
   AnyMySqlColumn,
+  date,
   datetime,
   mysqlTable,
   text,
@@ -40,7 +41,7 @@ const transactions = mysqlTable("transactions", {
     .references((): AnyMySqlColumn => modesOfPayment.mopId, {
       onDelete: "cascade",
     }),
-  tranTransactionDate: datetime("tran_transaction_date").notNull(),
+  tranTransactionDate: date("tran_transaction_date").notNull(),
   tranOtherPartner: text("tran_other_partner"),
   tranCreatedAt: datetime("tran_created_at").notNull().default(new Date()),
   tranUpdatedAt: datetime("tran_updated_at").notNull().default(new Date()),
