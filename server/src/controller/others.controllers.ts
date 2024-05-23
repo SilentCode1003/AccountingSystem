@@ -178,19 +178,21 @@ export const getAccountTypeTotalPerMonth = async (
     console.log(
       "successfully fetched account type total for given month and year"
     );
+
+    const currTotal = parseFloat(String(total ?? 0));
+    const prevTotal = parseFloat(String(prevMonthTotal ?? 0));
+    const percentTotal = Math.abs((prevTotal - currTotal) / prevTotal) * 100;
+    const finalPercent = prevTotal > currTotal ? -percentTotal : percentTotal;
+
+    console.log(percentTotal);
+
     return res.status(200).send({
       accountTypeName: accTypeName!.accTypeName,
       total,
       percentAgainstPrevMonth:
-        Number(total) > Number(prevMonthTotal)
-          ? (parseFloat(String(prevMonthTotal ?? 0)) /
-              parseFloat(String(total ?? 0))) *
-            100
-          : -(
-              (parseFloat(String(prevMonthTotal ?? 0)) /
-                parseFloat(String(total ?? 0))) *
-              100
-            ),
+        Number.isNaN(finalPercent) || !Number.isFinite(finalPercent)
+          ? 0
+          : finalPercent,
     });
   } catch (error) {
     console.log(
