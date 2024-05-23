@@ -996,6 +996,14 @@ export const useUpdateInventory = ({
         queryKey: ['accounts'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
