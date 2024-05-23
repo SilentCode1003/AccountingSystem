@@ -11,7 +11,7 @@ import tranTypes from "./transactionTypes.schema";
 const accountTypes = mysqlTable("account_types", {
   accTypeId: varchar("acc_type_id", { length: 60 }).primaryKey().notNull(),
   accTypeName: varchar("acc_type_name", { length: 60 }).notNull().unique(),
-  accTypIsProfit: boolean("acc_type_is_profit").notNull().default(true),
+  accTypeIsProfit: boolean("acc_type_is_profit").notNull().default(true),
   accTypeDefault: mysqlEnum("acc_type_default", [
     "BALANCESHEET",
     "CASHFLOW",

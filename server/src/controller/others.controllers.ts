@@ -175,16 +175,14 @@ export const getAccountTypeTotalPerMonth = async (
       ),
     });
 
-    console.log(
-      "successfully fetched account type total for given month and year"
-    );
-
     const currTotal = parseFloat(String(total ?? 0));
     const prevTotal = parseFloat(String(prevMonthTotal ?? 0));
     const percentTotal = Math.abs((prevTotal - currTotal) / prevTotal) * 100;
     const finalPercent = prevTotal > currTotal ? -percentTotal : percentTotal;
 
-    console.log(percentTotal);
+    console.log(
+      "successfully fetched account type total for given month and year"
+    );
 
     return res.status(200).send({
       accountTypeName: accTypeName!.accTypeName,
@@ -252,7 +250,7 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
 
       const dz: any = {};
 
-      await Promise.all(
+      const nd = await Promise.all(
         d.map(async (item) => {
           const accTypeName = await db.query.accountTypes.findFirst({
             where: eq(accounts.accTypeId, item.accTypeId),
@@ -260,6 +258,11 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
 
           dz[accTypeName!.accTypeName] = parseFloat(String(item.total));
           aKeys.push(accTypeName?.accTypeName);
+
+          return {
+            total: item.total,
+            isProfit: accTypeName!.accTypeIsProfit,
+          };
         })
       );
 
@@ -268,7 +271,14 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
           month: "long",
         }),
         ...dz,
-        total: d.reduce((acc, curr) => acc + parseFloat(String(curr.total)), 0),
+        total: nd.reduce(
+          (acc, curr) =>
+            acc +
+            (curr.isProfit
+              ? parseFloat(String(curr.total))
+              : -parseFloat(String(curr.total))),
+          0
+        ),
       });
     }
 

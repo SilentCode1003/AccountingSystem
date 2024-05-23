@@ -105,6 +105,7 @@ export const getAccountTypeBarChartData = async (input: {
   for (let i = 0; i < currentMonth + 1; i++) {
     const d = await db
       .select({
+        accTypeId: accounts.accTypeId,
         name: accounts.accName,
         total: sum(accounts.accAmount),
       })
