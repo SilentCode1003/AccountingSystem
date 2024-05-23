@@ -78,7 +78,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranId',
     accessorFn: (_, index) => index,
-    meta: 'Transaction ID',
+    meta: 'ID',
     header: ({ column }) => {
       return (
         <Button
@@ -119,7 +119,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranFile',
-    meta: 'Transaction File',
+    meta: 'File',
     header: () => (
       <div
         className={text({
@@ -155,7 +155,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranAmount',
-    meta: 'Transaction Amount',
+    meta: 'Amount',
     header: ({ column }) => {
       return (
         <Button
@@ -196,7 +196,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranTransactionDate',
-    meta: 'Transaction Date',
+    meta: 'Date',
     filterFn: 'dateBetweenFilter',
     header: ({ column }) => {
       return (
@@ -288,7 +288,7 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranAmount',
-    meta: 'Transaction Amount',
+    meta: 'Amount',
     header: ({ column }) => {
       return (
         <Button
@@ -328,7 +328,7 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranTransactionDate',
-    meta: 'Transaction Date',
+    meta: 'Date',
     filterFn: 'dateBetweenFilter',
     header: ({ column }) => {
       return (

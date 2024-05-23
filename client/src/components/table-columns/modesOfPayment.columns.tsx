@@ -31,7 +31,7 @@ export const ModesOfPaymentColumns: ColumnDef<ModesOfPayment>[] = [
         </Button>
       )
     },
-    meta: 'mopName',
+    meta: 'Mode of Payment Name',
     cell: ModeOfPaymentNameColumn,
   },
   {
@@ -51,7 +51,7 @@ export const ModesOfPaymentColumns: ColumnDef<ModesOfPayment>[] = [
         </Button>
       )
     },
-    meta: 'mopIsActive',
+    meta: 'Status',
     cell: ModeOfPaymentStatusColumn,
   },
 ]

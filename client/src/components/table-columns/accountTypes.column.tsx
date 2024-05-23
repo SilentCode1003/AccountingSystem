@@ -18,6 +18,7 @@ export type AccountTypes = {
 export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
   {
     accessorKey: 'accTypeName',
+    meta: 'Account Type Name',
     header: ({ column }) => {
       return (
         <Button
@@ -34,7 +35,6 @@ export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
       )
     },
     cell: AccountTypeNameColumn,
-    meta: 'accTypeName',
   },
   // {
   //   accessorKey: 'accounts',
