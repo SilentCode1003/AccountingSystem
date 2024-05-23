@@ -19,7 +19,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -80,53 +79,60 @@ export const EmployeeNameColumn = ({ row }: CellContext<Payrolls, unknown>) => {
             </DialogTrigger>
           </DropdownMenuContent>
         </DropdownMenu>
-        <DialogContent className="rounded-md w-fit sm:max-w-[500px]">
+        <DialogContent className="rounded-md max-w-fit sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>{row.original.employee.empName}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 sm:space-y-0">
-            <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
-                ID
-              </Text>
-              <div className="flex-1">{row.original.employee.empId}</div>
-            </DialogDescription>
 
-            <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+          <div className="space-y-4 sm:space-y-2">
+            <div className="flex flex-col sm:flex-row">
+              <Text className="w-full sm:w-[33%]" variant={'body'}>
+                Employee Name
+              </Text>
+              <Text variant={'label'} className="flex-1">
+                {row.original.employee.empName}
+              </Text>
+            </div>
+            <div className="flex flex-col sm:flex-row">
+              <Text className="w-full sm:w-[33%]" variant={'body'}>
                 Contact Info
               </Text>
-              <div className="flex-1">
+              <Text variant={'label'} className="flex-1">
                 {row.original.employee.empContactInfo}
-              </div>
-            </DialogDescription>
-            <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
+              </Text>
+            </div>
+            <div className="flex flex-col sm:flex-row">
+              <Text className="w-full sm:w-[33%]" variant={'body'}>
                 Email
               </Text>
-              <div className="flex-1">{row.original.employee.empEmail}</div>
-            </DialogDescription>
-
-            <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
-                Date Hired
+              <Text variant={'label'} className="flex-1">
+                {row.original.employee.empEmail}
               </Text>
-              <div className="flex-1">
-                {new Date(
-                  row.original.employee.empDateHired,
-                ).toLocaleDateString()}
-              </div>
-            </DialogDescription>
-            <DialogDescription className="flex flex-col sm:items-center sm:flex-row">
-              <Text variant={'body'} className="w-full sm:w-[33%]">
-                Date Terminated
+            </div>
+            <div className="flex flex-col sm:flex-row">
+              <Text className="w-full sm:w-[33%]" variant={'body'}>
+                Job Status
               </Text>
-              <div className="flex-1">
-                {new Date(
-                  row.original.employee.empDateTerminated,
-                ).toLocaleDateString()}
-              </div>
-            </DialogDescription>
+              <Text variant={'label'} className="flex-1">
+                {row.original.employee.empJobStatus}
+              </Text>
+            </div>
+            <div className="flex flex-col sm:flex-row">
+              <Text className="w-full sm:w-[33%]" variant={'body'}>
+                Department
+              </Text>
+              <Text variant={'label'} className="flex-1">
+                {row.original.employee.empDepartment}
+              </Text>
+            </div>
+            <div className="flex flex-col sm:flex-row">
+              <Text className="w-full sm:w-[33%]" variant={'body'}>
+                Position
+              </Text>
+              <Text variant={'label'} className="flex-1">
+                {row.original.employee.empPosition}
+              </Text>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
