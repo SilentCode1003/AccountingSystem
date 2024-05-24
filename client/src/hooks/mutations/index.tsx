@@ -265,17 +265,17 @@ export const useUpdateAccountType = ({
   })
 }
 
-export const useDeleteAccountType = () => {
+export const useToggleAccountType = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationKey: ['deleteAccountType'],
+    mutationKey: ['toggleAccountType'],
     mutationFn: async (
       payload: Pick<z.infer<typeof updateAccountTypeSchema>, 'accTypeId'>,
     ) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/accountTypes/${payload.accTypeId}`,
         {
-          method: 'DELETE',
+          method: 'PUT',
           credentials: 'include',
         },
       )
@@ -283,7 +283,7 @@ export const useDeleteAccountType = () => {
       if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
-        deletedAccountTypeId: string
+        accountType: AccountTypes
       }>
       return data
     },
@@ -292,12 +292,19 @@ export const useDeleteAccountType = () => {
         ['accountTypes'],
         (old: { accountTypes: Array<AccountTypes> }) => {
           return {
-            accountTypes: old.accountTypes.filter(
-              (accType) => accType.accTypeId !== data.deletedAccountTypeId,
-            ),
+            accountTypes: old.accountTypes.map((accType) => {
+              if (accType.accTypeId === data.accountType.accTypeId) {
+                return data.accountType
+              }
+              return accType
+            }),
           }
         },
-      )
+      ),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
       toast({
         title: (
           <div>
