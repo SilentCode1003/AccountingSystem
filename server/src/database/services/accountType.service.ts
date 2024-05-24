@@ -3,6 +3,7 @@ import db from "..";
 import accountTypes from "../schema/accountType.schema";
 import crypto from "crypto";
 import accounts from "../schema/accounts.schema";
+import { not } from "drizzle-orm";
 
 const ACCTYPE_DEFAULT = {
   CASHFLOW: "CASHFLOW",
@@ -70,12 +71,18 @@ export const editAccountType = async (input: {
   return updatedAccountType;
 };
 
-export const removeAccountType = async (input: { accTypeId: string }) => {
+export const changeAccountTypeIsActive = async (input: {
+  accTypeId: string;
+}) => {
   await db
-    .delete(accountTypes)
+    .update(accountTypes)
+    .set({
+      accTypeIsActive: not(accountTypes.accTypeIsActive),
+    })
     .where(eq(accountTypes.accTypeId, input.accTypeId));
+  const editedAccountType = await getAccountTypeById(input);
+  return editedAccountType;
 };
-
 export const getAccountTypeTotalPerMonthQuery = async (input: {
   accTypeId: string;
   date: Date;
