@@ -54,7 +54,7 @@ export const accountTypeColumn: ColumnDef<AccountTypes>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          accounts
+          Status
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
