@@ -267,6 +267,13 @@
       "when": 1716433953378,
       "tag": "0037_gifted_stick",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1716512463041,
+      "tag": "0038_harsh_nomad",
+      "breakpoints": true
     }
   ]
 }
