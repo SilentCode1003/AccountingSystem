@@ -2067,6 +2067,14 @@ export const useCreateTransaction = (
         queryKey: ['accounts'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
       form.reset()
       toast({
         title: (
@@ -2100,7 +2108,7 @@ export const useCreateTransactionByFile = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationKey: ['createTransaction'],
+    mutationKey: ['createTransactionByFile'],
     mutationFn: async (payload: FormData) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/transactions/file`,
