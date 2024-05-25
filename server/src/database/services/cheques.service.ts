@@ -46,10 +46,20 @@ export const addCheque = async (input: {
   chqAccTypeId: string;
   chqNumber: string;
   chqTranFileMimeType?: string;
+  chqMopId: string;
+  chqFileName?: string;
 }) => {
   const tranType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeName, "CHEQUE"),
   });
+
+  const checkIfChqExists = await db.query.cheques.findFirst({
+    where: (cheque) => eq(cheque.chqNumber, input.chqNumber),
+  });
+
+  if (checkIfChqExists) {
+    throw new Error("Cheque number already exists");
+  }
 
   const transaction = await addTransaction({
     tranAccTypeId: input.chqAccTypeId,
@@ -60,6 +70,8 @@ export const addCheque = async (input: {
     tranTransactionDate: input.chqIssueDate,
     tranFileMimeType: input.chqTranFileMimeType,
     tranAccName: "CHEQUE",
+    tranFileName: input.chqFileName ?? undefined,
+    tranMopId: input.chqMopId,
   });
 
   const newChqId = `chqId ${crypto.randomUUID()}`;
@@ -95,6 +107,7 @@ export const editCheque = async (input: {
   chqNumber?: string;
   chqTranId: string;
   chqTranFileMimeType?: string;
+  chqMopId?: string;
 }) => {
   await Promise.all([
     db
@@ -121,6 +134,7 @@ export const editCheque = async (input: {
       tranOtherPartner: input.chqPayeeName,
       tranTransactionDate: input.chqIssueDate,
       tranFileMimeType: input.chqTranFileMimeType,
+      tranMopId: input.chqMopId,
     }),
   ]);
 

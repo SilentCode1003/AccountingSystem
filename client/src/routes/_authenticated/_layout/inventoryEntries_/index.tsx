@@ -41,6 +41,7 @@ import { useCreateInventoryEntry } from '@/hooks/mutations'
 import {
   useInventories,
   useInventoryEntries,
+  useModesOfPayment,
   useTransactionPartners,
 } from '@/hooks/queries'
 import { createInventoryEntrySchema } from '@/validators/inventoryEntries.validator'
@@ -131,10 +132,12 @@ function GrandTotal({
 
 function CrudComponents() {
   const [open, setOpen] = useState<boolean>(false)
+  const modesOfPayment = useModesOfPayment()
   const createInventoryEntry = useCreateInventoryEntry({ setOpen })
   const form = useForm<z.infer<typeof createInventoryEntrySchema>>({
     defaultValues: {
       invEntryType: 'INCOMING',
+      invEntryMopId: '',
       invEntryPartner: '',
       iepProducts: [
         {
@@ -296,6 +299,33 @@ function CrudComponents() {
                         </FormItem>
                       )
                     }}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="invEntryMopId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Mode of Payment</FormLabel>
+                          <FormMessage />
+                        </div>
+                        <FormControl>
+                          {modesOfPayment.isSuccess && (
+                            <ComboBox
+                              data={modesOfPayment.data.modesOfPayment.map(
+                                (mop) => ({
+                                  value: mop.mopId,
+                                  label: mop.mopName,
+                                }),
+                              )}
+                              emptyLabel="Nothing Selected"
+                              value={field.value}
+                              setValue={field.onChange}
+                            />
+                          )}
+                        </FormControl>
+                      </FormItem>
+                    )}
                   />
                   <DialogTrigger asChild>
                     <Button

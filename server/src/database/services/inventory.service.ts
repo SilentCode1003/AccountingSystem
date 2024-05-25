@@ -5,6 +5,8 @@ import { eq, sql } from "drizzle-orm";
 import inventoryEntries from "../schema/inventoryEntries.schema";
 import { editInventoryEntry } from "./inventoryEntries.service";
 import { inArray } from "drizzle-orm";
+import inventoryEntryProducts from "../schema/inventoryEntriesProducts.schema";
+import { editInventoryEntryProducts } from "./inventoryEntryProducts.service";
 
 const INVENTORY_STATUS = {
   GOOD: "GOOD",
@@ -55,9 +57,9 @@ export const editInventory = async (input: {
     invPricePerUnit?: number;
   };
 }) => {
-  // const prevValues = await db.query.inventory.findFirst({
-  //   where: (inv) => eq(inv.invId, input.invId),
-  // });
+  const prevValues = await db.query.inventory.findFirst({
+    where: (inv) => eq(inv.invId, input.invId),
+  });
 
   await db
     .update(inventory)
@@ -68,22 +70,46 @@ export const editInventory = async (input: {
     where: (inv) => eq(inv.invId, input.invId),
   });
 
-  // if (Number(prevValues?.invPricePerUnit) !== input.newData.invPricePerUnit) {
-  //   const invEntriesId = await db.query.inventoryEntries.findMany({
-  //     where: eq(inventoryEntries.invEntryInvId, input.invId),
-  //   });
+  if (Number(prevValues?.invPricePerUnit) !== input.newData.invPricePerUnit) {
+    const iepIds = await db.query.inventoryEntryProducts.findMany({
+      where: eq(inventoryEntryProducts.iepInvId, input.invId),
+    });
+    let iepArr: Array<string> = [];
+    await Promise.all(
+      iepIds.map(async (iep) => {
+        iepArr.push(iep.iepInvEntryId);
+        await db
+          .update(inventoryEntryProducts)
+          .set({
+            iepTotalPrice: iep.iepQuantity * input.newData.invPricePerUnit!,
+          })
+          .where(eq(inventoryEntryProducts.iepId, iep.iepId));
+      })
+    );
+    const updatedIep = await db.query.inventoryEntryProducts.findMany({
+      where: eq(inventoryEntryProducts.iepInvId, input.invId),
+    });
 
-  //   await Promise.all(
-  //     invEntriesId.map(async (invEntry) => {
-  //       await editInventoryEntry({
-  //         invEntryId: invEntry.invEntryId,
-  //         invEntryTranId: invEntry.invEntryTranId,
-  //         invEntryInvId: editedInv!.invId,
-  //         invEntryQuantity: invEntry.invEntryQuantity,
-  //         invEntryType: invEntry.invEntryType,
-  //       });
-  //     })
-  //   );
-  // }
+    await Promise.all(
+      Array.from(new Set(iepArr)).map(async (invEntry) => {
+        const origInvEntry = await db.query.inventoryEntries.findFirst({
+          where: eq(inventoryEntries.invEntryId, invEntry),
+        });
+        const products = await db.query.inventoryEntryProducts.findMany({
+          where: eq(inventoryEntryProducts.iepInvEntryId, invEntry),
+        });
+        await editInventoryEntry({
+          invEntryId: origInvEntry!.invEntryId,
+          invEntryPartner: (origInvEntry!.invEntryCustId ??
+            origInvEntry!.invEntryVdId)!,
+          invEntryTranId: origInvEntry!.invEntryTranId,
+          iepProducts: products.map((p) => ({
+            iepInvId: p.iepInvId,
+            iepQuantity: p.iepQuantity,
+          })),
+        });
+      })
+    );
+  }
   return editedInv;
 };

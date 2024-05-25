@@ -176,7 +176,7 @@ function Header() {
                 </Text>
               </AccordionTrigger>
               <AccordionContent className="flex flex-col gap-4 ps-8 pt-4 pb-0">
-                <Link to="/income_statement">
+                <Link to="/income_statement/">
                   <SheetClose>
                     <Text
                       variant={'heading2'}
@@ -188,7 +188,7 @@ function Header() {
                     </Text>
                   </SheetClose>
                 </Link>
-                <Link to="/balance_sheet">
+                <Link to="/balance_sheet/">
                   <SheetClose>
                     <Text
                       variant={'heading2'}
@@ -200,7 +200,7 @@ function Header() {
                     </Text>
                   </SheetClose>
                 </Link>
-                <Link to="/cash_flow">
+                <Link to="/cash_flow/">
                   <SheetClose>
                     <Text
                       variant={'heading2'}
@@ -216,7 +216,7 @@ function Header() {
             </AccordionItem>
           </Accordion>
 
-          <Link to="/transactions">
+          <Link to="/transactions/">
             <SheetClose>
               <Text
                 variant={'heading1'}
@@ -228,7 +228,7 @@ function Header() {
               </Text>
             </SheetClose>
           </Link>
-          <Link to="/cheques">
+          <Link to="/cheques/">
             <SheetClose>
               <Text
                 variant={'heading1'}
@@ -240,7 +240,7 @@ function Header() {
               </Text>
             </SheetClose>
           </Link>
-          <Link to="/payrolls">
+          <Link to="/payrolls/">
             <SheetClose>
               <Text
                 variant={'heading1'}
@@ -252,7 +252,7 @@ function Header() {
               </Text>
             </SheetClose>
           </Link>
-          <Link to="/inventoryEntries">
+          <Link to="/inventoryEntries/">
             <SheetClose>
               <Text
                 variant={'heading1'}

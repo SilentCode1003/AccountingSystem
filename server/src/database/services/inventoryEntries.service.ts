@@ -57,6 +57,7 @@ export const addInventoryEntry = async (input: {
     iepInvId: string;
     iepQuantity: number;
   }>;
+  invEntryMopId: string;
 }) => {
   const newInventoryEntryId = `invEntryId ${crypto.randomUUID()}`;
 
@@ -90,6 +91,7 @@ export const addInventoryEntry = async (input: {
     tranTransactionDate: input.invEntryDate,
     tranAccName:
       input.invEntryType === "INCOMING" ? "BOUGHT INVENTORY" : "SOLD INVENTORY",
+    tranMopId: input.invEntryMopId,
   });
 
   await db.insert(inventoryEntries).values({
@@ -129,6 +131,7 @@ export const editInventoryEntry = async (input: {
     iepQuantity: number;
   }>;
   invEntryTranFileMimeType?: string;
+  invEntryMopId?: string;
 }) => {
   const inventories = await getInventoriesByIds(
     input.iepProducts.map((i) => i.iepInvId)
@@ -186,6 +189,7 @@ export const editInventoryEntry = async (input: {
     tranTransactionDate: input.invEntryDate,
     tranAccName:
       input.invEntryType === "INCOMING" ? "BOUGHT INVENTORY" : "SOLD INVENTORY",
+    tranMopId: input.invEntryMopId,
   });
 
   const updatedInventoryEntry = await getInventoryEntryById(input.invEntryId);

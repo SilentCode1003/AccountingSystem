@@ -15,6 +15,20 @@ export const createPayrollSchema = z.object({
       })
     }
   }),
+  prMopId: z.string().superRefine((val, ctx) => {
+    if (val === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Required`,
+      })
+    }
+    if (val.split(' ')[0] !== 'mopId') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an mode of payment id.`,
+      })
+    }
+  }),
   prTotalDeduction: z
     .union([
       z.number().positive({ message: 'must not be 0 or negative' }),
@@ -68,6 +82,23 @@ export const updatePayrollSchema = z.object({
       })
     }
   }),
+  prMopId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Required`,
+        })
+      }
+      if (val.split(' ')[0] !== 'mopId') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not an mode of payment id.`,
+        })
+      }
+    })
+    .optional(),
   prEmployeeId: z
     .string()
     .superRefine((val, ctx) => {

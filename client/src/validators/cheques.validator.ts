@@ -18,6 +18,20 @@ export const createChequeSchema = z.object({
       message: 'required',
     }),
   chqIssueDate: z.date(),
+  chqMopId: z.string().superRefine((val, ctx) => {
+    if (val === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Required`,
+      })
+    }
+    if (val.split(' ')[0] !== 'mopId') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an mode of payment id.`,
+      })
+    }
+  }),
   chqNumber: z.string().max(50),
   chqStatus: z.enum(['APPROVED', 'PENDING', 'REJECTED']),
   chqAccTypeId: z.string().superRefine((val, ctx) => {
@@ -88,6 +102,23 @@ export const chequeUpdateSchema = z.object({
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Not valid uuid.`,
+        })
+      }
+    })
+    .optional(),
+  chqMopId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val === '') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Required`,
+        })
+      }
+      if (val.split(' ')[0] !== 'mopId') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not an mode of payment id.`,
         })
       }
     })

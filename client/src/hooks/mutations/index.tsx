@@ -5,6 +5,7 @@ import { Customers } from '@/components/table-columns/customers.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
+import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
 import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
@@ -28,6 +29,10 @@ import {
   createInventorySchema,
   updateFormSchema,
 } from '@/validators/inventory.validator'
+import {
+  createModeOfPaymentSchema,
+  updateModeOfPaymentSchema,
+} from '@/validators/modesOfPayment.validator'
 import { updatePayrollSchema } from '@/validators/payrolls.validators'
 import { createTransactionSchema } from '@/validators/transactions.validator'
 import {
@@ -234,6 +239,14 @@ export const useUpdateAccountType = ({
           }
         },
       )
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -260,17 +273,17 @@ export const useUpdateAccountType = ({
   })
 }
 
-export const useDeleteAccountType = () => {
+export const useToggleAccountType = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationKey: ['deleteAccountType'],
+    mutationKey: ['toggleAccountType'],
     mutationFn: async (
       payload: Pick<z.infer<typeof updateAccountTypeSchema>, 'accTypeId'>,
     ) => {
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/accountTypes/${payload.accTypeId}`,
         {
-          method: 'DELETE',
+          method: 'PUT',
           credentials: 'include',
         },
       )
@@ -278,7 +291,7 @@ export const useDeleteAccountType = () => {
       if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
-        deletedAccountTypeId: string
+        accountType: AccountTypes
       }>
       return data
     },
@@ -287,12 +300,19 @@ export const useDeleteAccountType = () => {
         ['accountTypes'],
         (old: { accountTypes: Array<AccountTypes> }) => {
           return {
-            accountTypes: old.accountTypes.filter(
-              (accType) => accType.accTypeId !== data.deletedAccountTypeId,
-            ),
+            accountTypes: old.accountTypes.map((accType) => {
+              if (accType.accTypeId === data.accountType.accTypeId) {
+                return data.accountType
+              }
+              return accType
+            }),
           }
         },
-      )
+      ),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
       toast({
         title: (
           <div>
@@ -327,7 +347,7 @@ export const useUpdateTransactionType = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationKey: ['useTransactionType'],
+    mutationKey: ['updateTransactionType'],
     mutationFn: async (
       payload: z.infer<typeof updateTransactionTypeSchema>,
     ) => {
@@ -363,7 +383,27 @@ export const useUpdateTransactionType = ({
             }),
           }
         },
-      )
+      ),
+        await queryClient.invalidateQueries({
+          queryKey: ['payrolls'],
+          type: 'inactive',
+        })
+      await queryClient.invalidateQueries({
+        queryKey: ['cheques'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['inventoryEntries'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -453,6 +493,138 @@ export const useToggleTransactionType = () => {
   })
 }
 
+export const useUpdateModeOfPayment = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['updateModeOfPayment'],
+    mutationFn: async (payload: z.infer<typeof updateModeOfPaymentSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/modesOfPayment`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        modeOfPayment: ModesOfPayment
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['modesOfPayment'],
+        (old: { modesOfPayment: Array<ModesOfPayment> }) => {
+          return {
+            modesOfPayment: old.modesOfPayment.map((mop) => {
+              if (mop.mopId === data.modeOfPayment.mopId) {
+                return data.modeOfPayment
+              }
+              return mop
+            }),
+          }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Mode of payment was updated successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update mode of payment',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useToggleModeOfPayment = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['toggleModeOfPayment'],
+    mutationFn: async (
+      payload: Pick<z.infer<typeof updateModeOfPaymentSchema>, 'mopId'>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/modesOfPayment/${payload.mopId}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        modeOfPayment: ModesOfPayment
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['modesOfPayment'],
+        (old: { modesOfPayment: Array<ModesOfPayment> }) => {
+          console.log(data)
+          return {
+            modesOfPayment: old.modesOfPayment.map((mop) => {
+              if (mop.mopId === data.modeOfPayment.mopId) {
+                return data.modeOfPayment
+              }
+              return mop
+            }),
+          }
+        },
+      )
+      toast({
+        title: (
+          <div>
+            <div className="flex gap-2 items-centers">
+              <PartyPopperIcon />
+              Success
+            </div>
+          </div>
+        ),
+        description: 'Mode of payment was toggled successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to toggle mode of payment ',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useUpdateCheque = ({
   setIsOpen,
   cell,
@@ -499,6 +671,14 @@ export const useUpdateCheque = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -851,6 +1031,14 @@ export const useUpdateInventory = ({
         queryKey: ['accounts'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -925,6 +1113,14 @@ export const useUpdateInventoryEntry = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       setIsOpen(false)
@@ -1005,6 +1201,14 @@ export const useUpdatePayroll = ({
         queryKey: ['transactions'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setIsOpen(false)
       toast({
         title: (
@@ -1074,6 +1278,14 @@ export const useUpdateTransaction = ({
       await queryClient.invalidateQueries({
         queryKey: ['accounts'],
         type: 'inactive',
+      }),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
       })
       setOpenUpdate(false)
       toast({
@@ -1136,6 +1348,14 @@ export const useCreateCheque = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       toast({
@@ -1442,6 +1662,14 @@ export const useCreateInventoryEntry = ({
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
         type: 'inactive',
+      }),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
       })
       setOpen(false)
       toast({
@@ -1506,6 +1734,14 @@ export const useCreatePayroll = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['transactions'],
+        type: 'inactive',
+      }),
+        await queryClient.invalidateQueries({
+          queryKey: ['cashFlowBarChart'],
+          type: 'inactive',
+        })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       toast({
@@ -1586,6 +1822,67 @@ export const useCreateAccountType = ({
           </div>
         ),
         description: error.message ?? 'Failed to create account type',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateModeOfPayment = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: z.infer<typeof createModeOfPaymentSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/modesOfPayment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        modeOfPayment: ModesOfPayment
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['modesOfPayment'],
+        (old: { modesOfPayment: Array<ModesOfPayment> }) => {
+          return {
+            modesOfPayment: [...old.modesOfPayment, data.modeOfPayment],
+          }
+        },
+      )
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Mode of payment was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create mode of payment',
         variant: 'destructive',
       })
     },
@@ -1830,6 +2127,14 @@ export const useCreateTransactionByFile = ({
         queryKey: ['accounts'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -1850,6 +2155,150 @@ export const useCreateTransactionByFile = ({
           </div>
         ),
         description: error.message ?? 'Failed to create transaction',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreatePayrollByFile = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['createPayrollByFile'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/payrolls/file`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: payload,
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as {
+        payrolls: Array<Payrolls>
+      }
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['payrolls'],
+        (old: { payrolls: Array<Payrolls> }) => {
+          return { payrolls: [...old.payrolls, ...data.payrolls] }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Payroll was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create Payroll',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useCreateChequeByFile = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['createChequeByFile'],
+    mutationFn: async (payload: FormData) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/cheques/file`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: payload,
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = (await response.json()) as {
+        cheques: Array<Cheques>
+      }
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['cheques'],
+        (old: { cheques: Array<Cheques> }) => {
+          return { cheques: [...old.cheques, ...data.cheques] }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['transactions'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Cheque was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create cheque',
         variant: 'destructive',
       })
     },
@@ -1898,11 +2347,11 @@ export const useLogin = () => {
   })
 }
 
-export const useDownloadFile = (fileName: string) => {
+export const useDownloadFile = (fileName: string, dirPath: string) => {
   return useMutation({
     mutationKey: ['downloadFile'],
     mutationFn: async () => {
-      const params = new URLSearchParams({ fileName })
+      const params = new URLSearchParams({ fileName, dirPath })
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/others/download/?` + params,
         {
@@ -1914,7 +2363,7 @@ export const useDownloadFile = (fileName: string) => {
       return { data, fileName }
     },
     onSuccess: (data) => {
-      fileDownload(data.data, data.fileName.split(' ')[1])
+      fileDownload(data.data, data.fileName.split(' ')[1] ?? fileName)
     },
   })
 }

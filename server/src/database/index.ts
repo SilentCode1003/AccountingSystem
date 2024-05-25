@@ -2,32 +2,15 @@ import "dotenv/config";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import accounts, { accountTypeRelation } from "./schema/accounts.schema";
-import cheques, { chequesRelations } from "./schema/cheques.schema";
-import customers from "./schema/customers.schema";
-import employees from "./schema/employees.schema";
-import inventory from "./schema/inventory.schema";
-import payrolls, {
-  payrollTransactionrelation,
-  payrollEmployeeRelation,
-} from "./schema/payrolls.schema";
-import transactions, {
-  transactionAccountRelation,
-  transactionCustomerRelation,
-  transactionEmployeeRelation,
-  transactionVendorRelation,
-  tranTypeRelation,
-} from "./schema/transactions.schema";
-import users from "./schema/users.schema";
-import vendors from "./schema/vendors.schema";
 import accountTypes, {
   accountTypesAccountManyRelations,
   accountTypeTransactionTypeManyRelations,
 } from "./schema/accountType.schema";
 import apiKeys from "./schema/apiKeyStore.schema";
-import tranTypes, {
-  tranTypeAccTypeIdRelations,
-  tranTypeTransactionManyRelations,
-} from "./schema/transactionTypes.schema";
+import cheques, { chequesRelations } from "./schema/cheques.schema";
+import customers from "./schema/customers.schema";
+import employees from "./schema/employees.schema";
+import inventory from "./schema/inventory.schema";
 import inventoryEntries, {
   inventoryEntriesCustomerRelation,
   inventoryEntriesInventoryEntryProductsManyRelation,
@@ -38,6 +21,27 @@ import inventoryEntryProducts, {
   inventoryEntriesProductsInventoryEntryRelations,
   inventoryEntriesProductsInventoryRelations,
 } from "./schema/inventoryEntriesProducts.schema";
+import modesOfPayment, {
+  modesOfPaymentTransactionRelations,
+} from "./schema/modeOfPayment";
+import payrolls, {
+  payrollEmployeeRelation,
+  payrollTransactionrelation,
+} from "./schema/payrolls.schema";
+import transactions, {
+  transactionAccountRelation,
+  transactionCustomerRelation,
+  transactionEmployeeRelation,
+  transactionModeOfPaymentRelation,
+  transactionVendorRelation,
+  tranTypeRelation,
+} from "./schema/transactions.schema";
+import tranTypes, {
+  tranTypeAccTypeIdRelations,
+  tranTypeTransactionManyRelations,
+} from "./schema/transactionTypes.schema";
+import users from "./schema/users.schema";
+import vendors from "./schema/vendors.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -95,6 +99,9 @@ const db = drizzle(connection, {
     accountTypeTransactionTypeManyRelations,
     inventoryEntriesVendorRelation,
     inventoryEntriesCustomerRelation,
+    modesOfPayment,
+    modesOfPaymentTransactionRelations,
+    transactionModeOfPaymentRelation,
   },
   mode: "default",
 });

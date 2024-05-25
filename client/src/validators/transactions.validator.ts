@@ -38,20 +38,6 @@ export const createTransactionSchema = z.object({
     }
   }),
   tranTransactionDate: z.date(),
-  tranAccTypeId: z.string().superRefine((val, ctx) => {
-    if (val.split(' ')[0] !== 'accTypeId') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not an account type id.`,
-      })
-    }
-    if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
-      })
-    }
-  }),
   tranTypeId: z.string().superRefine((val, ctx) => {
     if (val.split(' ')[0] !== 'tranTypeId') {
       ctx.addIssue({
@@ -63,6 +49,20 @@ export const createTransactionSchema = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not valid uuid.`,
+      })
+    }
+  }),
+  tranMopId: z.string().superRefine((val, ctx) => {
+    if (val === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Required`,
+      })
+    }
+    if (val.split(' ')[0] !== 'mopId') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an mode of payment id.`,
       })
     }
   }),
@@ -162,19 +162,19 @@ export const updateTransactionSchema = z.object({
     .nullable()
     .optional(),
   tranTransactionDate: z.date().optional(),
-  tranAccTypeId: z
+  tranMopId: z
     .string()
     .superRefine((val, ctx) => {
-      if (val.split(' ')[0] !== 'accTypeId') {
+      if (val === '') {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Not an account type id.`,
+          message: `Required`,
         })
       }
-      if (!z.string().uuid().safeParse(val.split(' ')[1]).success) {
+      if (val.split(' ')[0] !== 'mopId') {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Not valid uuid.`,
+          message: `Not an mode of payment id.`,
         })
       }
     })

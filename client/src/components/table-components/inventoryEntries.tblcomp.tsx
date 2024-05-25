@@ -136,25 +136,25 @@ export const InventoryEntryAccountColumn = ({
               </DialogTrigger>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DialogContent className="rounded-md w-fit sm:max-w-[500px]">
+          <DialogContent className="rounded-md max-w-fit sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Account Details</DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-4 sm:space-y-0">
+            <div className="space-y-4 sm:space-y-2">
               <div className="flex flex-col sm:flex-row">
                 <Text className="w-full sm:w-[33%]" variant={'body'}>
-                  Account ID
+                  Account Name
                 </Text>
-                <Text variant={'label'} className="flex-1">
-                  {row.original.transaction.account.accId}
-                </Text>
+                <Badge variant={'outline'} className="w-fit">
+                  {row.original.transaction.account.accName}
+                </Badge>
               </div>
               <div className="flex flex-col sm:flex-row">
                 <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Account Type
                 </Text>
-                <Badge variant={'secondary'}>
+                <Badge variant={'secondary'} className="w-fit">
                   {row.original.transaction.account.accountType.accTypeName}
                 </Badge>
               </div>
