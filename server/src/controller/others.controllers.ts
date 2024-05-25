@@ -1,7 +1,10 @@
-import { and, eq, inArray, sql, sum } from "drizzle-orm";
+import { and, eq, sql, sum } from "drizzle-orm";
 import { Request, Response } from "express";
+import path from "path";
+import * as xlsx from "xlsx";
 import db from "../database";
 import accounts from "../database/schema/accounts.schema";
+import employees from "../database/schema/employees.schema";
 import {
   getBalanceSheet,
   getIncomeStatement,
@@ -21,10 +24,8 @@ import {
   IncomeStatementByMonthValidator,
   syncEmployeesByAPIValidator,
 } from "../utils/validators/others.validator";
-import path from "path";
-import employees from "../database/schema/employees.schema";
 import { createTransactionByFileValidator } from "../utils/validators/transactions.validator";
-import * as xlsx from "xlsx";
+import fetch from "node-fetch";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
@@ -330,6 +331,8 @@ export const syncEmployeesByAPI = async (req: Request, res: Response) => {
         }>
     );
 
+    console.log(data);
+
     const shapeDataToDB: Array<{
       empId: string;
       empName: string;
@@ -356,7 +359,7 @@ export const syncEmployeesByAPI = async (req: Request, res: Response) => {
         });
 
         //early return if employee does not exist
-        if (!empExists) return;
+        if (empExists) return;
 
         //insert employee
         const newEmployee = await db.insert(employees).values({
