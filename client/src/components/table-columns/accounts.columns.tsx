@@ -28,7 +28,7 @@ export type Accounts = {
 export const accountsColumns: ColumnDef<Accounts>[] = [
   {
     accessorKey: 'accName',
-    meta: 'accName',
+    meta: 'Account Name',
     header: ({ column }) => {
       return (
         <Button
@@ -48,7 +48,7 @@ export const accountsColumns: ColumnDef<Accounts>[] = [
   },
   {
     accessorKey: 'accAmount',
-    meta: 'accAmount',
+    meta: 'Amount',
     header: ({ column }) => {
       return (
         <Button
@@ -69,7 +69,7 @@ export const accountsColumns: ColumnDef<Accounts>[] = [
   {
     accessorKey: 'accountType',
     accessorFn: (row) => row.accountType.accTypeName,
-    meta: 'accountType',
+    meta: 'Account Type',
     header: ({ column }) => {
       return (
         <Button
@@ -89,7 +89,7 @@ export const accountsColumns: ColumnDef<Accounts>[] = [
   },
   {
     accessorKey: 'accDescription',
-    meta: 'accDescription',
+    meta: 'Description',
     header: ({ column }) => {
       return (
         <Button
@@ -108,7 +108,7 @@ export const accountsColumns: ColumnDef<Accounts>[] = [
   },
   {
     accessorKey: 'accIsActive',
-    meta: 'accIsActive',
+    meta: 'Status',
     header: ({ column }) => {
       return (
         <Button

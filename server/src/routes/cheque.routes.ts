@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   approveCheque,
   createCheque,
+  createChequeByFile,
   getCheques,
   updateCheque,
 } from "../controller/cheques.controller";
@@ -13,6 +14,9 @@ chequeRouter.get("/", getCheques);
 
 //create a cheque entry
 chequeRouter.post("/", createCheque);
+
+//create a cheque entry by file
+chequeRouter.post("/file", createChequeByFile);
 
 //update a cheque
 chequeRouter.put("/", updateCheque);

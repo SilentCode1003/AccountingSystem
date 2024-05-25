@@ -20,6 +20,7 @@ export type TransactionTypes = {
 export const TransactionTypeColumns: ColumnDef<TransactionTypes>[] = [
   {
     accessorKey: 'tranTypeName',
+    meta: 'Transaction Type',
     header: ({ column }) => {
       return (
         <Button
@@ -36,10 +37,10 @@ export const TransactionTypeColumns: ColumnDef<TransactionTypes>[] = [
       )
     },
     cell: TranTypeNameColumn,
-    meta: 'tranTypeName',
   },
   {
     accessorKey: 'tranTypeIsActive',
+    meta: 'Status',
     header: ({ column }) => {
       return (
         <Button
@@ -55,7 +56,6 @@ export const TransactionTypeColumns: ColumnDef<TransactionTypes>[] = [
         </Button>
       )
     },
-    meta: 'tranTypeIsActive',
     cell: ({ row }) => {
       return (
         <>
@@ -70,6 +70,7 @@ export const TransactionTypeColumns: ColumnDef<TransactionTypes>[] = [
   },
   {
     accessorKey: 'tranTypeAccTypeId',
+    meta: 'Account Type',
     accessorFn: (row) => row.accountType.accTypeName,
     header: ({ column }) => {
       return (
@@ -86,7 +87,6 @@ export const TransactionTypeColumns: ColumnDef<TransactionTypes>[] = [
         </Button>
       )
     },
-    meta: 'TranTypeAccTypeId',
     cell: TranTypeAccountTypeColumn,
   },
 ]

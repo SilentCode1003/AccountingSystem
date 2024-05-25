@@ -1,5 +1,6 @@
 import {
   boolean,
+  date,
   datetime,
   decimal,
   mysqlTable,
@@ -20,7 +21,7 @@ const accounts = mysqlTable("accounts", {
     .notNull(),
   accDescription: text("acc_description").notNull(),
   accIsActive: boolean("acc_is_active").notNull().default(true),
-  accCreatedAt: datetime("acc_created_at").notNull().default(new Date()),
+  accCreatedAt: date("acc_created_at").notNull().default(new Date()),
   accUpdatedAt: datetime("acc_updated_at").notNull().default(new Date()),
 });
 

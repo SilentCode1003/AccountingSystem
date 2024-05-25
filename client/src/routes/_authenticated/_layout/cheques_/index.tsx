@@ -1,5 +1,6 @@
 import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
+import { CreateByFileUpload } from '@/components/FileDropZone'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
 import {
@@ -32,8 +33,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
-import { useCreateCheque } from '@/hooks/mutations'
-import { useAccountTypes, useCheques } from '@/hooks/queries'
+import { useCreateCheque, useCreateChequeByFile } from '@/hooks/mutations'
+import { useAccountTypes, useCheques, useModesOfPayment } from '@/hooks/queries'
 import { chequesOptions } from '@/hooks/queries/options'
 import { createChequeSchema } from '@/validators/cheques.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -63,13 +64,18 @@ function LoadingComponent() {
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
   const accountTypes = useAccountTypes()
+  const modesOfPayment = useModesOfPayment()
   const createCheque = useCreateCheque({ setOpen })
+  const [file, setFile] = useState<File>()
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const createChequeByFile = useCreateChequeByFile({ setOpen: setUploadOpen })
   const form = useForm<z.infer<typeof createChequeSchema>>({
     defaultValues: {
       chqAmount: 0,
       chqPayeeName: '',
       chqStatus: 'PENDING',
       chqNumber: '',
+      chqMopId: '',
     },
     resolver: zodResolver(createChequeSchema),
   })
@@ -92,7 +98,19 @@ const CrudComponents = () => {
         </Button>
         <AlertDialogContent className="scale-75 sm:scale-100">
           <AlertDialogHeader>
-            <Text variant={'heading3bold'}>Create Cheque</Text>
+            <div className="flex justify-between">
+              <Text variant={'heading3bold'}>Create Cheque</Text>
+              <CreateByFileUpload
+                open={uploadOpen}
+                setOpen={setUploadOpen}
+                setFile={setFile}
+                file={file}
+                template
+                fileName="chqFile"
+                label="Upload an xlsx file to create cheques!"
+                mutate={createChequeByFile.mutate}
+              />
+            </div>
           </AlertDialogHeader>
           <Form {...form}>
             <form>
@@ -156,6 +174,33 @@ const CrudComponents = () => {
                             field.onChange(parseFloat(e.target.value))
                           }
                         />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="chqMopId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Mode of Payment</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        {modesOfPayment.isSuccess && (
+                          <ComboBox
+                            data={modesOfPayment.data.modesOfPayment.map(
+                              (mop) => ({
+                                value: mop.mopId,
+                                label: mop.mopName,
+                              }),
+                            )}
+                            emptyLabel="Nothing Selected"
+                            value={field.value}
+                            setValue={field.onChange}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}
