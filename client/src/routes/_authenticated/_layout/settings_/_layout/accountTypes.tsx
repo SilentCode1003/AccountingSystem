@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -67,6 +68,7 @@ const CrudComponents = () => {
     defaultValues: {
       accTypeName: '',
       accTypeDefault: '',
+      accTypeIsProfit: false,
     },
     resolver: zodResolver(createAccountTypeSchema),
   })
@@ -136,6 +138,26 @@ const CrudComponents = () => {
                           </SelectContent>
                         </Select>
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="accTypeIsProfit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className=" flex gap-2 items-center">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Profitable</FormLabel>
+                          <FormMessage />
+                        </div>
+                      </div>
                     </FormItem>
                   )}
                 />

@@ -17,6 +17,7 @@ import {
   incomeStatementOptions,
   inventoriesOptions,
   inventoryEntriesOptions,
+  modesOfPaymentOptions,
   payrollsOptions,
   transactionPartnersOptions,
   transactionsOptions,
@@ -67,6 +68,8 @@ export const useInventoryEntries = () => useQuery(inventoryEntriesOptions())
 export const usePayrolls = () => useQuery(payrollsOptions())
 
 export const useAccounts = () => useQuery(accountsOptions())
+
+export const useModesOfPayment = () => useQuery(modesOfPaymentOptions())
 
 export const useBalanceSheetSuspense = (date: Date, accTypes: string[]) =>
   useSuspenseQuery(balanceSheetOptions(date, accTypes))

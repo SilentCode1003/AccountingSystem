@@ -5,11 +5,11 @@ import z from "zod";
 export const createValidator = z.object({
   tranDescription: z.string(),
   tranAmount: z.coerce.number(),
-  tranAccTypeId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "accTypeId") {
+  tranTypeId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "tranTypeId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an account type id.`,
+        message: `Not an transaction type id.`,
       });
     }
     if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
@@ -19,11 +19,11 @@ export const createValidator = z.object({
       });
     }
   }),
-  tranTypeId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "tranTypeId") {
+  tranMopId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "mopId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an transaction type id.`,
+        message: `Not a mode of payment id.`,
       });
     }
     if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
@@ -111,14 +111,13 @@ export const updateValidator = z.object({
       }
     })
     .optional(),
-  tranDescription: z.string().optional(),
-  tranAccTypeId: z
+  tranMopId: z
     .string()
     .superRefine((val, ctx) => {
-      if (val.split(" ")[0] !== "accTypeId") {
+      if (val.split(" ")[0] !== "mopId") {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Not an account type id.`,
+          message: `Not a mode of payment id.`,
         });
       }
       if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
@@ -129,6 +128,7 @@ export const updateValidator = z.object({
       }
     })
     .optional(),
+  tranDescription: z.string().optional(),
   tranAmount: z.coerce.number().optional(),
   tranTypeId: z
     .string()

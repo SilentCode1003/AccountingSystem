@@ -175,22 +175,22 @@ export const getAccountTypeTotalPerMonth = async (
       ),
     });
 
+    const currTotal = parseFloat(String(total ?? 0));
+    const prevTotal = parseFloat(String(prevMonthTotal ?? 0));
+    const percentTotal = Math.abs((prevTotal - currTotal) / prevTotal) * 100;
+    const finalPercent = prevTotal > currTotal ? -percentTotal : percentTotal;
+
     console.log(
       "successfully fetched account type total for given month and year"
     );
+
     return res.status(200).send({
       accountTypeName: accTypeName!.accTypeName,
       total,
       percentAgainstPrevMonth:
-        Number(total) > Number(prevMonthTotal)
-          ? (parseFloat(String(prevMonthTotal ?? 0)) /
-              parseFloat(String(total ?? 0))) *
-            100
-          : -(
-              (parseFloat(String(prevMonthTotal ?? 0)) /
-                parseFloat(String(total ?? 0))) *
-              100
-            ),
+        Number.isNaN(finalPercent) || !Number.isFinite(finalPercent)
+          ? 0
+          : finalPercent,
     });
   } catch (error) {
     console.log(
@@ -250,7 +250,7 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
 
       const dz: any = {};
 
-      await Promise.all(
+      const nd = await Promise.all(
         d.map(async (item) => {
           const accTypeName = await db.query.accountTypes.findFirst({
             where: eq(accounts.accTypeId, item.accTypeId),
@@ -258,6 +258,11 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
 
           dz[accTypeName!.accTypeName] = parseFloat(String(item.total));
           aKeys.push(accTypeName?.accTypeName);
+
+          return {
+            total: item.total,
+            isProfit: accTypeName!.accTypeIsProfit,
+          };
         })
       );
 
@@ -266,7 +271,14 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
           month: "long",
         }),
         ...dz,
-        total: d.reduce((acc, curr) => acc + parseFloat(String(curr.total)), 0),
+        total: nd.reduce(
+          (acc, curr) =>
+            acc +
+            (curr.isProfit
+              ? parseFloat(String(curr.total))
+              : -parseFloat(String(curr.total))),
+          0
+        ),
       });
     }
 
@@ -284,11 +296,12 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
 
 export const downloadFile = async (req: Request, res: Response) => {
   const fileName = req.query.fileName as string;
+  const dirPath = req.query.dirPath as string;
   const filePath = path.join(
     __dirname,
     "..",
     "..",
-    `/files/transactionfiles/${fileName}`
+    `/files/${dirPath}/${fileName}`
   );
 
   res.download(filePath);
@@ -339,11 +352,11 @@ export const syncEmployeesByAPI = async (req: Request, res: Response) => {
       shapeDataToDB.map(async (emp) => {
         //check if employee exists
         const empExists = await db.query.employees.findFirst({
-          where: eq(employees.empId, emp.empId),
+          where: eq(employees.empId, `empId ${emp.empId}`),
         });
 
         //early return if employee does not exist
-        if (empExists) return;
+        if (!empExists) return;
 
         //insert employee
         const newEmployee = await db.insert(employees).values({
@@ -412,7 +425,7 @@ export const syncEmployeesByFile = async (req: Request, res: Response) => {
       shapeDataToDB.map(async (emp) => {
         //check if employee exists
         const empExists = await db.query.employees.findFirst({
-          where: eq(employees.empId, emp.empId),
+          where: eq(employees.empId, `empId ${emp.empId}`),
         });
 
         //early return if employee does not exist

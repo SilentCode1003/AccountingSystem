@@ -11,10 +11,12 @@ import {
   TransactionDate,
   transactionFileColumn,
   TransactionIndexColumn,
+  TransactionModeOfPaymentColumn,
   TransactionTypeColumn,
   TransactionWithColumn,
 } from '../table-components/transactions.tblcomp'
 import { TransactionTypes } from './transactionTypes.columns'
+import { ModesOfPayment } from './modesOfPayment.columns'
 
 type AccountType = {
   accTypeId: string
@@ -67,6 +69,8 @@ export type Transactions = {
   tranFile: string
   tranOtherPartner?: string
   tranTypeId: string
+  tranMopId: string
+  modeOfPayment: ModesOfPayment
   transactionType: TransactionTypes
 }
 
@@ -74,7 +78,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   {
     accessorKey: 'tranId',
     accessorFn: (_, index) => index,
-    meta: 'Transaction ID',
+    meta: 'ID',
     header: ({ column }) => {
       return (
         <Button
@@ -85,7 +89,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction ID
+          ID
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -115,7 +119,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranFile',
-    meta: 'Transaction File',
+    meta: 'File',
     header: () => (
       <div
         className={text({
@@ -123,7 +127,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
           className: 'p-0 text-foreground whitespace-nowrap',
         })}
       >
-        Transaction File
+        File
       </div>
     ),
     cell: transactionFileColumn,
@@ -151,7 +155,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
   },
   {
     accessorKey: 'tranAmount',
-    meta: 'Transaction Amount',
+    meta: 'Amount',
     header: ({ column }) => {
       return (
         <Button
@@ -162,7 +166,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Amount
+          Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -170,8 +174,29 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
     cell: TransactionAmountColumn,
   },
   {
+    accessorKey: 'tranMopId',
+    accessorFn: (row) => row.modeOfPayment.mopName,
+    meta: 'Mode Of Payment',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Mode of Payment
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: TransactionModeOfPaymentColumn,
+  },
+  {
     accessorKey: 'tranTransactionDate',
-    meta: 'Transaction Date',
+    meta: 'Date',
     filterFn: 'dateBetweenFilter',
     header: ({ column }) => {
       return (
@@ -183,7 +208,7 @@ export const transactionColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Date
+          Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -241,8 +266,9 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
     cell: TransactionAccountIDColumn,
   },
   {
-    accessorKey: 'tranAmount',
-    meta: 'Transaction Amount',
+    accessorKey: 'tranTypeId',
+    meta: 'Transaction Type',
+    accessorFn: (row) => row.transactionType.tranTypeName,
     header: ({ column }) => {
       return (
         <Button
@@ -253,7 +279,27 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Amount
+          Transaction Type
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: TransactionTypeColumn,
+  },
+  {
+    accessorKey: 'tranAmount',
+    meta: 'Amount',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Amount
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -261,8 +307,28 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
     cell: TransactionAmountColumn,
   },
   {
+    accessorKey: 'tranMopId',
+    accessorFn: (row) => row.modeOfPayment.mopName,
+    meta: 'Mode Of Payment',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className={text({
+            variant: 'bodybold',
+            className: 'p-0 text-foreground',
+          })}
+        >
+          Mode of Payment
+          <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
     accessorKey: 'tranTransactionDate',
-    meta: 'Transaction Date',
+    meta: 'Date',
     filterFn: 'dateBetweenFilter',
     header: ({ column }) => {
       return (
@@ -274,7 +340,7 @@ export const recentTransactionsColumns: ColumnDef<Transactions>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Transaction Date
+          Date
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )

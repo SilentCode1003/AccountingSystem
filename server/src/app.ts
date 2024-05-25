@@ -25,6 +25,7 @@ import { authMiddleware } from "./utils/middlewares/auth.middleware";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 import compression from "compression";
 import morgan from "morgan";
+import modesOfPaymentRouter from "./routes/modesOfPayment.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -111,6 +112,9 @@ app.use("/transactions", transactionRouter);
 
 //route for all transaction type actions
 app.use("/transactionTypes", transactionTypesRouter);
+
+//route for all modes of payment actions
+app.use("/modesOfPayment", modesOfPaymentRouter);
 
 //route for all vendor actions
 app.use("/vendors", vendorRouter);

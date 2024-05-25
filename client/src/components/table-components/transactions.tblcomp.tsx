@@ -18,7 +18,7 @@ import {
 import { Text } from '@/components/ui/text'
 import { useDownloadFile, useUpdateTransaction } from '@/hooks/mutations'
 import {
-  useAccountTypes,
+  useModesOfPayment,
   useTransactionPartners,
   useTransactionTypes,
 } from '@/hooks/queries'
@@ -59,7 +59,10 @@ export const TransactionIndexColumn = ({
 export const transactionFileColumn = ({
   row,
 }: CellContext<Transactions, unknown>) => {
-  const downloadFile = useDownloadFile(row.original.tranFile)
+  const downloadFile = useDownloadFile(
+    row.original.tranFile,
+    'transactionfiles',
+  )
   return (
     <Badge
       onClick={() => downloadFile.mutate()}
@@ -67,6 +70,16 @@ export const transactionFileColumn = ({
       className="hover:cursor-pointer"
     >
       download
+    </Badge>
+  )
+}
+
+export const TransactionModeOfPaymentColumn = ({
+  row,
+}: CellContext<Transactions, unknown>) => {
+  return (
+    <Badge variant={'secondary'} className="w-fit whitespace-nowrap ">
+      {row.original.modeOfPayment.mopName}
     </Badge>
   )
 }
@@ -105,25 +118,25 @@ export const TransactionAccountIDColumn = ({
               </DialogTrigger>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DialogContent className="rounded-md w-fit sm:max-w-[500px]">
+          <DialogContent className="rounded-md max-w-fit sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Account Details</DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-4 sm:space-y-0">
+            <div className="space-y-4 sm:space-y-2">
               <div className="flex flex-col sm:flex-row">
                 <Text className="w-full sm:w-[33%]" variant={'body'}>
-                  Account ID
+                  Account Name
                 </Text>
-                <Text variant={'label'} className="flex-1">
-                  {row.original.account.accId}
-                </Text>
+                <Badge variant={'outline'} className="w-fit">
+                  {row.original.account.accName}
+                </Badge>
               </div>
               <div className="flex flex-col sm:flex-row">
                 <Text className="w-full sm:w-[33%]" variant={'body'}>
                   Account Type
                 </Text>
-                <Badge variant={'secondary'}>
+                <Badge variant={'secondary'} className="w-fit">
                   {row.original.account.accountType.accTypeName}
                 </Badge>
               </div>
@@ -317,20 +330,20 @@ export const TransactionWithColumn = ({
 
 function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
   const [, setOpen] = useMultiDialog('updateTransaction')
-  const accountTypes = useAccountTypes()
   const transactionTypes = useTransactionTypes()
+  const modesOfPayment = useModesOfPayment()
   const form = useForm<z.infer<typeof updateTransactionSchema>>({
     defaultValues: {
       tranId: props.row.original.tranId,
       tranAccId: props.row.original.account.accId,
       tranAmount: Number.parseFloat(String(props.row.original.tranAmount)),
       tranDescription: props.row.original.tranDescription,
+      tranMopId: props.row.original.modeOfPayment.mopId,
       tranPartner:
         props.row.original.tranEmpId ??
         props.row.original.tranCustId ??
         props.row.original.tranVdId ??
         undefined,
-      tranAccTypeId: props.row.original.account.accountType.accTypeId,
       tranTransactionDate: new Date(props.row.original.tranTransactionDate),
       tranTypeId: props.row.original.tranTypeId,
     },
@@ -484,31 +497,6 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  name="tranAccTypeId"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <FormLabel>Account Type</FormLabel>
-                      </div>
-                      <FormControl>
-                        {accountTypes.isSuccess && (
-                          <ComboBox
-                            data={accountTypes.data.accountTypes.map((t) => ({
-                              label: t.accTypeName,
-                              value: t.accTypeId,
-                            }))}
-                            emptyLabel="Nothing Found"
-                            value={field.value as string}
-                            setValue={field.onChange}
-                          />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
               <div className="flex flex-col">
                 <FormField
@@ -533,6 +521,33 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                         />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tranMopId"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Mode of Payment</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        {modesOfPayment.isSuccess && (
+                          <ComboBox
+                            data={modesOfPayment.data.modesOfPayment.map(
+                              (mop) => ({
+                                value: mop.mopId,
+                                label: mop.mopName,
+                              }),
+                            )}
+                            emptyLabel="Nothing Selected"
+                            value={field.value as string}
+                            setValue={field.onChange}
+                          />
+                        )}
+                      </FormControl>
                     </FormItem>
                   )}
                 />
@@ -562,6 +577,7 @@ function UpdateFormDialog(props: DialogProps & { row: Row<Transactions> }) {
                   )}
                 />
               </div>
+
               <div className="flex flex-col">
                 <FormField
                   name="tranDescription"

@@ -1,17 +1,12 @@
 import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
-import { Dropzone } from '@/components/Dropzone'
+import { CreateByFileUpload } from '@/components/FileDropZone'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
 import { transactionColumns } from '@/components/table-columns/transactions.columns'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import DatePicker from '@/components/ui/DatePicker'
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -29,9 +24,10 @@ import {
   useCreateTransactionByFile,
 } from '@/hooks/mutations'
 import {
-  useAccountTypes,
+  useModesOfPayment,
   useTransactionPartners,
   useTransactions,
+  useTransactionTypes,
 } from '@/hooks/queries'
 import {
   transactionPartnersOptions,
@@ -39,9 +35,7 @@ import {
 } from '@/hooks/queries/options'
 import { createTransactionSchema } from '@/validators/transactions.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Dialog } from '@radix-ui/react-dialog'
 import { createFileRoute } from '@tanstack/react-router'
-import { FileUpIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ToWords } from 'to-words'
@@ -103,10 +97,11 @@ function CrudComponents() {
 
 function TransactionsComponent() {
   const [file, setFile] = useState<File>()
-  const [uploadOpen, setUploadOpen] = useState<boolean>(false)
+  const [uploadOpen, setUploadOpen] = useState(false)
   const transactions = useTransactions()
 
-  const accountTypes = useAccountTypes()
+  const modesOfPayment = useModesOfPayment()
+  const transactionTypes = useTransactionTypes()
 
   const transactionPartners = useTransactionPartners()
 
@@ -119,6 +114,7 @@ function TransactionsComponent() {
       tranAmount: 0,
       tranDescription: '',
       tranPartner: '',
+      tranMopId: '',
     },
     resolver: zodResolver(createTransactionSchema),
   })
@@ -136,14 +132,6 @@ function TransactionsComponent() {
     })
 
     createTransaction.mutate(fd)
-  }
-
-  const handleSubmitFile = () => {
-    const payload = new FormData()
-
-    payload.append('file', file as File)
-
-    createTransactionByFile.mutate(payload)
   }
 
   return (
@@ -238,278 +226,257 @@ function TransactionsComponent() {
             </div>
           </CardContent>
         </Card>
-        <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-          <Card className="flex-1">
-            <CardHeader className="w-full">
-              <div className="flex justify-between">
-                <div>Create Transaction</div>
-                <DialogTrigger asChild>
-                  <Button variant={'secondary'} className="px-2">
-                    <FileUpIcon className="hover:cursor-pointer" />
-                  </Button>
-                </DialogTrigger>
-              </div>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <Form {...form}>
-                <form className="flex flex-col gap-4">
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <FormField
-                        name="tranAmount"
-                        control={form.control}
-                        render={({ field }) => (
+        <Card className="flex-1">
+          <CardHeader className="w-full">
+            <div className="flex justify-between">
+              <div>Create Transaction</div>
+              <CreateByFileUpload
+                file={file}
+                setFile={setFile}
+                fileName="file"
+                mutate={createTransactionByFile.mutate}
+                open={uploadOpen}
+                label="Upload an xlsx file to add transactions!"
+                setOpen={setUploadOpen}
+              />
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Form {...form}>
+              <form className="flex flex-col gap-4">
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <FormField
+                      name="tranAmount"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Amount</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="w-full"
+                              type="number"
+                              placeholder="Amount"
+                              step="0.01"
+                              {...field}
+                              value={
+                                Number.isNaN(field.value) ? '' : field.value
+                              }
+                              onChange={(e) => {
+                                setAmount(
+                                  Number.isNaN(parseFloat(e.target.value))
+                                    ? 0
+                                    : (e.target.value as unknown as number),
+                                )
+                                field.onChange(parseFloat(e.target.value))
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex-1 flex flex-col">
+                    <FormField
+                      name="tranTransactionDate"
+                      control={form.control}
+                      render={({ field }) => {
+                        return (
                           <FormItem>
-                            <FormLabel>Amount</FormLabel>
+                            <FormLabel>Transaction Date</FormLabel>
                             <FormControl>
-                              <Input
-                                className="w-full"
-                                type="number"
-                                placeholder="Total Deduction"
-                                step="0.01"
-                                {...field}
-                                value={
-                                  Number.isNaN(field.value) ? '' : field.value
-                                }
-                                onChange={(e) => {
-                                  setAmount(
-                                    Number.isNaN(parseFloat(e.target.value))
-                                      ? 0
-                                      : (e.target.value as unknown as number),
-                                  )
-                                  field.onChange(parseFloat(e.target.value))
+                              <DatePicker
+                                date={field.value}
+                                setDate={(value: Date) => {
+                                  setDate(value)
+                                  field.onChange(value)
                                 }}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="flex-1 flex flex-col">
-                      <FormField
-                        name="tranTransactionDate"
-                        control={form.control}
-                        render={({ field }) => {
-                          return (
-                            <FormItem>
-                              <FormLabel>Transaction Date</FormLabel>
-                              <FormControl>
-                                <DatePicker
-                                  date={field.value}
-                                  setDate={(value: Date) => {
-                                    setDate(value)
-                                    field.onChange(value)
-                                  }}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <FormField
-                      name="tranPartner"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>Person Transacting with</FormLabel>
-                          <FormControl>
-                            {transactionPartners.isSuccess && (
-                              <ComboBox
-                                data={transactionPartners.data.customers
-                                  .map((c) => ({
-                                    label: `${c.custName} | Customer`,
-                                    value: c.custId,
-                                  }))
-                                  .concat([
-                                    {
-                                      label: 'separator',
-                                      value: 'separator',
-                                    },
-                                  ])
-                                  .concat(
-                                    transactionPartners.data.employees.map(
-                                      (e) => ({
-                                        label: `${e.empName} | Employee`,
-                                        value: e.empId,
-                                      }),
-                                    ),
-                                  )
-                                  .concat([
-                                    {
-                                      label: 'separator',
-                                      value: 'separator',
-                                    },
-                                  ])
-                                  .concat(
-                                    transactionPartners.data.vendors.map(
-                                      (v) => ({
-                                        label: `${v.vdName} | Vendor`,
-                                        value: v.vdId,
-                                      }),
-                                    ),
-                                  )}
-                                emptyLabel="Nothing Selected"
-                                value={field.value}
-                                setValue={field.onChange}
-                              />
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                        )
+                      }}
                     />
-                    <FormField
-                      name="tranAccTypeId"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>Account Type</FormLabel>
-                          <FormControl>
-                            {accountTypes.isSuccess && (
-                              <ComboBox
-                                data={accountTypes.data.accountTypes.map(
-                                  (t) => ({
-                                    label: t.accTypeName,
-                                    value: t.accTypeId,
-                                  }),
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <FormField
+                    name="tranPartner"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Person Transacting with</FormLabel>
+                        <FormControl>
+                          {transactionPartners.isSuccess && (
+                            <ComboBox
+                              data={transactionPartners.data.customers
+                                .map((c) => ({
+                                  label: `${c.custName} | Customer`,
+                                  value: c.custId,
+                                }))
+                                .concat([
+                                  {
+                                    label: 'separator',
+                                    value: 'separator',
+                                  },
+                                ])
+                                .concat(
+                                  transactionPartners.data.employees.map(
+                                    (e) => ({
+                                      label: `${e.empName} | Employee`,
+                                      value: e.empId,
+                                    }),
+                                  ),
+                                )
+                                .concat([
+                                  {
+                                    label: 'separator',
+                                    value: 'separator',
+                                  },
+                                ])
+                                .concat(
+                                  transactionPartners.data.vendors.map((v) => ({
+                                    label: `${v.vdName} | Vendor`,
+                                    value: v.vdId,
+                                  })),
                                 )}
-                                emptyLabel="Nothing Found"
-                                value={field.value}
-                                setValue={field.onChange}
-                              />
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="flex gap-4">
-                    <FormField
-                      name="tranFile"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>Supporting File</FormLabel>
-                          <FormControl>
-                            <Input
-                              ref={field.ref}
-                              onBlur={field.onBlur}
-                              onChange={(e: any) => {
-                                if (!e.target.files) return
-
-                                if (!e.target.files[0]) return
-                                field.onChange(e.target.files[0])
-                              }}
-                              type="file"
-                              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                              className="w-full hover:cursor-pointer"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name="tranTypeId"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>Transaction Type</FormLabel>
-                          <FormControl>
-                            {accountTypes.isSuccess && (
-                              <ComboBox
-                                data={
-                                  form.watch('tranAccTypeId')
-                                    ? accountTypes.data.accountTypes
-                                        .filter(
-                                          (at) =>
-                                            at.accTypeId ===
-                                            form.watch('tranAccTypeId'),
-                                        )[0]
-                                        .transactionTypes.map((t) => ({
-                                          label: t.tranTypeName,
-                                          value: t.tranTypeId,
-                                        }))
-                                    : ([] satisfies {
-                                        label: string
-                                        value: string
-                                      }[])
-                                }
-                                emptyLabel="Nothing Found"
-                                value={field.value}
-                                setValue={field.onChange}
-                              />
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <FormField
-                      name="tranDescription"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center justify-between">
-                            <FormLabel>Transaction Description</FormLabel>
-                            <FormMessage />
-                          </div>
-                          <FormControl>
-                            <Textarea
-                              {...field}
+                              emptyLabel="Nothing Selected"
                               value={field.value}
-                              onChange={field.onChange}
-                              placeholder="Transaction Description"
+                              setValue={field.onChange}
                             />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </form>
-              </Form>
-              <div className="flex w-full gap-4">
-                <PromptModal
-                  dialogMessage="Continue?"
-                  prompType="ADD"
-                  dialogTitle="You are about to create a new transaction"
-                  triggerText="Create"
-                  callback={form.handleSubmit(handleSubmit)}
-                />
-                <Button
-                  onClick={() => {
-                    form.clearErrors()
-                    form.reset()
-                  }}
-                  className="flex-1"
-                  variant={'outline'}
-                >
-                  Clear
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          <DialogContent className="">
-            <DialogHeader>
-              <div className="flex gap-4">
-                <Text variant="heading3bold">Upload</Text>
-                <Text variant={'label'}>Upload a file to add transaction!</Text>
-              </div>
-            </DialogHeader>
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="tranMopId"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Mode of Payment</FormLabel>
+                          <FormMessage />
+                        </div>
+                        <FormControl>
+                          {modesOfPayment.isSuccess && (
+                            <ComboBox
+                              data={modesOfPayment.data.modesOfPayment.map(
+                                (mop) => ({
+                                  value: mop.mopId,
+                                  label: mop.mopName,
+                                }),
+                              )}
+                              emptyLabel="Nothing Selected"
+                              value={field.value}
+                              setValue={field.onChange}
+                            />
+                          )}
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <FormField
+                    name="tranFile"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Supporting File</FormLabel>
+                        <FormControl>
+                          <Input
+                            ref={field.ref}
+                            onBlur={field.onBlur}
+                            onChange={(e: any) => {
+                              if (!e.target.files) return
 
-            <Dropzone onChange={setFile} fileExtension="xlsx" />
-
-            <Button onClick={handleSubmitFile}>Upload</Button>
-          </DialogContent>
-        </Dialog>
+                              if (!e.target.files[0]) return
+                              field.onChange(e.target.files[0])
+                            }}
+                            type="file"
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            className="w-full hover:cursor-pointer"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="tranTypeId"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Transaction Type</FormLabel>
+                        <FormControl>
+                          {transactionTypes.isSuccess && (
+                            <ComboBox
+                              data={transactionTypes.data?.transactionTypes.map(
+                                (t) => ({
+                                  label: t.tranTypeName,
+                                  value: t.tranTypeId,
+                                }),
+                              )}
+                              emptyLabel="Nothing Found"
+                              value={field.value}
+                              setValue={field.onChange}
+                            />
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <FormField
+                    name="tranDescription"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Transaction Description</FormLabel>
+                          <FormMessage />
+                        </div>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="Transaction Description"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </form>
+            </Form>
+            <div className="flex w-full gap-4">
+              <PromptModal
+                dialogMessage="Continue?"
+                prompType="ADD"
+                dialogTitle="You are about to create a new transaction"
+                triggerText="Create"
+                callback={form.handleSubmit(handleSubmit)}
+              />
+              <Button
+                onClick={() => {
+                  form.clearErrors()
+                  form.reset()
+                }}
+                className="flex-1"
+                variant={'outline'}
+              >
+                Clear
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

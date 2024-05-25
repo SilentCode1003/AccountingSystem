@@ -34,6 +34,20 @@ export const createValidator = z.object({
       message: "Only xlsx/pdf files are allowed",
     }
   ),
+  prMopId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "mopId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not a mode of payment id.`,
+      });
+    }
+    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not valid uuid.`,
+      });
+    }
+  }),
 });
 
 //validator for PUT /payrolls input
@@ -66,6 +80,23 @@ export const updateValidator = z.object({
       });
     }
   }),
+  prMopId: z
+    .string()
+    .superRefine((val, ctx) => {
+      if (val.split(" ")[0] !== "mopId") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not a mode of payment id.`,
+        });
+      }
+      if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Not valid uuid.`,
+        });
+      }
+    })
+    .optional(),
   prEmployeeId: z
     .string()
     .superRefine((val, ctx) => {
@@ -105,4 +136,20 @@ export const updateValidator = z.object({
       }
     )
     .optional(),
+});
+
+export const createPayrollByFileValidator = z.object({
+  prFile: z.custom<UploadedFile>().refine(
+    (file) => {
+      if (
+        file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+        return true;
+      return false;
+    },
+    {
+      message: "Only xlsx files are allowed",
+    }
+  ),
 });

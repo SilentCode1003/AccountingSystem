@@ -1,5 +1,6 @@
 import { ComboBox } from '@/components/Combobox'
 import DataTable from '@/components/DataTable'
+import { CreateByFileUpload } from '@/components/FileDropZone'
 import { LoadingTable } from '@/components/LoadingComponents'
 import { PromptModal } from '@/components/PromptModal'
 import {
@@ -24,8 +25,8 @@ import {
 } from '@/components/ui/Form'
 import { Input } from '@/components/ui/input'
 import { Text } from '@/components/ui/text'
-import { useCreatePayroll } from '@/hooks/mutations'
-import { useEmployees, usePayrolls } from '@/hooks/queries'
+import { useCreatePayroll, useCreatePayrollByFile } from '@/hooks/mutations'
+import { useEmployees, useModesOfPayment, usePayrolls } from '@/hooks/queries'
 import { employeesOptions, payrollsOptions } from '@/hooks/queries/options'
 import { createPayrollSchema } from '@/validators/payrolls.validators'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -58,12 +59,18 @@ function LoadingComponent() {
 const CrudComponents = () => {
   const [open, setOpen] = useState<boolean>(false)
   const employees = useEmployees()
+  const modesOfPayment = useModesOfPayment()
   const createPayroll = useCreatePayroll({ setOpen })
+  const [file, setFile] = useState<File>()
+  const [uploadOpen, setUploadOpen] = useState(false)
+
+  const createPayrollByFile = useCreatePayrollByFile({ setOpen: setUploadOpen })
 
   const form = useForm<z.infer<typeof createPayrollSchema>>({
     defaultValues: {
       prEmployeeId: '',
       prTotalDeduction: 0,
+      prMopId: '',
     },
     resolver: zodResolver(createPayrollSchema),
   })
@@ -87,7 +94,19 @@ const CrudComponents = () => {
         </Button>
         <AlertDialogContent className="scale-75 sm:scale-100">
           <AlertDialogHeader>
-            <Text variant={'heading3bold'}>Create Payroll</Text>
+            <div className="flex justify-between">
+              <Text variant={'heading3bold'}>Create Payroll</Text>
+              <CreateByFileUpload
+                file={file}
+                setFile={setFile}
+                open={uploadOpen}
+                setOpen={setUploadOpen}
+                fileName="prFile"
+                label="Upload an xlsx file to add payrolls!"
+                template
+                mutate={createPayrollByFile.mutate}
+              />
+            </div>
           </AlertDialogHeader>
           <Form {...form}>
             <form>
@@ -138,6 +157,33 @@ const CrudComponents = () => {
                             field.onChange(parseFloat(e.target.value))
                           }
                         />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="prMopId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Mode of Payment</FormLabel>
+                        <FormMessage />
+                      </div>
+                      <FormControl>
+                        {modesOfPayment.isSuccess && (
+                          <ComboBox
+                            data={modesOfPayment.data.modesOfPayment.map(
+                              (mop) => ({
+                                value: mop.mopId,
+                                label: mop.mopName,
+                              }),
+                            )}
+                            emptyLabel="Nothing Selected"
+                            value={field.value}
+                            setValue={field.onChange}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}

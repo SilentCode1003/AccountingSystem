@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import db from "../database";
 import {
   addAccountType,
+  changeAccountTypeIsActive,
   editAccountType,
   getAllAccountTypes,
 } from "../database/services/accountType.service";
@@ -66,7 +67,10 @@ export const updateAccountType = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteAccountType = async (req: Request, res: Response) => {
+export const toggleAccountTypeIsActive = async (
+  req: Request,
+  res: Response
+) => {
   const input = deleteValidator.safeParse(req.params);
 
   if (!input.success)
@@ -75,15 +79,11 @@ export const deleteAccountType = async (req: Request, res: Response) => {
     });
 
   try {
-    await db
-      .delete(accountTypes)
-      .where(eq(accountTypes.accTypeId, input.data.accTypeId));
-    console.log("successfully deleted an account type");
-    return res
-      .status(200)
-      .send({ success: true, deletedAccountTypeId: input.data.accTypeId });
+    const accountType = await changeAccountTypeIsActive(input.data);
+    console.log("successfully toggled account type");
+    return res.status(200).send({ accountType });
   } catch (error) {
-    console.log("error deleting an account type");
+    console.log("error toggling account type");
     console.log(error);
     return res.status(500).send({
       error: "Server error",
