@@ -64,7 +64,7 @@ export const createUser = async (req: Request, res: Response) => {
 
   if (!input.success)
     return res.status(400).send({
-      error: "Invalid inputs",
+      error: input.error.errors[0].message,
     });
   try {
     const newUser = await addUser(input.data);

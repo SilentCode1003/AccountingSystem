@@ -4,27 +4,14 @@ import { type UploadedFile } from "express-fileupload";
 //validator for POST /users inputs
 export const createValidator = z.object({
   userType: z.enum(["FINANCE", "HIGHER_DEPARTMENT"]),
-  userUsername: z.string(),
-  userPassword: z.string(),
-  userFullName: z.string(),
-  userContactNumber: z.string(),
-  userProfilePic: z
-    .custom<UploadedFile>()
-    .refine(
-      (file) => {
-        if (
-          file.mimetype === "image/png" ||
-          file.mimetype === "image/jpeg" ||
-          file.mimetype === "image/jpg"
-        )
-          return true;
-        return false;
-      },
-      {
-        message: "Only PNG files are allowed",
-      }
-    )
-    .transform((file) => file.name),
+  empId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "empId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an employee id.`,
+      });
+    }
+  }),
 });
 
 //validator for GET /users single user input
@@ -34,12 +21,6 @@ export const getByIdValidator = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not an user id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
       });
     }
   }),
@@ -52,12 +33,6 @@ export const updateValidator = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not an user id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
       });
     }
   }),
@@ -95,12 +70,6 @@ export const toggleIsActiveValidator = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Not an user id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
       });
     }
   }),
