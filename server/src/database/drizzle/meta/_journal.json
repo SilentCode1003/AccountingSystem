@@ -288,6 +288,13 @@
       "when": 1716773685535,
       "tag": "0040_burly_silverclaw",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "5",
+      "when": 1716779299004,
+      "tag": "0041_closed_dorian_gray",
+      "breakpoints": true
     }
   ]
 }
