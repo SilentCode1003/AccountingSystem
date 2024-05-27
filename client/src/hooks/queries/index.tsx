@@ -23,6 +23,7 @@ import {
   transactionsOptions,
   transactionTypesOptions,
   userOptions,
+  usersOptions,
   vendorsOptions,
 } from './options'
 
@@ -36,6 +37,10 @@ export const useCurrentUserSuspense = () =>
 export const useUser = () => {
   const queryClient = useQueryClient()
   return useQuery(userOptions(queryClient))
+}
+export const useUsers = () => {
+  const queryClient = useQueryClient()
+  return useQuery(usersOptions(queryClient))
 }
 
 export const useUserSuspense = () => {

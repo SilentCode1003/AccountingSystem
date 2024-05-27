@@ -9,6 +9,7 @@ import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.column
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
 import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
+import { Users } from '@/components/table-columns/users.columns'
 import { Vendors } from '@/components/table-columns/vendors.columns'
 import { toast } from '@/components/ui/use-toast'
 import { updateAccountSchema } from '@/validators/accounts.validator'
@@ -39,6 +40,10 @@ import {
   createTransactionTypeSchema,
   updateTransactionTypeSchema,
 } from '@/validators/transactionTypes.validator'
+import {
+  createUserSchema,
+  updateUserSchema,
+} from '@/validators/users.validator'
 import {
   createVendorSchema,
   updateVendorSchema,
@@ -322,7 +327,7 @@ export const useToggleAccountType = () => {
             </div>
           </div>
         ),
-        description: 'Account type was deleted successfully',
+        description: 'Account type was toggled successfully',
       })
     },
     onError: (error) => {
@@ -333,7 +338,70 @@ export const useToggleAccountType = () => {
             Something went wrong!
           </div>
         ),
-        description: error.message ?? 'Failed to delete account type ',
+        description: error.message ?? 'Failed to toggle account type ',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useToggleUser = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['toggleUser'],
+    mutationFn: async (
+      payload: Pick<z.infer<typeof updateUserSchema>, 'userId'>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/users/${payload.userId}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        user: Users
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['users'],
+        (old: { users: Array<Users> }) => {
+          return {
+            users: old.users.map((user) => {
+              if (user.userId === data.user.userId) {
+                return data.user
+              }
+              return user
+            }),
+          }
+        },
+      ),
+        toast({
+          title: (
+            <div>
+              <div className="flex gap-2 items-centers">
+                <PartyPopperIcon />
+                Success
+              </div>
+            </div>
+          ),
+          description: 'User was toggled successfully',
+        })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to toggle user ',
         variant: 'destructive',
       })
     },
@@ -1952,11 +2020,67 @@ export const useCreateTransactionType = ({
   })
 }
 
+export const useCreateUser = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: z.infer<typeof createUserSchema>) => {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      })
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{ user: Users }>
+      return data
+    },
+    onSuccess: async (data) => {
+      setOpen(false)
+      await queryClient.setQueryData(
+        ['users'],
+        (old: { users: Array<Users> }) => {
+          return {
+            users: [...old.users, data.user],
+          }
+        },
+      )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'User was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create User',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useUpdateUser = ({
-  setToggleEdit,
+  setOpen,
   setUserData,
 }: {
-  setUserData: React.Dispatch<
+  setUserData?: React.Dispatch<
     React.SetStateAction<{
       fullName: string
       username: string
@@ -1966,7 +2090,7 @@ export const useUpdateUser = ({
       contactNumber: string
     }>
   >
-  setToggleEdit: React.Dispatch<React.SetStateAction<boolean>>
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -2001,15 +2125,20 @@ export const useUpdateUser = ({
           },
         }
       })
-      setToggleEdit((prev) => !prev)
-      setUserData({
-        fullName: data.user.userFullName,
-        username: data.user.userUsername,
-        profileLink: '',
-        password: '',
-        profilePic: data.user.userProfilePic,
-        contactNumber: data.user.userContactNumber,
+      await queryClient.invalidateQueries({
+        queryKey: ['users'],
+        type: 'inactive',
       })
+      setOpen(false)
+      if (setUserData)
+        setUserData({
+          fullName: data.user.userFullName,
+          username: data.user.userUsername,
+          profileLink: '',
+          password: '',
+          profilePic: data.user.userProfilePic,
+          contactNumber: data.user.userContactNumber,
+        })
       toast({
         title: (
           <div className="flex gap-2 items-centers">

@@ -13,6 +13,7 @@ import {
   Vendor,
 } from '@/components/table-columns/transactions.columns'
 import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
+import { Users } from '@/components/table-columns/users.columns'
 import { Vendors } from '@/components/table-columns/vendors.columns'
 import { QueryClient, queryOptions } from '@tanstack/react-query'
 
@@ -63,12 +64,24 @@ export const userOptions = (queryClient: QueryClient) => {
       if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
-        user: {
-          userUsername: string
-          userFullName: string
-          userContactNumber: string
-          userProfilePic: string
-        }
+        user: Users
+      }>
+
+      return data
+    },
+  })
+}
+export const usersOptions = (queryClient: QueryClient) => {
+  return queryOptions({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users`, {
+        credentials: 'include',
+      })
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        users: Array<Users>
       }>
 
       return data
