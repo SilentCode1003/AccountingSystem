@@ -14,10 +14,13 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
-import { Route as LoginLayoutImport } from './routes/login/_layout'
+import { Route as LoginlayoutImport } from './routes/login_/_layout'
+import { Route as ForgotPasswordlayoutImport } from './routes/forgotPassword_/_layout'
 import { Route as AuthenticatedLayoutImport } from './routes/_authenticated/_layout'
-import { Route as LoginLayoutIndexImport } from './routes/login/_layout/index'
+import { Route as LoginlayoutIndexImport } from './routes/login_/_layout/index'
+import { Route as ForgotPasswordlayoutIndexImport } from './routes/forgotPassword_/_layout/index'
 import { Route as AuthenticatedLayoutIndexImport } from './routes/_authenticated/_layout/index'
+import { Route as ForgotPasswordlayoutUserIdIndexImport } from './routes/forgotPassword_/_layout/$userId/index'
 import { Route as AuthenticatedLayoutTransactionsIndexImport } from './routes/_authenticated/_layout/transactions_/index'
 import { Route as AuthenticatedLayoutPayrollsIndexImport } from './routes/_authenticated/_layout/payrolls_/index'
 import { Route as AuthenticatedLayoutInventoryEntriesIndexImport } from './routes/_authenticated/_layout/inventoryEntries_/index'
@@ -41,6 +44,7 @@ import { Route as AuthenticatedLayoutSettingslayoutAccountTypesImport } from './
 // Create Virtual Routes
 
 const LoginImport = createFileRoute('/login')()
+const ForgotPasswordImport = createFileRoute('/forgotPassword')()
 const AuthenticatedLayoutSettingsImport = createFileRoute(
   '/_authenticated/_layout/settings',
 )()
@@ -52,14 +56,24 @@ const LoginRoute = LoginImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ForgotPasswordRoute = ForgotPasswordImport.update({
+  path: '/forgotPassword',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AuthenticatedRoute = AuthenticatedImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRoute,
 } as any)
 
-const LoginLayoutRoute = LoginLayoutImport.update({
+const LoginlayoutRoute = LoginlayoutImport.update({
   id: '/_layout',
   getParentRoute: () => LoginRoute,
+} as any)
+
+const ForgotPasswordlayoutRoute = ForgotPasswordlayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => ForgotPasswordRoute,
 } as any)
 
 const AuthenticatedLayoutRoute = AuthenticatedLayoutImport.update({
@@ -73,15 +87,26 @@ const AuthenticatedLayoutSettingsRoute =
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
-const LoginLayoutIndexRoute = LoginLayoutIndexImport.update({
+const LoginlayoutIndexRoute = LoginlayoutIndexImport.update({
   path: '/',
-  getParentRoute: () => LoginLayoutRoute,
+  getParentRoute: () => LoginlayoutRoute,
+} as any)
+
+const ForgotPasswordlayoutIndexRoute = ForgotPasswordlayoutIndexImport.update({
+  path: '/',
+  getParentRoute: () => ForgotPasswordlayoutRoute,
 } as any)
 
 const AuthenticatedLayoutIndexRoute = AuthenticatedLayoutIndexImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedLayoutRoute,
 } as any)
+
+const ForgotPasswordlayoutUserIdIndexRoute =
+  ForgotPasswordlayoutUserIdIndexImport.update({
+    path: '/$userId/',
+    getParentRoute: () => ForgotPasswordlayoutRoute,
+  } as any)
 
 const AuthenticatedLayoutTransactionsIndexRoute =
   AuthenticatedLayoutTransactionsIndexImport.update({
@@ -215,6 +240,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/forgotPassword': {
+      id: '/forgotPassword'
+      path: '/forgotPassword'
+      fullPath: '/forgotPassword'
+      preLoaderRoute: typeof ForgotPasswordImport
+      parentRoute: typeof rootRoute
+    }
+    '/forgotPassword/_layout': {
+      id: '/forgotPassword/_layout'
+      path: '/forgotPassword'
+      fullPath: '/forgotPassword'
+      preLoaderRoute: typeof ForgotPasswordlayoutImport
+      parentRoute: typeof ForgotPasswordRoute
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -226,7 +265,7 @@ declare module '@tanstack/react-router' {
       id: '/login/_layout'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof LoginLayoutImport
+      preLoaderRoute: typeof LoginlayoutImport
       parentRoute: typeof LoginRoute
     }
     '/_authenticated/_layout/': {
@@ -236,12 +275,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
+    '/forgotPassword/_layout/': {
+      id: '/forgotPassword/_layout/'
+      path: '/'
+      fullPath: '/forgotPassword/'
+      preLoaderRoute: typeof ForgotPasswordlayoutIndexImport
+      parentRoute: typeof ForgotPasswordlayoutImport
+    }
     '/login/_layout/': {
       id: '/login/_layout/'
       path: '/'
       fullPath: '/login/'
-      preLoaderRoute: typeof LoginLayoutIndexImport
-      parentRoute: typeof LoginLayoutImport
+      preLoaderRoute: typeof LoginlayoutIndexImport
+      parentRoute: typeof LoginlayoutImport
     }
     '/_authenticated/_layout/settings': {
       id: '/_authenticated/_layout/settings'
@@ -305,6 +351,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/transactions/'
       preLoaderRoute: typeof AuthenticatedLayoutTransactionsIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
+    }
+    '/forgotPassword/_layout/$userId/': {
+      id: '/forgotPassword/_layout/$userId/'
+      path: '/$userId/'
+      fullPath: '/forgotPassword/$userId/'
+      preLoaderRoute: typeof ForgotPasswordlayoutUserIdIndexImport
+      parentRoute: typeof ForgotPasswordlayoutImport
     }
     '/_authenticated/_layout/settings/_layout/accountTypes': {
       id: '/_authenticated/_layout/settings/_layout/accountTypes'
@@ -418,8 +471,14 @@ export const routeTree = rootRoute.addChildren({
       AuthenticatedLayoutTransactionsIndexRoute,
     }),
   }),
+  ForgotPasswordRoute: ForgotPasswordRoute.addChildren({
+    ForgotPasswordlayoutRoute: ForgotPasswordlayoutRoute.addChildren({
+      ForgotPasswordlayoutIndexRoute,
+      ForgotPasswordlayoutUserIdIndexRoute,
+    }),
+  }),
   LoginRoute: LoginRoute.addChildren({
-    LoginLayoutRoute: LoginLayoutRoute.addChildren({ LoginLayoutIndexRoute }),
+    LoginlayoutRoute: LoginlayoutRoute.addChildren({ LoginlayoutIndexRoute }),
   }),
 })
 
