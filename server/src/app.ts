@@ -26,6 +26,7 @@ import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 import compression from "compression";
 import morgan from "morgan";
 import modesOfPaymentRouter from "./routes/modesOfPayment.routes";
+import forgetPasswordRequestsRouter from "./routes/forgetPasswordRequests.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -63,6 +64,9 @@ app.use(
 app.use(fileUpload());
 
 app.use(express.json());
+
+//route for all forget password request actions
+app.use("/forgetPasswordRequests", forgetPasswordRequestsRouter);
 
 app.use("/auth", authRouter);
 
