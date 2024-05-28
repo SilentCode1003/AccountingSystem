@@ -157,37 +157,38 @@ export const toggleUserIsActive = async (req: Request, res: Response) => {
 };
 
 export const forgetPassword = async (req: Request, res: Response) => {
+  console.log(req.body);
   const input = forgetPasswordValidator.safeParse(req.body);
 
   if (!input.success)
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const user = await getUserById({
-      userId: input.data.userId,
+    const user = await db.query.users.findFirst({
+      where: eq(users.userUsername, input.data.userName),
     });
 
     if (!user) return res.status(404).send({ error: "User not found" });
 
     const checkIfExist = await db.query.forgetPasswordRequests.findFirst({
-      where: eq(forgetPasswordRequests.userId, input.data.userId),
+      where: eq(forgetPasswordRequests.userId, user.userId),
     });
 
     if (checkIfExist)
       await db
         .update(forgetPasswordRequests)
         .set({ timeRequested: new Date() })
-        .where(eq(forgetPasswordRequests.userId, input.data.userId));
+        .where(eq(forgetPasswordRequests.userId, user.userId));
     else {
       await db.insert(forgetPasswordRequests).values({
         id: crypto.randomUUID(),
-        userId: input.data.userId,
+        userId: user.userId,
         timeRequested: new Date(),
       });
     }
 
     const passwordResetId = await db.query.forgetPasswordRequests.findFirst({
-      where: eq(forgetPasswordRequests.userId, input.data.userId),
+      where: eq(forgetPasswordRequests.userId, user.userId),
     });
 
     const transporter = nodemailer.createTransport({
@@ -289,7 +290,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
     );
 
     console.log("Password reset email sent successfully");
-    return res.status(200).send("Email sent successfully!");
+    return res.status(200).send({ message: "Email Sent Successfully!" });
   } catch (error) {
     console.log("error in password reset email");
     console.log(error);
@@ -298,7 +299,6 @@ export const forgetPassword = async (req: Request, res: Response) => {
 };
 
 export const changePassword = async (req: Request, res: Response) => {
-  console.log("test");
   const input = changePasswordValidator.safeParse(req.query);
 
   if (!input.success) return res.status(400).send({ error: input.error });

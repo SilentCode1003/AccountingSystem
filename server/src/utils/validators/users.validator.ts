@@ -76,14 +76,7 @@ export const toggleIsActiveValidator = z.object({
 });
 
 export const forgetPasswordValidator = z.object({
-  userId: z.string().superRefine((val, ctx) => {
-    if (val.split(" ")[0] !== "userId") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not a user id.`,
-      });
-    }
-  }),
+  userName: z.string().min(1, { message: "Username is required" }),
 });
 
 export const changePasswordValidator = z.object({

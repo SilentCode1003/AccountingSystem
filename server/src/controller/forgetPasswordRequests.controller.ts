@@ -20,11 +20,19 @@ export const getSingleForgetPasswordRequestById = async (
     if (difference > 86400000) {
       return res
         .status(200)
-        .send({ id: forgetPasswordRequest.id, remarks: "expired" });
+        .send({
+          id: forgetPasswordRequest.id,
+          userId: forgetPasswordRequest.userId,
+          remarks: "expired",
+        });
     } else {
       return res
         .status(200)
-        .send({ id: forgetPasswordRequest.id, remarks: "valid" });
+        .send({
+          id: forgetPasswordRequest.id,
+          userId: forgetPasswordRequest.userId,
+          remarks: "valid",
+        });
     }
   } catch (error) {
     console.log("error in getting forget password request");
