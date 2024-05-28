@@ -17,6 +17,7 @@ export const getAllUsers = async () => {
   const users = await db.query.users.findMany();
 
   return users.map((user) => ({
+    userId: user.userId,
     userUsername: user.userUsername,
     userContactNumber: user.userContactNumber,
     userProfilePic: user.userProfilePic,
@@ -35,6 +36,7 @@ export const getUserById = async (input: { userId: string }) => {
     userContactNumber: userData?.userContactNumber,
     userProfilePic: userData?.userProfilePic,
     userFullName: userData?.userFullName,
+    userEmail: userData?.userEmail,
   };
 };
 
@@ -58,6 +60,7 @@ export const addUser = async (input: { userType: UserType; empId: string }) => {
 
   await db.insert(users).values({
     userId: newUserId,
+    userEmail: emp!.empEmail,
     userContactNumber: emp!.empContactInfo,
     userFullName: emp!.empName!,
     userUsername: emp!.empId.split(" ")[1],
@@ -70,6 +73,7 @@ export const addUser = async (input: { userType: UserType; empId: string }) => {
   });
 
   return {
+    userId: newUser!.userId,
     userUsername: newUser!.userUsername,
     userContactNumber: newUser!.userContactNumber,
     userProfilePic: newUser!.userProfilePic,
@@ -105,8 +109,8 @@ export const editUser = async (input: {
   const editedUser = await db.query.users.findFirst({
     where: (user) => eq(user.userId, input.userId),
   });
-
   return {
+    userId: editedUser!.userId,
     userUsername: editedUser!.userUsername,
     userContactNumber: editedUser!.userContactNumber,
     userProfilePic: editedUser!.userProfilePic,
@@ -126,6 +130,7 @@ export const toggleIsActive = async (input: { userId: string }) => {
   });
 
   return {
+    userId: editedUser!.userId,
     userUsername: editedUser!.userUsername,
     userContactNumber: editedUser!.userContactNumber,
     userProfilePic: editedUser!.userProfilePic,

@@ -20,7 +20,7 @@ export const getByIdValidator = z.object({
     if (val.split(" ")[0] !== "userId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an user id.`,
+        message: `Not a user id.`,
       });
     }
   }),
@@ -32,7 +32,7 @@ export const updateValidator = z.object({
     if (val.split(" ")[0] !== "userId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an user id.`,
+        message: `Not a user id.`,
       });
     }
   }),
@@ -69,8 +69,31 @@ export const toggleIsActiveValidator = z.object({
     if (val.split(" ")[0] !== "userId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an user id.`,
+        message: `Not a user id.`,
       });
     }
   }),
+});
+
+export const forgetPasswordValidator = z.object({
+  userId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "userId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not a user id.`,
+      });
+    }
+  }),
+});
+
+export const changePasswordValidator = z.object({
+  userId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "userId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not a user id.`,
+      });
+    }
+  }),
+  newPassword: z.string().min(1, { message: "Password is required" }),
 });

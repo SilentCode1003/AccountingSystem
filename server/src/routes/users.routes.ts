@@ -5,6 +5,8 @@ import {
   updateUser,
   toggleUserIsActive,
   getSingleUserById,
+  forgetPassword,
+  changePassword,
 } from "../controller/users.controller";
 
 const usersRouter = Router();
@@ -21,7 +23,13 @@ usersRouter.post("/", createUser);
 //update an users
 usersRouter.put("/", updateUser);
 
-//delete but update users isactive instead
+//toggle user is active
 usersRouter.put("/:userId", toggleUserIsActive);
+
+//forgot password
+usersRouter.post("/forgetPassword", forgetPassword);
+
+//change password
+usersRouter.put("/changePassword/reset", changePassword);
 
 export default usersRouter;
