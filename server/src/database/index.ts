@@ -42,6 +42,7 @@ import tranTypes, {
 } from "./schema/transactionTypes.schema";
 import users from "./schema/users.schema";
 import vendors from "./schema/vendors.schema";
+import forgetPasswordRequests from "./schema/forgetPasswordRequests.schema";
 
 // type DBSchema = {
 //   accounts: MySqlTable;
@@ -95,6 +96,7 @@ const db = drizzle(connection, {
     accountTypeRelation,
     inventoryEntries,
     inventoryEntriesTransactionRelation,
+    forgetPasswordRequests,
     inventoryEntriesInventoryEntryProductsManyRelation,
     accountTypeTransactionTypeManyRelations,
     inventoryEntriesVendorRelation,
