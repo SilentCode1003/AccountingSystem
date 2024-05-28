@@ -20,7 +20,7 @@ import { Route as AuthenticatedLayoutImport } from './routes/_authenticated/_lay
 import { Route as LoginlayoutIndexImport } from './routes/login_/_layout/index'
 import { Route as ForgotPasswordlayoutIndexImport } from './routes/forgotPassword_/_layout/index'
 import { Route as AuthenticatedLayoutIndexImport } from './routes/_authenticated/_layout/index'
-import { Route as ForgotPasswordlayoutUserIdIndexImport } from './routes/forgotPassword_/_layout/$userId/index'
+import { Route as ForgotPasswordlayoutFprIdIndexImport } from './routes/forgotPassword_/_layout/$fprId/index'
 import { Route as AuthenticatedLayoutTransactionsIndexImport } from './routes/_authenticated/_layout/transactions_/index'
 import { Route as AuthenticatedLayoutPayrollsIndexImport } from './routes/_authenticated/_layout/payrolls_/index'
 import { Route as AuthenticatedLayoutInventoryEntriesIndexImport } from './routes/_authenticated/_layout/inventoryEntries_/index'
@@ -102,9 +102,9 @@ const AuthenticatedLayoutIndexRoute = AuthenticatedLayoutIndexImport.update({
   getParentRoute: () => AuthenticatedLayoutRoute,
 } as any)
 
-const ForgotPasswordlayoutUserIdIndexRoute =
-  ForgotPasswordlayoutUserIdIndexImport.update({
-    path: '/$userId/',
+const ForgotPasswordlayoutFprIdIndexRoute =
+  ForgotPasswordlayoutFprIdIndexImport.update({
+    path: '/$fprId/',
     getParentRoute: () => ForgotPasswordlayoutRoute,
   } as any)
 
@@ -352,11 +352,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutTransactionsIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
-    '/forgotPassword/_layout/$userId/': {
-      id: '/forgotPassword/_layout/$userId/'
-      path: '/$userId/'
-      fullPath: '/forgotPassword/$userId/'
-      preLoaderRoute: typeof ForgotPasswordlayoutUserIdIndexImport
+    '/forgotPassword/_layout/$fprId/': {
+      id: '/forgotPassword/_layout/$fprId/'
+      path: '/$fprId/'
+      fullPath: '/forgotPassword/$fprId/'
+      preLoaderRoute: typeof ForgotPasswordlayoutFprIdIndexImport
       parentRoute: typeof ForgotPasswordlayoutImport
     }
     '/_authenticated/_layout/settings/_layout/accountTypes': {
@@ -474,7 +474,7 @@ export const routeTree = rootRoute.addChildren({
   ForgotPasswordRoute: ForgotPasswordRoute.addChildren({
     ForgotPasswordlayoutRoute: ForgotPasswordlayoutRoute.addChildren({
       ForgotPasswordlayoutIndexRoute,
-      ForgotPasswordlayoutUserIdIndexRoute,
+      ForgotPasswordlayoutFprIdIndexRoute,
     }),
   }),
   LoginRoute: LoginRoute.addChildren({

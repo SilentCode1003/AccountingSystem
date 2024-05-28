@@ -10,45 +10,48 @@ import {
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Text } from '@/components/ui/text'
-import { useForgetPassword } from '@/hooks/mutations'
-import { currentUserOptions } from '@/hooks/queries/options'
-import { forgetPasswordSchema } from '@/validators/auth.validator'
+import { useChangePassword } from '@/hooks/mutations'
+import { forgetPasswordRequestOptions } from '@/hooks/queries/options'
+import { changePasswordSchema } from '@/validators/auth.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-export const Route = createFileRoute('/forgotPassword/_layout/')({
-  beforeLoad: async ({ context: { queryClient }, location }) => {
-    const data = await queryClient.ensureQueryData(currentUserOptions())
-
-    if (data && data.isLogged) {
-      throw redirect({
-        to: '/',
-        search: {
-          redirect: location.href,
-        },
-      })
+export const Route = createFileRoute('/forgotPassword/_layout/$fprId/')({
+  loader: async ({ params, context: { queryClient } }) => {
+    const forgetPasswordRequest = await queryClient.ensureQueryData(
+      forgetPasswordRequestOptions(params.fprId),
+    )
+    return {
+      forgetPasswordRequest,
     }
   },
-  component: login,
+  component: forgetPasswordUserIdComponent,
 })
 
-function login() {
+function forgetPasswordUserIdComponent() {
+  const loader = Route.useLoaderData()
   const [success, setSuccess] = useState<boolean>(false)
   const form = useForm({
     defaultValues: {
-      userName: '',
+      userId: loader.forgetPasswordRequest.userId,
+      newPassword: '',
     },
-    resolver: zodResolver(forgetPasswordSchema),
+    resolver: zodResolver(changePasswordSchema),
   })
 
-  const forgetPassword = useForgetPassword({ setOpen: setSuccess })
+  const changePassword = useChangePassword({ setOpen: setSuccess })
 
-  const handleSubmit = (values: z.infer<typeof forgetPasswordSchema>) => {
-    forgetPassword.mutate(values)
+  const handleSubmit = (values: z.infer<typeof changePasswordSchema>) => {
+    changePassword.mutate(values)
     setSuccess(true)
+  }
+
+  if (loader.forgetPasswordRequest.remarks === 'expired') {
+    return <div>Request expired!</div>
   }
 
   return (
@@ -69,16 +72,15 @@ function login() {
           <div className="flex flex-col gap-4 ">
             <div className="flex flex-col gap-2 items-center md:items-start">
               <Text variant={'heading1bold'} className="font-thin md:font-bold">
-                {success ? 'Check your email!' : 'Forgot Password?'}
+                {!success
+                  ? 'Set new password'
+                  : 'Password Change Successfully!'}
               </Text>
               <Text
                 variant={'heading4ghost'}
                 className="max-w-96 text-center md:text-start "
               >
-                {success
-                  ? "We've sent you an email with a link to reset your password."
-                  : `Enter your username and we will send you a link to your email to
-                reset your password.`}
+                You can now go back to the login page.
               </Text>
             </div>
             {!success ? (
@@ -87,18 +89,18 @@ function login() {
                   <div className="flex flex-col gap-4 w-full">
                     <FormField
                       control={form.control}
-                      name="userName"
+                      name="newPassword"
                       render={({ field }) => (
                         <FormItem>
                           <div className="w-full">
                             <div className="w-full flex justify-between items-center">
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>Password</FormLabel>
                               <FormMessage />
                             </div>
                             <FormControl>
                               <Input
                                 className="w-full"
-                                type="text"
+                                type="password"
                                 {...field}
                               />
                             </FormControl>
@@ -108,10 +110,7 @@ function login() {
                     />
                   </div>
                   <Button type="submit" className="w-full mt-4">
-                    Continue
-                  </Button>
-                  <Button variant={'outline'} className="w-full mt-4">
-                    <Link to={'/login'}>Cancel</Link>
+                    Confirm
                   </Button>
                 </form>
               </Form>
@@ -127,4 +126,4 @@ function login() {
   )
 }
 
-export default login
+export default forgetPasswordUserIdComponent

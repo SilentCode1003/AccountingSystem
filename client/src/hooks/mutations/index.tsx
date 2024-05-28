@@ -18,6 +18,10 @@ import {
   updateAccountTypeSchema,
 } from '@/validators/accountTypes.validator'
 import {
+  changePasswordSchema,
+  forgetPasswordSchema,
+} from '@/validators/auth.validator'
+import {
   createCustomerSchema,
   updateCustomersSchema,
 } from '@/validators/customers.validator'
@@ -2608,6 +2612,105 @@ export const useSyncEmployeeByFile = ({
           </div>
         ),
         description: error.message ?? 'Failed to sync employees',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useForgetPassword = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  return useMutation({
+    mutationKey: ['forgetPassword'],
+    mutationFn: async (payload: z.infer<typeof forgetPasswordSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/forgetPassword`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      return response.json()
+    },
+    onSuccess: async (data) => {
+      setOpen(true)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Email sent successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to send email',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useChangePassword = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  return useMutation({
+    mutationKey: ['changePassword'],
+    mutationFn: async (payload: z.infer<typeof changePasswordSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/changePassword/reset?` +
+          new URLSearchParams({ ...payload }),
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      return response.json()
+    },
+    onSuccess: async (data) => {
+      setOpen(true)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Password changed successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to change password',
         variant: 'destructive',
       })
     },

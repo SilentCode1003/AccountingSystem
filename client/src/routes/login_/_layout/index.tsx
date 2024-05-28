@@ -14,7 +14,7 @@ import { useLogin } from '@/hooks/mutations'
 import { currentUserOptions } from '@/hooks/queries/options'
 import { loginSchema } from '@/validators/auth.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -120,6 +120,9 @@ function login() {
                 </div>
                 <Button type="submit" className="w-full mt-4">
                   Sign in
+                </Button>
+                <Button type="submit" variant={'ghost'} className="w-full mt-4">
+                  <Link to="/forgotPassword">Forgot Password</Link>
                 </Button>
               </form>
             </Form>

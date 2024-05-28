@@ -6,7 +6,10 @@ export const loginSchema = z.object({
 })
 
 export const forgetPasswordSchema = z.object({
-  email: z.string().email('Invalid email address').min(1, {
-    message: 'Email is required',
-  }),
+  userName: z.string().min(1, { message: 'Username is required' }),
+})
+
+export const changePasswordSchema = z.object({
+  userId: z.string().min(1, { message: 'Username is required' }),
+  newPassword: z.string().min(1, { message: 'Password is required' }),
 })

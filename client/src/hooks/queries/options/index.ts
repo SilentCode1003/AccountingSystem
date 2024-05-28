@@ -43,6 +43,29 @@ export const currentUserOptions = () => {
   })
 }
 
+export const forgetPasswordRequestOptions = (id: string) => {
+  return queryOptions({
+    queryKey: ['forgetPasswordRequest'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/forgetPasswordRequests/${id}`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        id: string
+        userId: string
+        remarks: string
+      }>
+
+      return data
+    },
+  })
+}
+
 export const userOptions = (queryClient: QueryClient) => {
   return queryOptions({
     queryKey: ['userData'],
