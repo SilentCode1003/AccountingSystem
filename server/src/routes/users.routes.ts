@@ -26,10 +26,4 @@ usersRouter.put("/", updateUser);
 //toggle user is active
 usersRouter.put("/:userId", toggleUserIsActive);
 
-//forgot password
-usersRouter.post("/forgetPassword", forgetPassword);
-
-//change password
-usersRouter.put("/changePassword/reset", changePassword);
-
 export default usersRouter;
