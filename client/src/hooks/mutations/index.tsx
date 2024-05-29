@@ -476,6 +476,14 @@ export const useUpdateTransactionType = ({
         queryKey: ['accounts'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypes'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
