@@ -13,6 +13,7 @@ const liquidationRoutes = mysqlTable("liquidation_routes", {
       onDelete: "cascade",
     })
     .notNull(),
+  lrDestination: varchar("lr_destination", { length: 60 }).notNull(),
   lrPrice: decimal("lr_price", { precision: 13, scale: 2 })
     .$type<number>()
     .notNull(),
