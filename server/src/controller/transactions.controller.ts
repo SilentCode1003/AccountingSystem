@@ -292,7 +292,6 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
           liquidationEmpId: tran.tranPartner!,
           liquidationAmount: tran.amount!,
           liquidationDate: tran.date!,
-          liquidationDestination: tran.tranPartner!,
           liquidationTranId: transaction!.tranId,
           liquidationRoutes: tran.liquidationRoutes!,
         });
@@ -302,15 +301,15 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
     // console.log(lq);
 
-    // file.mv(
-    //   path.join(
-    //     __dirname,
-    //     "..",
-    //     "..",
-    //     "files/transactionfiles",
-    //     `${newMultiFileName}.xlsx`
-    //   )
-    // );
+    file.mv(
+      path.join(
+        __dirname,
+        "..",
+        "..",
+        "files/transactionfiles",
+        `${newMultiFileName}.xlsx`
+      )
+    );
 
     console.log("successfully created transaction by file");
     return res.send({ transactions });

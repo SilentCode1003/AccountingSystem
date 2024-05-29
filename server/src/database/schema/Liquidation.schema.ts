@@ -25,9 +25,6 @@ const liquidations = mysqlTable("liquidation", {
   liquidationAmount: decimal("liquidation_amount", { precision: 13, scale: 2 })
     .$type<number>()
     .notNull(),
-  liquidationDestination: varchar("liquidation_destination", {
-    length: 60,
-  }).notNull(),
   liquidationDate: date("liquidation_date").notNull(),
 });
 

@@ -29,7 +29,6 @@ export const addLiquidation = async (input: {
   liquidationEmpId: string;
   liquidationAmount: number;
   liquidationDate: Date;
-  liquidationDestination: string;
   liquidationTranId: string;
   liquidationRoutes: Array<{
     lrDestination: string;
