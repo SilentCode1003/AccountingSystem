@@ -27,6 +27,8 @@ import compression from "compression";
 import morgan from "morgan";
 import modesOfPaymentRouter from "./routes/modesOfPayment.routes";
 import forgetPasswordRequestsRouter from "./routes/forgetPasswordRequests.routes";
+import budgetRouter from "./routes/budgets.routes";
+import liquidationRouter from "./routes/liquidations.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -86,6 +88,12 @@ app.use("/others", othersRouter);
 
 //route for all account actions
 app.use("/accounts", accountRouter);
+
+//route for all budget actions
+app.use("/budgets", budgetRouter);
+
+//route for all liquidation actions
+app.use("/liquidations", liquidationRouter);
 
 //route for all account type actions
 app.use("/accountTypes", accountTypeRouter);
