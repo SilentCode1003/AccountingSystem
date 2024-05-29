@@ -23,10 +23,12 @@ import { Route as AuthenticatedLayoutIndexImport } from './routes/_authenticated
 import { Route as ForgotPasswordlayoutFprIdIndexImport } from './routes/forgotPassword_/_layout/$fprId/index'
 import { Route as AuthenticatedLayoutTransactionsIndexImport } from './routes/_authenticated/_layout/transactions_/index'
 import { Route as AuthenticatedLayoutPayrollsIndexImport } from './routes/_authenticated/_layout/payrolls_/index'
+import { Route as AuthenticatedLayoutLiquidationsIndexImport } from './routes/_authenticated/_layout/liquidations/index'
 import { Route as AuthenticatedLayoutInventoryEntriesIndexImport } from './routes/_authenticated/_layout/inventoryEntries_/index'
 import { Route as AuthenticatedLayoutIncomestatementIndexImport } from './routes/_authenticated/_layout/income_statement_/index'
 import { Route as AuthenticatedLayoutChequesIndexImport } from './routes/_authenticated/_layout/cheques_/index'
 import { Route as AuthenticatedLayoutCashflowIndexImport } from './routes/_authenticated/_layout/cash_flow_/index'
+import { Route as AuthenticatedLayoutBudgetsIndexImport } from './routes/_authenticated/_layout/budgets_/index'
 import { Route as AuthenticatedLayoutBalancesheetIndexImport } from './routes/_authenticated/_layout/balance_sheet_/index'
 import { Route as AuthenticatedLayoutSettingslayoutImport } from './routes/_authenticated/_layout/settings_/_layout'
 import { Route as AuthenticatedLayoutSettingslayoutIndexImport } from './routes/_authenticated/_layout/settings_/_layout/index'
@@ -120,6 +122,12 @@ const AuthenticatedLayoutPayrollsIndexRoute =
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
+const AuthenticatedLayoutLiquidationsIndexRoute =
+  AuthenticatedLayoutLiquidationsIndexImport.update({
+    path: '/liquidations/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+
 const AuthenticatedLayoutInventoryEntriesIndexRoute =
   AuthenticatedLayoutInventoryEntriesIndexImport.update({
     path: '/inventoryEntries/',
@@ -141,6 +149,12 @@ const AuthenticatedLayoutChequesIndexRoute =
 const AuthenticatedLayoutCashflowIndexRoute =
   AuthenticatedLayoutCashflowIndexImport.update({
     path: '/cash_flow/',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutBudgetsIndexRoute =
+  AuthenticatedLayoutBudgetsIndexImport.update({
+    path: '/budgets/',
     getParentRoute: () => AuthenticatedLayoutRoute,
   } as any)
 
@@ -310,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLayoutBalancesheetIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
+    '/_authenticated/_layout/budgets/': {
+      id: '/_authenticated/_layout/budgets/'
+      path: '/budgets/'
+      fullPath: '/budgets/'
+      preLoaderRoute: typeof AuthenticatedLayoutBudgetsIndexImport
+      parentRoute: typeof AuthenticatedLayoutImport
+    }
     '/_authenticated/_layout/cash_flow/': {
       id: '/_authenticated/_layout/cash_flow/'
       path: '/cash_flow/'
@@ -336,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/inventoryEntries/'
       fullPath: '/inventoryEntries/'
       preLoaderRoute: typeof AuthenticatedLayoutInventoryEntriesIndexImport
+      parentRoute: typeof AuthenticatedLayoutImport
+    }
+    '/_authenticated/_layout/liquidations/': {
+      id: '/_authenticated/_layout/liquidations/'
+      path: '/liquidations/'
+      fullPath: '/liquidations/'
+      preLoaderRoute: typeof AuthenticatedLayoutLiquidationsIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/payrolls/': {
@@ -463,10 +491,12 @@ export const routeTree = rootRoute.addChildren({
             }),
         }),
       AuthenticatedLayoutBalancesheetIndexRoute,
+      AuthenticatedLayoutBudgetsIndexRoute,
       AuthenticatedLayoutCashflowIndexRoute,
       AuthenticatedLayoutChequesIndexRoute,
       AuthenticatedLayoutIncomestatementIndexRoute,
       AuthenticatedLayoutInventoryEntriesIndexRoute,
+      AuthenticatedLayoutLiquidationsIndexRoute,
       AuthenticatedLayoutPayrollsIndexRoute,
       AuthenticatedLayoutTransactionsIndexRoute,
     }),
