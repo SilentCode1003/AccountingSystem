@@ -7,7 +7,7 @@ import accountTypes, {
   accountTypeTransactionTypeManyRelations,
 } from "./schema/accountType.schema";
 import apiKeys from "./schema/apiKeyStore.schema";
-import budgets from "./schema/Budget.schema";
+import budgets, { budgetEmployeeRelation } from "./schema/Budget.schema";
 import cheques, { chequesRelations } from "./schema/cheques.schema";
 import customers from "./schema/customers.schema";
 import employees from "./schema/employees.schema";
@@ -23,7 +23,9 @@ import inventoryEntryProducts, {
   inventoryEntriesProductsInventoryEntryRelations,
   inventoryEntriesProductsInventoryRelations,
 } from "./schema/inventoryEntriesProducts.schema";
-import liquidations from "./schema/Liquidation.schema";
+import liquidations, {
+  liquidationEmployeeRelation,
+} from "./schema/Liquidation.schema";
 import modesOfPayment, {
   modesOfPaymentTransactionRelations,
 } from "./schema/modeOfPayment";
@@ -45,6 +47,7 @@ import tranTypes, {
 } from "./schema/transactionTypes.schema";
 import users from "./schema/users.schema";
 import vendors from "./schema/vendors.schema";
+import liquidationRoutes from "./schema/liquidationRoutes.schema";
 
 export const connection = mysql.createPool({
   host: process.env.DB_HOST,
@@ -69,7 +72,10 @@ const db = drizzle(connection, {
     apiKeys,
     tranTypes,
     liquidations,
+    liquidationEmployeeRelation,
+    liquidationRoutes,
     budgets,
+    budgetEmployeeRelation,
     inventoryEntryProducts,
     inventoryEntriesProductsInventoryEntryRelations,
     inventoryEntriesProductsInventoryRelations,
