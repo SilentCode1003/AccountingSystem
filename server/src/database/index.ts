@@ -7,9 +7,11 @@ import accountTypes, {
   accountTypeTransactionTypeManyRelations,
 } from "./schema/accountType.schema";
 import apiKeys from "./schema/apiKeyStore.schema";
+import budgets from "./schema/Budget.schema";
 import cheques, { chequesRelations } from "./schema/cheques.schema";
 import customers from "./schema/customers.schema";
 import employees from "./schema/employees.schema";
+import forgetPasswordRequests from "./schema/forgetPasswordRequests.schema";
 import inventory from "./schema/inventory.schema";
 import inventoryEntries, {
   inventoryEntriesCustomerRelation,
@@ -21,6 +23,7 @@ import inventoryEntryProducts, {
   inventoryEntriesProductsInventoryEntryRelations,
   inventoryEntriesProductsInventoryRelations,
 } from "./schema/inventoryEntriesProducts.schema";
+import liquidations from "./schema/Liquidation.schema";
 import modesOfPayment, {
   modesOfPaymentTransactionRelations,
 } from "./schema/modeOfPayment";
@@ -42,20 +45,6 @@ import tranTypes, {
 } from "./schema/transactionTypes.schema";
 import users from "./schema/users.schema";
 import vendors from "./schema/vendors.schema";
-import forgetPasswordRequests from "./schema/forgetPasswordRequests.schema";
-
-// type DBSchema = {
-//   accounts: MySqlTable;
-//   users: MySqlTable;
-//   employees: MySqlTable;
-//   cheques: MySqlTable;
-//   vendors: MySqlTable;
-//   customers: MySqlTable;
-//   inventory: MySqlTable;
-//   transactions: MySqlTable;
-//   payrolls: MySqlTable;
-//   chequesRelations: Relations;
-// };
 
 export const connection = mysql.createPool({
   host: process.env.DB_HOST,
@@ -79,6 +68,8 @@ const db = drizzle(connection, {
     payrolls,
     apiKeys,
     tranTypes,
+    liquidations,
+    budgets,
     inventoryEntryProducts,
     inventoryEntriesProductsInventoryEntryRelations,
     inventoryEntriesProductsInventoryRelations,
