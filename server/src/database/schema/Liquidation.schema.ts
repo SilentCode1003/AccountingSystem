@@ -8,6 +8,7 @@ import {
 import employees from "./employees.schema";
 import { relations } from "drizzle-orm";
 import transactions from "./transactions.schema";
+import liquidationRoutes from "./liquidationRoutes.schema";
 
 const liquidations = mysqlTable("liquidation", {
   liquidationId: varchar("liquidation_id", { length: 60 }).primaryKey(),
@@ -43,7 +44,7 @@ export const liquidationEmployeeRelation = relations(
 export const liquidationRouteRelations = relations(
   liquidations,
   ({ many }) => ({
-    liquidationRoutes: many(liquidations),
+    liquidationRoutes: many(liquidationRoutes),
   })
 );
 

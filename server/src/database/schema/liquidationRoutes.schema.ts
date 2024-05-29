@@ -5,6 +5,7 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 import liquidations from "./Liquidation.schema";
+import { relations } from "drizzle-orm";
 
 const liquidationRoutes = mysqlTable("liquidation_routes", {
   lrId: varchar("lr", { length: 60 }).primaryKey(),
@@ -21,5 +22,15 @@ const liquidationRoutes = mysqlTable("liquidation_routes", {
   lrTo: varchar("lr_to", { length: 60 }).notNull(),
   lrModeOfTransport: varchar("lr_mode_of_transport", { length: 60 }).notNull(),
 });
+
+export const liquidationRoutesLiquidationRelation = relations(
+  liquidationRoutes,
+  ({ one }) => ({
+    liquidation: one(liquidations, {
+      fields: [liquidationRoutes.lrLiqId],
+      references: [liquidations.liquidationId],
+    }),
+  })
+);
 
 export default liquidationRoutes;
