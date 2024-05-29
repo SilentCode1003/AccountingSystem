@@ -1,11 +1,15 @@
+import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import path from "path";
 import * as xlsx from "xlsx";
 import db from "../database";
+import modesOfPayment from "../database/schema/modeOfPayment";
 import { getAllAccountTypes } from "../database/services/accountType.service";
+import { addBudget } from "../database/services/budgets.service";
 import { getCustomerByName } from "../database/services/customers.service";
 import { getEmployeeByName } from "../database/services/employees.service";
+import { addLiquidation } from "../database/services/liquidations.service";
 import {
   addTransaction,
   editTransaction,
@@ -17,8 +21,6 @@ import {
   createValidator,
   updateValidator,
 } from "../utils/validators/transactions.validator";
-import crypto from "crypto";
-import modesOfPayment from "../database/schema/modeOfPayment";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -147,20 +149,45 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       }
     }
 
+    type LiquidationRoute = {
+      lrDestination: string;
+      lrModeOfTransport: string;
+      lrFrom: string;
+      lrTo: string;
+      lrPrice: number;
+    };
+
     const lq: Array<{
       tranPartner?: string;
       amount?: number;
       description?: string;
       date?: Date;
+      budgetRemaining?: number;
+      budgetGiven?: number;
+      liquidationRoutes?: Array<LiquidationRoute>;
       tranAccTypeId?: string;
       tranMopName?: string;
     }> = await Promise.all(
       excelEntries.map(async (entry) => {
         const entryObj: any = {};
+        let count: number = 0;
+        const routes: Array<string> = [];
+        const liquidationRoutes: Array<LiquidationRoute> = [];
         for (let i = 0; i < entry.length; i++) {
           const val = String(f[entry[i]].v).replaceAll(/\s/g, "");
 
           const targetVal = f[entry[i + 1]];
+
+          if (val === "ROUTE") {
+            count = 1;
+          }
+          if (val === "REMARKS/COMMENTS:") {
+            count = 0;
+          }
+
+          if (count === 1) {
+            routes.push(val);
+          }
 
           if (val === "SUBTOTAL:") {
             entryObj["amount"] = Number(targetVal.v);
@@ -168,6 +195,14 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
           if (val === "DATE:") {
             entryObj["date"] = new Date(targetVal.w);
+          }
+
+          if (val === "BUDGETRECEIVED") {
+            entryObj["budgetGiven"] = Number(targetVal.v);
+          }
+
+          if (val === "FUNDREMAINING:") {
+            entryObj["budgetRemaining"] = Number(targetVal.v);
           }
 
           if (val === "NAME:") {
@@ -193,7 +228,23 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
             entryObj["description"] = file.name.match(firstWordRegex)![0];
           }
         }
-        return entryObj;
+
+        const chunkSize = 5;
+        routes.shift();
+        routes.shift();
+        for (let i = 0; i < routes.length; i += chunkSize) {
+          const chunk = routes.slice(i, i + chunkSize);
+          if (i + 1 > chunkSize)
+            liquidationRoutes.push({
+              lrDestination: chunk[0],
+              lrFrom: chunk[1],
+              lrTo: chunk[2],
+              lrPrice: Number(chunk[3]),
+              lrModeOfTransport: chunk[4],
+            });
+        }
+
+        return { ...entryObj, liquidationRoutes };
       })
     );
 
@@ -226,19 +277,40 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
           tranMopId: tranMop?.mopId as string,
         });
 
+        // budgetRemaining < amount || budgetGiven then create a new budget
+        if (tran.budgetRemaining! < tran.amount! || tran.budgetGiven) {
+          const budget = await addBudget({
+            budgetEmpId: tran.tranPartner!,
+            budgetAmount: tran.budgetGiven!,
+            budgetDate: tran.date!,
+            budgetTranId: transaction!.tranId,
+          });
+        }
+
+        // create a new liquidation
+        await addLiquidation({
+          liquidationEmpId: tran.tranPartner!,
+          liquidationAmount: tran.amount!,
+          liquidationDate: tran.date!,
+          liquidationDestination: tran.tranPartner!,
+          liquidationTranId: transaction!.tranId,
+          liquidationRoutes: tran.liquidationRoutes!,
+        });
         return transaction;
       })
     );
 
-    file.mv(
-      path.join(
-        __dirname,
-        "..",
-        "..",
-        "files/transactionfiles",
-        `${newMultiFileName}.xlsx`
-      )
-    );
+    // console.log(lq);
+
+    // file.mv(
+    //   path.join(
+    //     __dirname,
+    //     "..",
+    //     "..",
+    //     "files/transactionfiles",
+    //     `${newMultiFileName}.xlsx`
+    //   )
+    // );
 
     console.log("successfully created transaction by file");
     return res.send({ transactions });
