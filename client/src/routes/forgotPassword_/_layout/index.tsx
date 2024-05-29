@@ -110,15 +110,17 @@ function login() {
                   <Button type="submit" className="w-full mt-4">
                     Continue
                   </Button>
-                  <Button variant={'outline'} className="w-full mt-4">
-                    <Link to={'/login'}>Cancel</Link>
-                  </Button>
+                  <Link to={'/login'}>
+                    <Button variant={'outline'} className="w-full mt-4">
+                      Cancel
+                    </Button>
+                  </Link>
                 </form>
               </Form>
             ) : (
-              <Button className="w-full mt-4">
-                <Link to={'/login'}>Go Back</Link>
-              </Button>
+              <Link to={'/login'}>
+                <Button className="w-full mt-4">Go Back</Button>
+              </Link>
             )}
           </div>
         </div>

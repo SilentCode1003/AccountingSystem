@@ -1,3 +1,4 @@
+import ErrorComponent from '@/components/ErrorComponent'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -11,16 +12,31 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Text } from '@/components/ui/text'
 import { useChangePassword } from '@/hooks/mutations'
-import { forgetPasswordRequestOptions } from '@/hooks/queries/options'
+import {
+  currentUserOptions,
+  forgetPasswordRequestOptions,
+} from '@/hooks/queries/options'
 import { changePasswordSchema } from '@/validators/auth.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { Link, redirect, useRouter } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/forgotPassword/_layout/$fprId/')({
+  beforeLoad: async ({ context: { queryClient }, location }) => {
+    const data = await queryClient.ensureQueryData(currentUserOptions())
+
+    if (data && data.isLogged) {
+      throw redirect({
+        to: '/',
+        search: {
+          redirect: location.href,
+        },
+      })
+    }
+  },
   loader: async ({ params, context: { queryClient } }) => {
     const forgetPasswordRequest = await queryClient.ensureQueryData(
       forgetPasswordRequestOptions(params.fprId),
@@ -30,6 +46,17 @@ export const Route = createFileRoute('/forgotPassword/_layout/$fprId/')({
     }
   },
   component: forgetPasswordUserIdComponent,
+  errorComponent: ({ error, reset }) => {
+    const router = useRouter()
+    return (
+      <ErrorComponent
+        passwordReset
+        error={error}
+        resetErrorBoundary={reset}
+        router={router}
+      />
+    )
+  },
 })
 
 function forgetPasswordUserIdComponent() {
@@ -115,9 +142,9 @@ function forgetPasswordUserIdComponent() {
                 </form>
               </Form>
             ) : (
-              <Button className="w-full mt-4">
-                <Link to={'/login'}>Go Back</Link>
-              </Button>
+              <Link to={'/login'}>
+                <Button className="w-full mt-4">Go Back</Button>
+              </Link>
             )}
           </div>
         </div>

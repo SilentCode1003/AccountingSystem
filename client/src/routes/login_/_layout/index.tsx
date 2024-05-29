@@ -121,9 +121,11 @@ function login() {
                 <Button type="submit" className="w-full mt-4">
                   Sign in
                 </Button>
-                <Button type="submit" variant={'ghost'} className="w-full mt-4">
-                  <Link to="/forgotPassword">Forgot Password</Link>
-                </Button>
+                <Link to="/forgotPassword">
+                  <Button variant={'ghost'} className="w-full mt-4">
+                    Forgot Password
+                  </Button>
+                </Link>
               </form>
             </Form>
           </div>
