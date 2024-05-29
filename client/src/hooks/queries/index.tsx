@@ -9,6 +9,7 @@ import {
   accountTypesOptions,
   accountTypeTotalPerMonthOptions,
   balanceSheetOptions,
+  budgetsOptions,
   cashFlowBarChartDataOptions,
   chequesOptions,
   currentUserOptions,
@@ -17,6 +18,7 @@ import {
   incomeStatementOptions,
   inventoriesOptions,
   inventoryEntriesOptions,
+  liquidationsOptions,
   modesOfPaymentOptions,
   payrollsOptions,
   transactionPartnersOptions,
@@ -73,6 +75,10 @@ export const useInventoryEntries = () => useQuery(inventoryEntriesOptions())
 export const usePayrolls = () => useQuery(payrollsOptions())
 
 export const useAccounts = () => useQuery(accountsOptions())
+
+export const useBudgets = () => useQuery(budgetsOptions())
+
+export const useLiquidations = () => useQuery(liquidationsOptions())
 
 export const useModesOfPayment = () => useQuery(modesOfPaymentOptions())
 

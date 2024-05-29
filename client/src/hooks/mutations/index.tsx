@@ -2276,6 +2276,14 @@ export const useCreateTransactionByFile = ({
         queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['liquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['budgets'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (

@@ -1,10 +1,12 @@
 import { Accounts } from '@/components/table-columns/accounts.columns'
 import { AccountTypes } from '@/components/table-columns/accountTypes.column'
+import { Budgets } from '@/components/table-columns/budgets.columns'
 import { Cheques } from '@/components/table-columns/cheques.columns'
 import { Customers } from '@/components/table-columns/customers.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
+import { Liquidations } from '@/components/table-columns/liquidations.columns'
 import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
 import {
@@ -510,3 +512,41 @@ export const cashFlowBarChartDataOptions = () =>
       return data
     },
   })
+
+export const budgetsOptions = () => {
+  return queryOptions({
+    queryKey: ['budgets'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/budgets`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        budgets: Array<Budgets>
+      }>
+      return data
+    },
+  })
+}
+
+export const liquidationsOptions = () => {
+  return queryOptions({
+    queryKey: ['liquidations'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/liquidations`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        liquidations: Array<Liquidations>
+      }>
+      return data
+    },
+  })
+}
