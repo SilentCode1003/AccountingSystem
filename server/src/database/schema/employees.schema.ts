@@ -10,6 +10,13 @@ const employees = mysqlTable("employees", {
   empPosition: varchar("emp_position", { length: 50 }).notNull(),
   empDateHired: date("emp_date_hired").notNull(),
   empDateTerminated: date("emp_date_terminated"),
+  empAccumulatedBudget: decimal("emp_accumulated_budget", {
+    precision: 13,
+    scale: 2,
+  })
+    .$type<number>()
+    .notNull()
+    .default(0),
   empSalary: decimal("emp_salary", { precision: 13, scale: 2 })
     .$type<number>()
     .notNull()

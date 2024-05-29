@@ -6,6 +6,7 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 import employees from "./employees.schema";
+import { relations } from "drizzle-orm";
 
 const liquidations = mysqlTable("liquidation", {
   liquidationId: varchar("liquidation_id", { length: 60 }).primaryKey(),
@@ -22,5 +23,15 @@ const liquidations = mysqlTable("liquidation", {
   }).notNull(),
   liquidationDate: date("liquidation_date").notNull(),
 });
+
+export const liquidationEmployeeRelation = relations(
+  liquidations,
+  ({ one }) => ({
+    employee: one(employees, {
+      fields: [liquidations.liquidationEmpId],
+      references: [employees.empId],
+    }),
+  })
+);
 
 export default liquidations;
