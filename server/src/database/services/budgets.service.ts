@@ -1,15 +1,17 @@
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import db from "..";
+import { desc } from "drizzle-orm";
 import budgets from "../schema/Budget.schema";
 
 export const getAllBudgets = async () => {
-  const budgets = await db.query.budgets.findMany({
+  const allBudgets = await db.query.budgets.findMany({
     with: {
       employee: true,
     },
+    orderBy: [desc(budgets.budgetDate)],
   });
-  return budgets;
+  return allBudgets;
 };
 
 export const getBudgetById = async (id: string) => {

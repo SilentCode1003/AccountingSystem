@@ -3,15 +3,18 @@ import { eq } from "drizzle-orm";
 import db from "..";
 import liquidations from "../schema/Liquidation.schema";
 import { addLiquidationRoutes } from "./liquidationRoutes.service";
+import { desc } from "drizzle-orm";
 
 export const getAllLiquidations = async () => {
-  const liquidations = await db.query.liquidations.findMany({
+  const allLiquidations = await db.query.liquidations.findMany({
     with: {
       employee: true,
       liquidationRoutes: true,
     },
+    orderBy: [desc(liquidations.liquidationDate)],
   });
-  return liquidations;
+
+  return allLiquidations;
 };
 
 export const getLiquidationById = async (id: string) => {
