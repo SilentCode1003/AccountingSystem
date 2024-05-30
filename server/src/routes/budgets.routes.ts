@@ -1,9 +1,15 @@
 import { Router } from "express";
-import { getBudgets } from "../controller/budgets.controllers";
+import {
+  getBudgets,
+  getEmployeeBudgets,
+} from "../controller/budgets.controllers";
 
 const budgetRouter = Router();
 
 //get all budgets
 budgetRouter.get("/", getBudgets);
+
+//get all budgets for an employee
+budgetRouter.get("/employeeBudgets", getEmployeeBudgets);
 
 export default budgetRouter;

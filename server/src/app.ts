@@ -1,20 +1,26 @@
+import compression from "compression";
 import MongoStore from "connect-mongo";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
 import fileUpload from "express-fileupload";
 import session from "express-session";
+import morgan from "morgan";
 import { currentUser } from "./controller/login.controller";
 import { getTransactionPartners } from "./controller/others.controllers";
 import accountRouter from "./routes/accounts.routes";
 import accountTypeRouter from "./routes/accountType.routes";
 import apiRouter from "./routes/api.routes";
 import authRouter from "./routes/auth.routes";
+import budgetRouter from "./routes/budgets.routes";
 import chequeRouter from "./routes/cheque.routes";
 import customerRouter from "./routes/customers.routes";
 import employeesRouter from "./routes/employees.routes";
+import forgetPasswordRequestsRouter from "./routes/forgetPasswordRequests.routes";
 import inventoryRouter from "./routes/inventory.routes";
 import inventoryEntryRouter from "./routes/inventoryEntries.routes";
+import liquidationRouter from "./routes/liquidations.routes";
+import modesOfPaymentRouter from "./routes/modesOfPayment.routes";
 import othersRouter from "./routes/others.routes";
 import payrollRouter from "./routes/payrolls.routes";
 import transactionRouter from "./routes/transactions.routes";
@@ -23,12 +29,6 @@ import usersRouter from "./routes/users.routes";
 import vendorRouter from "./routes/vendors.routes";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
-import compression from "compression";
-import morgan from "morgan";
-import modesOfPaymentRouter from "./routes/modesOfPayment.routes";
-import forgetPasswordRequestsRouter from "./routes/forgetPasswordRequests.routes";
-import budgetRouter from "./routes/budgets.routes";
-import liquidationRouter from "./routes/liquidations.routes";
 
 declare module "express-session" {
   interface SessionData {
