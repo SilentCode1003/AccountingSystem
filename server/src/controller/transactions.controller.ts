@@ -21,6 +21,7 @@ import {
   createValidator,
   updateValidator,
 } from "../utils/validators/transactions.validator";
+import { addTransactionType } from "../database/services/transactionTypes.service";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -258,9 +259,31 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
         eq(tranType.tranTypeName, file.name.match(firstWordRegex)![0]),
     });
 
+    await addTransactionType({
+      tranTypeName: "BUDGET",
+      tranTypeAccTypeId: transactionType!.tranTypeAccTypeId,
+    });
+
     const newMultiFileName = `multiFile ${crypto.randomUUID()}`;
 
-    const transactions = await Promise.all(
+    const newTransactions: Array<{
+      tranId: string;
+      tranAccId: string;
+      tranDescription: string;
+      tranAmount: number;
+      tranEmpId: string | null;
+      tranVdId: string | null;
+      tranCustId: string | null;
+      tranMopId: string;
+      tranTransactionDate: Date;
+      tranOtherPartner: string | null;
+      tranCreatedAt: Date;
+      tranUpdatedAt: Date;
+      tranFile: string;
+      tranTypeId: string | null;
+    }> = [];
+
+    await Promise.all(
       lq.map(async (tran) => {
         const tranMop = await db.query.modesOfPayment.findFirst({
           where: eq(modesOfPayment.mopName, tran.tranMopName!),
@@ -279,12 +302,27 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
         // budgetRemaining < amount || budgetGiven then create a new budget
         if (tran.budgetRemaining! < tran.amount! || tran.budgetGiven) {
-          const budget = await addBudget({
+          const budgetTranType = await db.query.tranTypes.findFirst({
+            where: (tranType) => eq(tranType.tranTypeName, "BUDGET"),
+          });
+
+          const budgetTransaction = await addTransaction({
+            tranAccTypeId: tran.tranAccTypeId!,
+            tranAmount: tran.budgetGiven!,
+            tranDescription: "BUDGET" ?? "FILE TRANSACTION",
+            tranTransactionDate: tran.date!,
+            tranPartner: tran.tranPartner,
+            tranTypeId: budgetTranType!.tranTypeId,
+            tranFileName: newMultiFileName,
+            tranMopId: tranMop!.mopId,
+          });
+          await addBudget({
             budgetEmpId: tran.tranPartner!,
             budgetAmount: tran.budgetGiven!,
             budgetDate: tran.date!,
-            budgetTranId: transaction!.tranId,
+            budgetTranId: budgetTransaction!.tranId,
           });
+          newTransactions.push(budgetTransaction!);
         }
 
         // create a new liquidation
@@ -295,7 +333,8 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
           liquidationTranId: transaction!.tranId,
           liquidationRoutes: tran.liquidationRoutes!,
         });
-        return transaction;
+
+        newTransactions.push(transaction!);
       })
     );
 
@@ -312,7 +351,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
     );
 
     console.log("successfully created transaction by file");
-    return res.send({ transactions });
+    return res.send({ transactions: newTransactions });
   } catch (error) {
     console.log("error creating transaction by file");
     console.log(error);

@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import db from "..";
 import tranTypes from "../schema/transactionTypes.schema";
 import { not } from "drizzle-orm";
@@ -34,7 +34,12 @@ export const addTransactionType = async (input: {
   const newTransactionTypeId = `tranTypeId ${crypto.randomUUID()}`;
   await db
     .insert(tranTypes)
-    .values({ ...input, tranTypeId: newTransactionTypeId });
+    .values({ ...input, tranTypeId: newTransactionTypeId })
+    .onDuplicateKeyUpdate({
+      set: {
+        tranTypeId: sql`tran_type_id`,
+      },
+    });
   const newTransactionType = await getTransactionTypeById(newTransactionTypeId);
   return newTransactionType;
 };
