@@ -1,6 +1,6 @@
 import { Row } from '@tanstack/table-core'
 import { Liquidations } from '../table-columns/liquidations.columns'
-import InventoryEntryProducsTable from '../inventoryEntryProductTable.'
+import ExpandedTable from '../ExpandedTable'
 import { liquidationsRoutesColumns } from '../table-columns/liquidationRoutes.columns'
 
 export const LiquidationSubComponent = ({
@@ -9,7 +9,7 @@ export const LiquidationSubComponent = ({
   row: Row<Liquidations>
 }) => {
   return (
-    <InventoryEntryProducsTable
+    <ExpandedTable
       columns={liquidationsRoutesColumns}
       data={row.original.liquidationRoutes}
     />

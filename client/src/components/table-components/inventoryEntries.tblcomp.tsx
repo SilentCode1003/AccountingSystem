@@ -31,7 +31,7 @@ import {
 import { Control, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { ComboBox } from '../Combobox'
-import InventoryEntryProducsTable from '../inventoryEntryProductTable.'
+import ExpandedTable from '../ExpandedTable'
 import { PromptModal } from '../PromptModal'
 import { InventoryEntries } from '../table-columns/inventoryEntries.columns'
 import { inventoryEntryProductsColumns } from '../table-columns/inventoryEntryProducts.columns'
@@ -827,7 +827,7 @@ export const InventoryEntriesSubComponent = ({
   row: Row<InventoryEntries>
 }) => {
   return (
-    <InventoryEntryProducsTable
+    <ExpandedTable
       columns={inventoryEntryProductsColumns}
       data={row.original.inventoryEntryProducts}
     />
