@@ -14,6 +14,7 @@ import {
   chequesOptions,
   currentUserOptions,
   customersOptions,
+  employeeBudgetsOptions,
   employeesOptions,
   incomeStatementOptions,
   inventoriesOptions,
@@ -77,6 +78,9 @@ export const usePayrolls = () => useQuery(payrollsOptions())
 export const useAccounts = () => useQuery(accountsOptions())
 
 export const useBudgets = () => useQuery(budgetsOptions())
+
+export const useEmployeeBudgets = ({ date }: { date?: Date }) =>
+  useQuery(employeeBudgetsOptions({ date }))
 
 export const useLiquidations = () => useQuery(liquidationsOptions())
 

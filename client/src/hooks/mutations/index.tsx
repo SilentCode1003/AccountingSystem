@@ -2292,6 +2292,10 @@ export const useCreateTransactionByFile = ({
         queryKey: ['budgets'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeBudgets'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (

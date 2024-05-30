@@ -532,6 +532,34 @@ export const budgetsOptions = () => {
   })
 }
 
+export const employeeBudgetsOptions = ({ date }: { date?: Date }) => {
+  return queryOptions({
+    queryKey: ['employeeBudgets', { date: date ? date.getMonth() : undefined }],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/budgets/employeeBudgets` +
+          (date
+            ? '?' +
+              new URLSearchParams({
+                date: date.toISOString(),
+              })
+            : ''),
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        employeeBudgets: Array<{
+          employee: Pick<Employees, 'empId' | 'empName'>
+          amount: number
+        }>
+      }>
+      return data
+    },
+  })
+}
+
 export const liquidationsOptions = () => {
   return queryOptions({
     queryKey: ['liquidations'],
