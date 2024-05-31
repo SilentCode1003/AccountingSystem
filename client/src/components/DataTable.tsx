@@ -18,6 +18,7 @@ import {
 import { ChevronDownIcon, FilterIcon } from 'lucide-react'
 import {
   ComponentProps,
+  Dispatch,
   ElementType,
   Fragment,
   ReactElement,
@@ -51,6 +52,7 @@ import {
   TableRow,
 } from './ui/table'
 import { text } from './ui/text'
+import { useDrag } from 'react-dnd'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -62,6 +64,9 @@ type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   renderSubComponent?: (props: { row: Row<TData> }) => ReactElement
+  setLeftLastDroppedItem?: Dispatch<React.SetStateAction<TData | undefined>>
+  setRightLastDroppedItem?: Dispatch<React.SetStateAction<TData | undefined>>
+  canDrag?: boolean
   getRowCanExpand?: (row: Row<TData>) => boolean
 } & ComponentProps<'div'> & {
     pageSize?: number
@@ -255,6 +260,9 @@ function DataTable<TData, TValue>({
   showFooter,
   renderSubComponent,
   getRowCanExpand,
+  canDrag,
+  setLeftLastDroppedItem,
+  setRightLastDroppedItem,
   ...props
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -359,32 +367,63 @@ function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <Fragment key={row.id}>
-                  <TableRow data-state={row.getIsSelected() && 'selected'}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  {row.getIsExpanded() && (
-                    <TableRow key={row.id} className="p-0">
-                      <TableCell
-                        className="p-0"
-                        colSpan={row.getVisibleCells().length}
+              table.getRowModel().rows.map((row) =>
+                canDrag ? (
+                  <DraggableRow
+                    item={row.original as Record<string, unknown>}
+                    row={row as Row<Record<string, unknown>>}
+                    setLeftLastDroppedItem={
+                      setLeftLastDroppedItem as Dispatch<
+                        React.SetStateAction<
+                          Record<string, unknown> | undefined
+                        >
                       >
-                        {renderSubComponent
-                          ? renderSubComponent({ row })
-                          : null}
-                      </TableCell>
+                    }
+                    setRightLastDroppedItem={
+                      setRightLastDroppedItem as Dispatch<
+                        React.SetStateAction<
+                          Record<string, unknown> | undefined
+                        >
+                      >
+                    }
+                    renderSubComponent={
+                      renderSubComponent as
+                        | ((props: {
+                            row: Row<Record<string, unknown>>
+                          }) => ReactElement<
+                            any,
+                            string | React.JSXElementConstructor<any>
+                          >)
+                        | undefined
+                    }
+                  />
+                ) : (
+                  <Fragment key={row.id}>
+                    <TableRow data-state={row.getIsSelected() && 'selected'}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
                     </TableRow>
-                  )}
-                </Fragment>
-              ))
+                    {row.getIsExpanded() && (
+                      <TableRow key={row.id} className="p-0">
+                        <TableCell
+                          className="p-0"
+                          colSpan={row.getVisibleCells().length}
+                        >
+                          {renderSubComponent
+                            ? renderSubComponent({ row })
+                            : null}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
+                ),
+              )
             ) : (
               <TableRow>
                 <TableCell
@@ -441,3 +480,59 @@ function DataTable<TData, TValue>({
 }
 
 export default DataTable
+
+const DraggableRow = <TData extends Record<string, unknown>>({
+  row,
+  item,
+  renderSubComponent,
+  setLeftLastDroppedItem,
+  setRightLastDroppedItem,
+}: {
+  item: TData
+  row: Row<TData>
+  setLeftLastDroppedItem?: Dispatch<React.SetStateAction<TData | undefined>>
+  setRightLastDroppedItem?: Dispatch<React.SetStateAction<TData | undefined>>
+  renderSubComponent?: (props: { row: Row<TData> }) => ReactElement
+}) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: 'CARD',
+    item,
+    end: (item, monitor) => {
+      const dropResult = monitor.getDropResult<TData>()
+      if (item && dropResult) {
+        if (dropResult.name === 'leftCompare') {
+          setLeftLastDroppedItem!(item)
+        } else if (dropResult.name === 'rightCompare') {
+          setRightLastDroppedItem!(item)
+        }
+      }
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+      handlerId: monitor.getHandlerId(),
+    }),
+  })
+
+  return (
+    <Fragment key={row.id}>
+      <TableRow
+        data-state={row.getIsSelected() && 'selected'}
+        ref={drag}
+        className={cn(isDragging && 'hidden')}
+      >
+        {row.getVisibleCells().map((cell) => (
+          <TableCell key={cell.id}>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        ))}
+      </TableRow>
+      {row.getIsExpanded() && (
+        <TableRow key={row.id} className="p-0">
+          <TableCell className="p-0" colSpan={row.getVisibleCells().length}>
+            {renderSubComponent ? renderSubComponent({ row }) : null}
+          </TableCell>
+        </TableRow>
+      )}
+    </Fragment>
+  )
+}
