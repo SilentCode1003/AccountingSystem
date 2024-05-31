@@ -96,7 +96,8 @@ export const getAccountTypeTotalPerMonthQuery = async (input: {
       and(
         eq(sql`month(acc_created_at)`, sql`month(${input.date})`),
         eq(sql`year(acc_created_at)`, sql`year(${input.date})`),
-        eq(accounts.accTypeId, input.accTypeId)
+        eq(accounts.accTypeId, input.accTypeId),
+        eq(accounts.accIsActive, true)
       )
     );
   return data[0].total;
@@ -128,6 +129,7 @@ export const getAccountTypeBarChartData = async (input: {
             sql`year(${new Date(new Date().getFullYear(), i)})`
           ),
           eq(accounts.accTypeId, input.accTypeId)
+          // eq(accounts.accIsActive, true)
         )
       )
       .groupBy(accounts.accName);

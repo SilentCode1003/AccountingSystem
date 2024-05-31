@@ -95,6 +95,7 @@ export const addAccount = async (input: {
   accDescription: string;
   accAmount: number;
   accCreatedAt?: Date;
+  accIsActive?: boolean;
 }) => {
   const newAccountId = `accId ${crypto.randomUUID()}`;
 

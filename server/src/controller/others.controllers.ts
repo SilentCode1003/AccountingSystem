@@ -244,7 +244,8 @@ export const getBarChartCashFlowData = async (req: Request, res: Response) => {
             eq(
               sql`year(acc_created_at)`,
               sql`year(${new Date(new Date().getFullYear(), i)})`
-            )
+            ),
+            eq(accounts.accIsActive, true)
           )
         )
         .groupBy(accounts.accTypeId);

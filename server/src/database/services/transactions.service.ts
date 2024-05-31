@@ -54,6 +54,9 @@ export const addTransaction = async (input: {
         }
       ).accountType.accTypeId,
     accCreatedAt: input.tranTransactionDate,
+    accIsActive: !(
+      transactionType?.tranTypeName.toLowerCase() === "liquidation"
+    ),
   });
 
   await db.insert(transactions).values({
