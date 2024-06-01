@@ -39,7 +39,7 @@ export const Route = createFileRoute('/forgotPassword/_layout/$fprId/')({
   },
   loader: async ({ params, context: { queryClient } }) => {
     const forgetPasswordRequest = await queryClient.ensureQueryData(
-      forgetPasswordRequestOptions(params.fprId),
+      forgetPasswordRequestOptions((params as { fprId: string }).fprId),
     )
     return {
       forgetPasswordRequest,
