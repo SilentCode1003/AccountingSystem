@@ -23,6 +23,7 @@ import forgetPasswordRequests from "../database/schema/forgetPasswordRequests.sc
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import users from "../database/schema/users.schema";
+import z from "zod";
 
 export const getUsers = async (
   req: Request,
@@ -208,6 +209,11 @@ export const forgetPassword = async (req: Request, res: Response) => {
         console.log(success);
       }
     });
+
+    const receiverEmail = z.string().email().safeParse(user.userEmail);
+
+    if (!receiverEmail.success)
+      return res.status(400).send({ error: "Invalid email address" });
 
     transporter.sendMail(
       {
