@@ -49,12 +49,14 @@ export const Route = createFileRoute('/forgotPassword/_layout/$fprId/')({
   errorComponent: ({ error, reset }) => {
     const router = useRouter()
     return (
-      <ErrorComponent
-        passwordReset
-        error={error}
-        resetErrorBoundary={reset}
-        router={router}
-      />
+      <div className=" h-[95vh] max-h-[95vh] ">
+        <ErrorComponent
+          passwordReset
+          error={error}
+          resetErrorBoundary={reset}
+          router={router}
+        />
+      </div>
     )
   },
 })
@@ -107,7 +109,9 @@ function forgetPasswordUserIdComponent() {
                 variant={'heading4ghost'}
                 className="max-w-96 text-center md:text-start "
               >
-                You can now go back to the login page.
+                {!success
+                  ? 'Enter your new password!'
+                  : 'You can now go back to the login page.'}
               </Text>
             </div>
             {!success ? (
