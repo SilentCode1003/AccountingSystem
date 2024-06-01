@@ -48,7 +48,6 @@ function login() {
 
   const handleSubmit = (values: z.infer<typeof forgetPasswordSchema>) => {
     forgetPassword.mutate(values)
-    setSuccess(true)
   }
 
   return (
