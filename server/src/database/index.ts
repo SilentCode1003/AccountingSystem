@@ -51,6 +51,11 @@ import vendors from "./schema/vendors.schema";
 import liquidationRoutes, {
   liquidationRoutesLiquidationRelation,
 } from "./schema/liquidationRoutes.schema";
+import routes from "./schema/routes.schema";
+import routeDiscrepancies, {
+  routeDiscrepancyLiquidationRouteRelation,
+  routeDiscrepancyRouteRelation,
+} from "./schema/routeDiscrepancies.schema";
 
 export const connection = mysql.createPool({
   host: process.env.DB_HOST,
@@ -79,6 +84,10 @@ const db = drizzle(connection, {
     liquidationRouteRelations,
     liquidationRoutes,
     liquidationRoutesLiquidationRelation,
+    routes,
+    routeDiscrepancies,
+    routeDiscrepancyLiquidationRouteRelation,
+    routeDiscrepancyRouteRelation,
     budgets,
     budgetEmployeeRelation,
     inventoryEntryProducts,
