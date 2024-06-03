@@ -1,7 +1,11 @@
+import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import db from "..";
 import liquidationRoutes from "../schema/liquidationRoutes.schema";
-import crypto from "crypto";
+import { addRoute } from "./routes.service";
+import { and } from "drizzle-orm";
+import routes from "../schema/routes.schema";
+import { addRouteDiscrepancy } from "./routesDiscrepancy.service";
 
 export const getAllLiquidationRoutes = async () => {
   const liquidationRoutes = await db.query.liquidationRoutes.findMany();
@@ -34,6 +38,32 @@ export const addLiquidationRoutes = async (input: {
         lrLiqId: input.lrLiqId,
         lrId: newLiquidationRouteId,
       });
+
+      await addRoute({
+        routeEnd: liquidationRoute.lrTo,
+        routeStart: liquidationRoute.lrFrom,
+        routePrice: liquidationRoute.lrPrice,
+        routeModeOfTransport: liquidationRoute.lrModeOfTransport,
+      });
+
+      const lr = await db.query.liquidationRoutes.findFirst({
+        where: eq(liquidationRoutes.lrId, newLiquidationRouteId),
+      });
+
+      const route = await db.query.routes.findFirst({
+        where: and(
+          eq(routes.routeStart, lr!.lrFrom),
+          eq(routes.routeEnd, lr!.lrTo),
+          eq(routes.routeModeOfTransport, lr!.lrModeOfTransport)
+        ),
+      });
+
+      if (route?.routePrice !== lr?.lrPrice)
+        await addRouteDiscrepancy({
+          rdLrId: lr!.lrId,
+          rdRouteId: route!.routeId,
+        });
+      // return;
     })
   );
 
