@@ -365,6 +365,13 @@
       "when": 1717395287155,
       "tag": "0051_fancy_betty_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "5",
+      "when": 1717397798133,
+      "tag": "0052_chubby_jubilee",
+      "breakpoints": true
     }
   ]
 }
