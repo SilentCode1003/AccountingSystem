@@ -12,7 +12,7 @@ const routes = mysqlTable(
     routeModeOfTransport: varchar("route_mode_of_transport", { length: 60 }),
   },
   (t) => ({
-    unq: unique().on(t.routeStart, t.routeEnd),
+    unq: unique().on(t.routeStart, t.routeEnd, t.routeModeOfTransport),
   })
 );
 
