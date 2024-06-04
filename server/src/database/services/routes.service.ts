@@ -44,10 +44,10 @@ export const editRoute = async (
   input: {
     routeId: string;
     newData: {
-      routeStart: string;
-      routeEnd: string;
-      routePrice: number;
-      routeModeOfTransport: string;
+      routeStart?: string;
+      routeEnd?: string;
+      routePrice?: number;
+      routeModeOfTransport?: string;
     };
   }
 ) => {
@@ -55,4 +55,7 @@ export const editRoute = async (
     .update(routes)
     .set(input.newData)
     .where(eq(routes.routeId, input.routeId));
+
+  const updatedRoute = await getRouteById(db, input.routeId);
+  return updatedRoute;
 };
