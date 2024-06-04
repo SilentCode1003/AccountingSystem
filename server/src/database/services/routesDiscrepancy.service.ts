@@ -17,7 +17,6 @@ export const addRouteDiscrepancy = async (
     rdId,
   });
 
-  throw new Error();
   const routeDiscrepancy = await db.query.routeDiscrepancies.findFirst({
     where: eq(routeDiscrepancies.rdId, rdId),
   });

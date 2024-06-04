@@ -46,61 +46,59 @@ export const addTransaction = async (
   const transactionType = await getTransactionTypeById(db, input.tranTypeId);
 
   let newTransaction: typeof transactions.$inferSelect | undefined;
-  await db.transaction(async (tx) => {
-    const newAccount = await addAccount(tx, {
-      accName: input.tranAccName ?? `ACCOUNT TRANSACTION`,
-      accAmount: input.tranAmount,
-      accDescription: `TRANSACTION: ${input.tranDescription}`,
-      accTypeId:
-        input.tranAccTypeId ??
-        (
-          transactionType as typeof transactionType & {
-            accountType: { accTypeId: string };
-          }
-        ).accountType.accTypeId,
-      accCreatedAt: input.tranTransactionDate,
-      accIsActive: !(
-        transactionType?.tranTypeName.toLowerCase() === "liquidation"
-      ),
-    });
+  const newAccount = await addAccount(db, {
+    accName: input.tranAccName ?? `ACCOUNT TRANSACTION`,
+    accAmount: input.tranAmount,
+    accDescription: `TRANSACTION: ${input.tranDescription}`,
+    accTypeId:
+      input.tranAccTypeId ??
+      (
+        transactionType as typeof transactionType & {
+          accountType: { accTypeId: string };
+        }
+      ).accountType.accTypeId,
+    accCreatedAt: input.tranTransactionDate,
+    accIsActive: !(
+      transactionType?.tranTypeName.toLowerCase() === "liquidation"
+    ),
+  });
 
-    await tx.insert(transactions).values({
-      ...input,
-      tranId: newTransactionId,
-      tranAccId: newAccount!.accId,
-      tranEmpId:
-        input.tranPartner && input.tranPartner.split(" ")[0] === "empId"
-          ? input.tranPartner
-          : null,
-      tranCustId:
-        input.tranPartner && input.tranPartner.split(" ")[0] === "custId"
-          ? input.tranPartner
-          : null,
-      tranVdId:
-        input.tranPartner && input.tranPartner.split(" ")[0] === "vdId"
-          ? input.tranPartner
-          : null,
-      tranFile: `${input.tranFileName ?? newTransactionId}.${
-        input.tranFileMimeType ?? "xlsx"
-      }`,
-      tranTypeId: input.tranTypeId,
-      tranOtherPartner: input.tranOtherPartner ?? null,
-    });
-    newTransaction = await tx.query.transactions.findFirst({
-      where: (transaction) => eq(transaction.tranId, newTransactionId),
-      with: {
-        transactionType: true,
-        account: {
-          with: {
-            accountType: true,
-          },
+  await db.insert(transactions).values({
+    ...input,
+    tranId: newTransactionId,
+    tranAccId: newAccount!.accId,
+    tranEmpId:
+      input.tranPartner && input.tranPartner.split(" ")[0] === "empId"
+        ? input.tranPartner
+        : null,
+    tranCustId:
+      input.tranPartner && input.tranPartner.split(" ")[0] === "custId"
+        ? input.tranPartner
+        : null,
+    tranVdId:
+      input.tranPartner && input.tranPartner.split(" ")[0] === "vdId"
+        ? input.tranPartner
+        : null,
+    tranFile: `${input.tranFileName ?? newTransactionId}.${
+      input.tranFileMimeType ?? "xlsx"
+    }`,
+    tranTypeId: input.tranTypeId,
+    tranOtherPartner: input.tranOtherPartner ?? null,
+  });
+  newTransaction = await db.query.transactions.findFirst({
+    where: (transaction) => eq(transaction.tranId, newTransactionId),
+    with: {
+      transactionType: true,
+      account: {
+        with: {
+          accountType: true,
         },
-        employee: true,
-        customer: true,
-        vendor: true,
-        modeOfPayment: true,
       },
-    });
+      employee: true,
+      customer: true,
+      vendor: true,
+      modeOfPayment: true,
+    },
   });
 
   return newTransaction;

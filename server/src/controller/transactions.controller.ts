@@ -338,10 +338,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
           newTransactions.push(transaction!);
         })
       );
-      tx.rollback();
     });
-
-    // console.log(lq);
 
     file.mv(
       path.join(
