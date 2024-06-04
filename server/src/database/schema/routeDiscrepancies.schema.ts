@@ -1,4 +1,9 @@
-import { AnyMySqlColumn, mysqlTable, varchar } from "drizzle-orm/mysql-core";
+import {
+  AnyMySqlColumn,
+  boolean,
+  mysqlTable,
+  varchar,
+} from "drizzle-orm/mysql-core";
 import routes from "./routes.schema";
 import liquidationRoutes from "./liquidationRoutes.schema";
 import { relations } from "drizzle-orm";
@@ -15,6 +20,7 @@ const routeDiscrepancies = mysqlTable("route_discrepancies", {
       onDelete: "cascade",
     })
     .notNull(),
+  rdIsResolved: boolean("rd_is_resolved").notNull().default(false),
 });
 
 export const routeDiscrepancyRouteRelation = relations(
