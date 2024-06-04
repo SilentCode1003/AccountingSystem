@@ -1,8 +1,7 @@
-import db from "../index";
-import crypto from "crypto";
-import users from "../schema/users.schema";
-import { eq, not } from "drizzle-orm";
 import * as bcrypt from "bcryptjs";
+import { eq, not } from "drizzle-orm";
+import { DB } from "../index";
+import users from "../schema/users.schema";
 
 const USER_TYPE = {
   FINANCE: "FINANCE",
@@ -13,7 +12,7 @@ type ObjectTypes<T> = T[keyof T];
 
 type UserType = ObjectTypes<typeof USER_TYPE>;
 
-export const getAllUsers = async () => {
+export const getAllUsers = async (db: DB) => {
   const users = await db.query.users.findMany();
 
   return users.map((user) => ({
@@ -26,7 +25,7 @@ export const getAllUsers = async () => {
   }));
 };
 
-export const getUserById = async (input: { userId: string }) => {
+export const getUserById = async (db: DB, input: { userId: string }) => {
   const userData = await db.query.users.findFirst({
     where: (user) => eq(user.userId, input.userId),
   });
@@ -40,7 +39,10 @@ export const getUserById = async (input: { userId: string }) => {
   };
 };
 
-export const addUser = async (input: { userType: UserType; empId: string }) => {
+export const addUser = async (
+  db: DB,
+  input: { userType: UserType; empId: string }
+) => {
   const emp = await db.query.employees.findFirst({
     where: (emp) => eq(emp.empId, input.empId),
   });
@@ -82,17 +84,20 @@ export const addUser = async (input: { userType: UserType; empId: string }) => {
   };
 };
 
-export const editUser = async (input: {
-  userId: string;
-  newData: {
-    userType?: UserType;
-    userUsername?: string;
-    userPassword?: string;
-    userFullName?: string;
-    userContactNumber?: string;
-    userProfilePic?: string;
-  };
-}) => {
+export const editUser = async (
+  db: DB,
+  input: {
+    userId: string;
+    newData: {
+      userType?: UserType;
+      userUsername?: string;
+      userPassword?: string;
+      userFullName?: string;
+      userContactNumber?: string;
+      userProfilePic?: string;
+    };
+  }
+) => {
   if (input.newData.userPassword) {
     const hashPassword = await bcrypt.hash(input.newData.userPassword, 10);
     await db
@@ -119,7 +124,7 @@ export const editUser = async (input: {
   };
 };
 
-export const toggleIsActive = async (input: { userId: string }) => {
+export const toggleIsActive = async (db: DB, input: { userId: string }) => {
   await db
     .update(users)
     .set({ userIsActive: not(users.userIsActive) })

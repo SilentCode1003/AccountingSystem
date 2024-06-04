@@ -2,7 +2,6 @@ import { and, eq, sql, sum } from "drizzle-orm";
 import { Request, Response } from "express";
 import path from "path";
 import * as xlsx from "xlsx";
-import db from "../database";
 import accounts from "../database/schema/accounts.schema";
 import employees from "../database/schema/employees.schema";
 import {
@@ -26,12 +25,13 @@ import {
 } from "../utils/validators/others.validator";
 import { createTransactionByFileValidator } from "../utils/validators/transactions.validator";
 import fetch from "node-fetch";
+import db from "../database";
 
 export const getTransactionPartners = async (req: Request, res: Response) => {
   try {
-    const employees = await getAllEmployees();
-    const customers = await getAllCustomers();
-    const vendors = await getAllVendors();
+    const employees = await getAllEmployees(db);
+    const customers = await getAllCustomers(db);
+    const vendors = await getAllVendors(db);
 
     console.log("successfully fetched all transaction partners");
     return res.status(200).send({
@@ -97,6 +97,7 @@ export const getIncomeStatementByMonth = async (
 
   try {
     const accountByMonth = await getIncomeStatement(
+      db,
       input.data.month as Date,
       input.data.accTypes
         ? typeof input.data.accTypes === "string"
@@ -128,6 +129,7 @@ export const getBalanceSheetByMonth = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
   try {
     const accountByMonth = await getBalanceSheet(
+      db,
       input.data.month as Date,
       input.data.accTypes
         ? typeof input.data.accTypes === "string"
@@ -159,16 +161,16 @@ export const getAccountTypeTotalPerMonth = async (
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const accTypeName = await getAccountTypeById({
+    const accTypeName = await getAccountTypeById(db, {
       accTypeId: input.data.accTypeId,
     });
 
-    const total = await getAccountTypeTotalPerMonthQuery({
+    const total = await getAccountTypeTotalPerMonthQuery(db, {
       accTypeId: input.data.accTypeId,
       date: input.data.date,
     });
 
-    const prevMonthTotal = await getAccountTypeTotalPerMonthQuery({
+    const prevMonthTotal = await getAccountTypeTotalPerMonthQuery(db, {
       accTypeId: input.data.accTypeId,
       date: new Date(
         input.data.date.getFullYear(),
@@ -209,7 +211,7 @@ export const AccountTypeBarChartData = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const data = await getAccountTypeBarChartData(input.data);
+    const data = await getAccountTypeBarChartData(db, input.data);
     console.log("successfully fetched account type bar chart data");
     return res.status(200).send({
       data,

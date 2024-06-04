@@ -1,11 +1,9 @@
-import { and, eq, sql, sum } from "drizzle-orm";
-import db from "..";
 import crypto from "crypto";
-import accounts from "../schema/accounts.schema";
+import { eq, not } from "drizzle-orm";
 import modesOfPayment from "../schema/modeOfPayment";
-import { not } from "drizzle-orm";
+import { DB } from "..";
 
-export const getAllModesOfPayment = async () => {
+export const getAllModesOfPayment = async (db: DB) => {
   const modeOfPayments = await db.query.modesOfPayment.findMany({
     with: {
       transactions: true,
@@ -14,7 +12,10 @@ export const getAllModesOfPayment = async () => {
   return modeOfPayments;
 };
 
-export const getModeOfPaymentById = async (input: { mopId: string }) => {
+export const getModeOfPaymentById = async (
+  db: DB,
+  input: { mopId: string }
+) => {
   const modeOfPayment = await db.query.modesOfPayment.findFirst({
     where: (mop) => eq(mop.mopId, input.mopId),
     with: {
@@ -24,43 +25,49 @@ export const getModeOfPaymentById = async (input: { mopId: string }) => {
   return modeOfPayment;
 };
 
-export const addModeOfPayment = async (input: { mopName: string }) => {
+export const addModeOfPayment = async (db: DB, input: { mopName: string }) => {
   const newModeOfPaymentId = `mopId ${crypto.randomUUID()}`;
   await db.insert(modesOfPayment).values({
     mopId: newModeOfPaymentId,
     mopName: input.mopName,
   });
 
-  const newModeOfPayment = await getModeOfPaymentById({
+  const newModeOfPayment = await getModeOfPaymentById(db, {
     mopId: newModeOfPaymentId,
   });
   return newModeOfPayment;
 };
 
-export const editModeOfPayment = async (input: {
-  mopId: string;
-  newData: {
-    mopName?: string;
-  };
-}) => {
+export const editModeOfPayment = async (
+  db: DB,
+  input: {
+    mopId: string;
+    newData: {
+      mopName?: string;
+    };
+  }
+) => {
   await db
     .update(modesOfPayment)
     .set(input.newData)
     .where(eq(modesOfPayment.mopId, input.mopId));
-  const updatedModeOfPayment = await getModeOfPaymentById({
+  const updatedModeOfPayment = await getModeOfPaymentById(db, {
     mopId: input.mopId,
   });
 
   return updatedModeOfPayment;
 };
 
-export const changeModeOfPaymentIsActive = async (input: { mopId: string }) => {
+export const changeModeOfPaymentIsActive = async (
+  db: DB,
+  input: { mopId: string }
+) => {
   await db
     .update(modesOfPayment)
     .set({
       mopIsActive: not(modesOfPayment.mopIsActive),
     })
     .where(eq(modesOfPayment.mopId, input.mopId));
-  const editedModeOfPayment = await getModeOfPaymentById(input);
+  const editedModeOfPayment = await getModeOfPaymentById(db, input);
   return editedModeOfPayment;
 };

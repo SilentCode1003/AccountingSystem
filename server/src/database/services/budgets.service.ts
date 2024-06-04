@@ -1,10 +1,9 @@
 import crypto from "crypto";
-import { eq } from "drizzle-orm";
-import db from "..";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { DB } from "..";
 import budgets from "../schema/Budget.schema";
 
-export const getAllBudgets = async () => {
+export const getAllBudgets = async (db: DB) => {
   const allBudgets = await db.query.budgets.findMany({
     with: {
       employee: true,
@@ -14,7 +13,7 @@ export const getAllBudgets = async () => {
   return allBudgets;
 };
 
-export const getBudgetById = async (id: string) => {
+export const getBudgetById = async (db: DB, id: string) => {
   const budget = await db.query.budgets.findFirst({
     where: eq(budgets.budgetId, id),
     with: {
@@ -24,19 +23,22 @@ export const getBudgetById = async (id: string) => {
   return budget;
 };
 
-export const addBudget = async (input: {
-  budgetEmpId: string;
-  budgetAmount: number;
-  budgetDate: Date;
-  budgetTranId: string;
-}) => {
+export const addBudget = async (
+  db: DB,
+  input: {
+    budgetEmpId: string;
+    budgetAmount: number;
+    budgetDate: Date;
+    budgetTranId: string;
+  }
+) => {
   const newBudgetId = `budgetId ${crypto.randomUUID()}`;
   await db.insert(budgets).values({
     ...input,
     budgetId: newBudgetId,
   });
 
-  const newBudget = await getBudgetById(newBudgetId);
+  const newBudget = await getBudgetById(db, newBudgetId);
   return newBudget;
 };
 

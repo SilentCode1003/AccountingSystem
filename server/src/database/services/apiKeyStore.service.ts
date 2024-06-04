@@ -1,10 +1,10 @@
-import { eq } from "drizzle-orm";
-import db from "..";
-import apiKeys from "../schema/apiKeyStore.schema";
-import randomstring from "randomstring";
 import * as bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
+import randomstring from "randomstring";
+import { DB } from "..";
+import apiKeys from "../schema/apiKeyStore.schema";
 
-export const getAksById = async (aksId: string) => {
+export const getAksById = async (db: DB, aksId: string) => {
   const aks = await db.query.apiKeys.findFirst({
     where: eq(apiKeys.aksId, aksId),
   });
@@ -12,7 +12,7 @@ export const getAksById = async (aksId: string) => {
   return aks;
 };
 
-export const generateAks = async (input: { aksUserName: string }) => {
+export const generateAks = async (db: DB, input: { aksUserName: string }) => {
   const aksId = randomstring.generate({
     length: 16,
   });

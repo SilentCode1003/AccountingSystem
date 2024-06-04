@@ -8,7 +8,7 @@ import { desc } from "drizzle-orm";
 
 export const getBudgets = async (req: Request, res: Response) => {
   try {
-    const budgets = await getAllBudgets();
+    const budgets = await getAllBudgets(db);
     console.log("successfully fetched all budgets");
     return res.status(200).send({ budgets });
   } catch (error) {

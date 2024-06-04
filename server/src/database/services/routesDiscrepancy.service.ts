@@ -1,12 +1,15 @@
 import { eq } from "drizzle-orm";
-import db from "..";
 import routeDiscrepancies from "../schema/routeDiscrepancies.schema";
 import crypto from "crypto";
+import { DB } from "..";
 
-export const addRouteDiscrepancy = async (input: {
-  rdRouteId: string;
-  rdLrId: string;
-}) => {
+export const addRouteDiscrepancy = async (
+  db: DB,
+  input: {
+    rdRouteId: string;
+    rdLrId: string;
+  }
+) => {
   const rdId = `rdId ${crypto.randomUUID()}`;
 
   await db.insert(routeDiscrepancies).values({
@@ -14,6 +17,7 @@ export const addRouteDiscrepancy = async (input: {
     rdId,
   });
 
+  throw new Error();
   const routeDiscrepancy = await db.query.routeDiscrepancies.findFirst({
     where: eq(routeDiscrepancies.rdId, rdId),
   });

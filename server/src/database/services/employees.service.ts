@@ -1,16 +1,15 @@
-import db from "../index";
-import crypto from "crypto";
-import employees from "../schema/employees.schema";
 import { eq } from "drizzle-orm";
+import employees from "../schema/employees.schema";
 import { editPayroll } from "./payroll.service";
+import { DB } from "..";
 
-export const getAllEmployees = async () => {
+export const getAllEmployees = async (db: DB) => {
   const employees = await db.query.employees.findMany();
 
   return employees;
 };
 
-export const getEmployeeByName = async (empName: string) => {
+export const getEmployeeByName = async (db: DB, empName: string) => {
   const employee = await db.query.employees.findFirst({
     where: eq(employees.empName, empName),
   });
@@ -18,17 +17,20 @@ export const getEmployeeByName = async (empName: string) => {
   return employee;
 };
 
-export const addEmployee = async (input: {
-  empId: string;
-  empName: string;
-  empContactInfo: string;
-  empEmail: string;
-  empDateHired: Date;
-  empSalary: number;
-  empJobStatus: string;
-  empDepartment: string;
-  empPosition: string;
-}) => {
+export const addEmployee = async (
+  db: DB,
+  input: {
+    empId: string;
+    empName: string;
+    empContactInfo: string;
+    empEmail: string;
+    empDateHired: Date;
+    empSalary: number;
+    empJobStatus: string;
+    empDepartment: string;
+    empPosition: string;
+  }
+) => {
   await db.insert(employees).values(input);
 
   const newEmployee = await db.query.employees.findFirst({
@@ -38,20 +40,23 @@ export const addEmployee = async (input: {
   return newEmployee;
 };
 
-export const editEmployee = async (input: {
-  empId: string;
-  newData: {
-    empName?: string;
-    empContactInfo?: string;
-    empEmail?: string;
-    empDateHired?: Date;
-    empDateTerminated?: Date;
-    empJobStatus?: string;
-    empDepartment?: string;
-    empPosition?: string;
-    empSalary?: number;
-  };
-}) => {
+export const editEmployee = async (
+  db: DB,
+  input: {
+    empId: string;
+    newData: {
+      empName?: string;
+      empContactInfo?: string;
+      empEmail?: string;
+      empDateHired?: Date;
+      empDateTerminated?: Date;
+      empJobStatus?: string;
+      empDepartment?: string;
+      empPosition?: string;
+      empSalary?: number;
+    };
+  }
+) => {
   const prevValues = await db.query.employees.findFirst({
     where: (emp) => eq(emp.empId, input.empId),
   });
@@ -71,7 +76,7 @@ export const editEmployee = async (input: {
     });
     await Promise.all(
       payrollIds.map(async (payroll) => {
-        await editPayroll({
+        await editPayroll(db, {
           prId: payroll.prId,
           prTranId: payroll.prTranId,
           prTotalDeduction: payroll.prTotalDeduction,
@@ -84,7 +89,7 @@ export const editEmployee = async (input: {
   return editedEmployee;
 };
 
-export const fireEmployee = async (input: { empId: string }) => {
+export const fireEmployee = async (db: DB, input: { empId: string }) => {
   await db
     .update(employees)
     .set({ empDateTerminated: new Date() })

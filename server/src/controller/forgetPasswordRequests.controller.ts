@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { getForgetPasswordRequestById } from "../database/services/forgetPasswordRequests.service";
+import db from "../database";
 
 export const getSingleForgetPasswordRequestById = async (
   req: Request,
@@ -7,6 +8,7 @@ export const getSingleForgetPasswordRequestById = async (
 ) => {
   try {
     const forgetPasswordRequest = await getForgetPasswordRequestById(
+      db,
       req.params.id
     );
     if (!forgetPasswordRequest)
@@ -18,21 +20,17 @@ export const getSingleForgetPasswordRequestById = async (
       new Date().getTime() - forgetPasswordRequest.timeRequested.getTime();
 
     if (difference > 86400000) {
-      return res
-        .status(200)
-        .send({
-          id: forgetPasswordRequest.id,
-          userId: forgetPasswordRequest.userId,
-          remarks: "expired",
-        });
+      return res.status(200).send({
+        id: forgetPasswordRequest.id,
+        userId: forgetPasswordRequest.userId,
+        remarks: "expired",
+      });
     } else {
-      return res
-        .status(200)
-        .send({
-          id: forgetPasswordRequest.id,
-          userId: forgetPasswordRequest.userId,
-          remarks: "valid",
-        });
+      return res.status(200).send({
+        id: forgetPasswordRequest.id,
+        userId: forgetPasswordRequest.userId,
+        remarks: "valid",
+      });
     }
   } catch (error) {
     console.log("error in getting forget password request");

@@ -25,7 +25,7 @@ import { addTransactionType } from "../database/services/transactionTypes.servic
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
-    const transactions = await getAllTransactions();
+    const transactions = await getAllTransactions(db);
     console.log("successfully fetched all transactions");
     return res.status(200).send({ transactions });
   } catch (error) {
@@ -47,7 +47,7 @@ export const createTransaction = async (req: Request, res: Response) => {
       .send({ error: "Invalid inputs", message: input.error.errors });
 
   try {
-    const newTransaction = await addTransaction({
+    const newTransaction = await addTransaction(db, {
       ...input.data,
     });
     input.data.tranFile?.mv(
@@ -78,7 +78,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const updatedTransaction = await editTransaction(input.data);
+    const updatedTransaction = await editTransaction(db, input.data);
 
     input.data.tranFile?.mv(
       path.join(
@@ -119,7 +119,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
     const secondWordRegex = /[^\w]\w+/;
 
-    const accountTypes = await getAllAccountTypes();
+    const accountTypes = await getAllAccountTypes(db);
 
     let entryAccType: string = "";
 
@@ -208,14 +208,14 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
           if (val === "NAME:") {
             if (file.name.toLowerCase().includes("employee")) {
-              const tranPartner = await getEmployeeByName(targetVal.v);
+              const tranPartner = await getEmployeeByName(db, targetVal.v);
 
               entryObj["tranPartner"] = tranPartner?.empId as string;
             } else if (file.name.includes("customer")) {
-              const tranPartner = await getCustomerByName(targetVal.v);
+              const tranPartner = await getCustomerByName(db, targetVal.v);
               entryObj["tranPartner"] = tranPartner?.custId as string;
             } else if (file.name.includes("vendor")) {
-              const tranPartner = await getVendorByName(targetVal.v);
+              const tranPartner = await getVendorByName(db, targetVal.v);
               entryObj["tranPartner"] = tranPartner?.vdId as string;
             }
           }
@@ -259,11 +259,6 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
         eq(tranType.tranTypeName, file.name.match(firstWordRegex)![0]),
     });
 
-    await addTransactionType({
-      tranTypeName: "BUDGET",
-      tranTypeAccTypeId: transactionType!.tranTypeAccTypeId,
-    });
-
     const newMultiFileName = `multiFile ${crypto.randomUUID()}`;
 
     const newTransactions: Array<{
@@ -283,60 +278,68 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       tranTypeId: string | null;
     }> = [];
 
-    await Promise.all(
-      lq.map(async (tran) => {
-        const tranMop = await db.query.modesOfPayment.findFirst({
-          where: eq(modesOfPayment.mopName, tran.tranMopName!),
-        });
+    await db.transaction(async (tx) => {
+      await addTransactionType(tx, {
+        tranTypeName: "BUDGET",
+        tranTypeAccTypeId: transactionType!.tranTypeAccTypeId,
+      });
 
-        const transaction = await addTransaction({
-          tranAccTypeId: tran.tranAccTypeId as string,
-          tranAmount: tran.amount!,
-          tranDescription: tran.description ?? "FILE TRANSACTION",
-          tranTransactionDate: tran.date!,
-          tranPartner: tran.tranPartner,
-          tranTypeId: transactionType?.tranTypeId as string,
-          tranFileName: newMultiFileName,
-          tranMopId: tranMop?.mopId as string,
-        });
-
-        // budgetRemaining < amount || budgetGiven then create a new budget
-        if (tran.budgetRemaining! < tran.amount! || tran.budgetGiven) {
-          const budgetTranType = await db.query.tranTypes.findFirst({
-            where: (tranType) => eq(tranType.tranTypeName, "BUDGET"),
+      await Promise.all(
+        lq.map(async (tran) => {
+          const tranMop = await tx.query.modesOfPayment.findFirst({
+            where: eq(modesOfPayment.mopName, tran.tranMopName!),
           });
 
-          const budgetTransaction = await addTransaction({
-            tranAccTypeId: tran.tranAccTypeId!,
-            tranAmount: tran.budgetGiven!,
-            tranDescription: "BUDGET" ?? "FILE TRANSACTION",
+          const transaction = await addTransaction(tx, {
+            tranAccTypeId: tran.tranAccTypeId as string,
+            tranAmount: tran.amount!,
+            tranDescription: tran.description ?? "FILE TRANSACTION",
             tranTransactionDate: tran.date!,
             tranPartner: tran.tranPartner,
-            tranTypeId: budgetTranType!.tranTypeId,
+            tranTypeId: transactionType?.tranTypeId as string,
             tranFileName: newMultiFileName,
-            tranMopId: tranMop!.mopId,
+            tranMopId: tranMop?.mopId as string,
           });
-          await addBudget({
-            budgetEmpId: tran.tranPartner!,
-            budgetAmount: tran.budgetGiven!,
-            budgetDate: tran.date!,
-            budgetTranId: budgetTransaction!.tranId,
+
+          // budgetRemaining < amount || budgetGiven then create a new budget
+          if (tran.budgetRemaining! < tran.amount! || tran.budgetGiven) {
+            const budgetTranType = await tx.query.tranTypes.findFirst({
+              where: (tranType) => eq(tranType.tranTypeName, "BUDGET"),
+            });
+
+            const budgetTransaction = await addTransaction(tx, {
+              tranAccTypeId: tran.tranAccTypeId!,
+              tranAmount: tran.budgetGiven!,
+              tranDescription: "BUDGET" ?? "FILE TRANSACTION",
+              tranTransactionDate: tran.date!,
+              tranPartner: tran.tranPartner,
+              tranTypeId: budgetTranType!.tranTypeId,
+              tranFileName: newMultiFileName,
+              tranMopId: tranMop!.mopId,
+            });
+            await addBudget(tx, {
+              budgetEmpId: tran.tranPartner!,
+              budgetAmount: tran.budgetGiven!,
+              budgetDate: tran.date!,
+              budgetTranId: budgetTransaction!.tranId,
+            });
+            newTransactions.push(budgetTransaction!);
+          }
+
+          // create a new liquidation
+          await addLiquidation(tx, {
+            liquidationEmpId: tran.tranPartner!,
+            liquidationAmount: tran.amount!,
+            liquidationDate: tran.date!,
+            liquidationTranId: transaction!.tranId,
+            liquidationRoutes: tran.liquidationRoutes!,
           });
-          newTransactions.push(budgetTransaction!);
-        }
 
-        // create a new liquidation
-        await addLiquidation({
-          liquidationEmpId: tran.tranPartner!,
-          liquidationAmount: tran.amount!,
-          liquidationDate: tran.date!,
-          liquidationTranId: transaction!.tranId,
-          liquidationRoutes: tran.liquidationRoutes!,
-        });
-
-        newTransactions.push(transaction!);
-      })
-    );
+          newTransactions.push(transaction!);
+        })
+      );
+      tx.rollback();
+    });
 
     // console.log(lq);
 

@@ -32,7 +32,7 @@ export const getUsers = async (
 ) => {
   if (req.query.userId) return next();
   try {
-    const users = await getAllUsers();
+    const users = await getAllUsers(db);
     console.log("successfully fetched all users");
     return res.status(200).send({
       users,
@@ -53,7 +53,7 @@ export const getSingleUserById = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const user = await getUserById(input.data);
+    const user = await getUserById(db, input.data);
     console.log("successfully fetched single user");
     return res.status(200).send({
       user,
@@ -77,7 +77,7 @@ export const createUser = async (req: Request, res: Response) => {
       error: input.error.errors[0].message,
     });
   try {
-    const newUser = await addUser(input.data);
+    const newUser = await addUser(db, input.data);
     console.log("successfully created an user");
     return res.status(200).send({ user: newUser });
   } catch (error) {
@@ -118,7 +118,7 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 
   try {
-    const updatedUser = await editUser({
+    const updatedUser = await editUser(db, {
       userId: input.data.userId,
       newData: {
         userProfilePic:
@@ -147,7 +147,7 @@ export const toggleUserIsActive = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const updatedUser = await toggleIsActive(input.data);
+    const updatedUser = await toggleIsActive(db, input.data);
     console.log("successfully toggled a user");
     return res.status(200).send({ user: updatedUser });
   } catch (error) {
@@ -314,7 +314,7 @@ export const changePassword = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: input.error });
 
   try {
-    const user = await getUserById({
+    const user = await getUserById(db, {
       userId: input.data.userId,
     });
 

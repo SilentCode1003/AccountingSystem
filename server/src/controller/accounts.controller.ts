@@ -10,10 +10,11 @@ import {
   toggleIsActiveValidator,
   updateValidator,
 } from "../utils/validators/accounts.validator";
+import db from "../database";
 
 export const getAccounts = async (req: Request, res: Response) => {
   try {
-    const accounts = await getAllAccounts();
+    const accounts = await getAllAccounts(db);
 
     if (accounts) console.log("successfully fetched all accounts");
     return res.status(200).send({
@@ -31,7 +32,7 @@ export const createAccount = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: "invalid input" });
 
   try {
-    const newAccount = await addAccount({ ...input.data });
+    const newAccount = await addAccount(db, { ...input.data });
     console.log("successfully created an account");
     return res.status(200).send({ account: newAccount });
   } catch (error) {
@@ -50,7 +51,7 @@ export const updateAccount = async (req: Request, res: Response) => {
     });
 
   try {
-    const editedAccount = await editAccount(input.data);
+    const editedAccount = await editAccount(db, input.data);
     console.log("successfully updated an account");
     return res.status(200).send({ account: editedAccount });
   } catch (error) {
@@ -68,7 +69,7 @@ export const toggleAccountIsActive = async (req: Request, res: Response) => {
     });
 
   try {
-    const editedAccount = await updateAccountIsActive({ ...input.data });
+    const editedAccount = await updateAccountIsActive(db, { ...input.data });
     console.log("successfully toggled an account");
     return res.status(200).send({
       account: editedAccount,

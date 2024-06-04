@@ -10,10 +10,11 @@ import {
   toggleIsActiveValidator,
   updateValidator,
 } from "../utils/validators/vendors.validator";
+import db from "../database";
 
 export const getVendors = async (req: Request, res: Response) => {
   try {
-    const vendors = await getAllVendors();
+    const vendors = await getAllVendors(db);
     console.log("successfully fetched all vendors");
     return res.status(200).send({
       vendors,
@@ -32,7 +33,7 @@ export const createVendor = async (req: Request, res: Response) => {
       error: "Invalid inputs",
     });
   try {
-    const newVendor = await addVendor(input.data);
+    const newVendor = await addVendor(db, input.data);
     console.log("successfully created an vendor");
     return res.status(200).send({ vendor: newVendor });
   } catch (error) {
@@ -48,7 +49,7 @@ export const updateVendor = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const updatedVendor = await editVendor(input.data);
+    const updatedVendor = await editVendor(db, input.data);
     console.log("successfully updated an vendor");
     return res.status(200).send({ vendor: updatedVendor });
   } catch (error) {
@@ -64,7 +65,7 @@ export const toggleVendorIsActive = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const updatedVendor = await toggleIsActive(input.data);
+    const updatedVendor = await toggleIsActive(db, input.data);
     console.log("successfully updated an vendor");
     return res.status(200).send({ vendor: updatedVendor });
   } catch (error) {

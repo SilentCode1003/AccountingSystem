@@ -1,13 +1,12 @@
 import crypto from "crypto";
-import { eq, sql } from "drizzle-orm";
-import db from "..";
-import tranTypes from "../schema/transactionTypes.schema";
-import { not } from "drizzle-orm";
+import { eq, not, sql } from "drizzle-orm";
+import { DB } from "..";
 import accounts from "../schema/accounts.schema";
 import transactions from "../schema/transactions.schema";
+import tranTypes from "../schema/transactionTypes.schema";
 import { inArray } from "drizzle-orm";
 
-export const getAllTransactionTypes = async () => {
+export const getAllTransactionTypes = async (db: DB) => {
   const transactionTypes = await db.query.tranTypes.findMany({
     with: {
       accountType: true,
@@ -17,7 +16,7 @@ export const getAllTransactionTypes = async () => {
   return transactionTypes;
 };
 
-export const getTransactionTypeById = async (tranTypeId: string) => {
+export const getTransactionTypeById = async (db: DB, tranTypeId: string) => {
   const transactionType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeId, tranTypeId),
     with: {
@@ -27,10 +26,13 @@ export const getTransactionTypeById = async (tranTypeId: string) => {
   return transactionType;
 };
 
-export const addTransactionType = async (input: {
-  tranTypeName: string;
-  tranTypeAccTypeId: string;
-}) => {
+export const addTransactionType = async (
+  db: DB,
+  input: {
+    tranTypeName: string;
+    tranTypeAccTypeId: string;
+  }
+) => {
   const newTransactionTypeId = `tranTypeId ${crypto.randomUUID()}`;
   await db
     .insert(tranTypes)
@@ -40,18 +42,24 @@ export const addTransactionType = async (input: {
         tranTypeId: sql`tran_type_id`,
       },
     });
-  const newTransactionType = await getTransactionTypeById(newTransactionTypeId);
+  const newTransactionType = await getTransactionTypeById(
+    db,
+    newTransactionTypeId
+  );
   return newTransactionType;
 };
 
-export const editTransactionType = async (input: {
-  tranTypeId: string;
-  newData: {
-    tranTypeName?: string;
-    tranTypeAccTypeId?: string;
-  };
-}) => {
-  const prevTranType = await getTransactionTypeById(input.tranTypeId);
+export const editTransactionType = async (
+  db: DB,
+  input: {
+    tranTypeId: string;
+    newData: {
+      tranTypeName?: string;
+      tranTypeAccTypeId?: string;
+    };
+  }
+) => {
+  const prevTranType = await getTransactionTypeById(db, input.tranTypeId);
   console.log(prevTranType);
   console.log(input.newData.tranTypeAccTypeId);
 
@@ -59,7 +67,10 @@ export const editTransactionType = async (input: {
     .update(tranTypes)
     .set(input.newData)
     .where(eq(tranTypes.tranTypeId, input.tranTypeId));
-  const editedTransactionType = await getTransactionTypeById(input.tranTypeId);
+  const editedTransactionType = await getTransactionTypeById(
+    db,
+    input.tranTypeId
+  );
 
   const currentTransactions = await db.query.transactions.findMany({
     where: eq(transactions.tranTypeId, input.tranTypeId),
@@ -77,15 +88,21 @@ export const editTransactionType = async (input: {
   return editedTransactionType;
 };
 
-export const changeTransactionTypeIsActive = async (input: {
-  tranTypeId: string;
-}) => {
+export const changeTransactionTypeIsActive = async (
+  db: DB,
+  input: {
+    tranTypeId: string;
+  }
+) => {
   await db
     .update(tranTypes)
     .set({
       tranTypeIsActive: not(tranTypes.tranTypeIsActive),
     })
     .where(eq(tranTypes.tranTypeId, input.tranTypeId));
-  const editedTransactionType = await getTransactionTypeById(input.tranTypeId);
+  const editedTransactionType = await getTransactionTypeById(
+    db,
+    input.tranTypeId
+  );
   return editedTransactionType;
 };

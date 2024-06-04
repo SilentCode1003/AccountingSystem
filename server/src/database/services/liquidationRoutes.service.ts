@@ -1,18 +1,18 @@
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
-import db from "..";
+import { DB } from "..";
 import liquidationRoutes from "../schema/liquidationRoutes.schema";
 import { addRoute } from "./routes.service";
 import { and } from "drizzle-orm";
 import routes from "../schema/routes.schema";
 import { addRouteDiscrepancy } from "./routesDiscrepancy.service";
 
-export const getAllLiquidationRoutes = async () => {
+export const getAllLiquidationRoutes = async (db: DB) => {
   const liquidationRoutes = await db.query.liquidationRoutes.findMany();
   return liquidationRoutes;
 };
 
-export const getLiquidationRouteById = async (id: string) => {
+export const getLiquidationRouteById = async (db: DB, id: string) => {
   const liquidationRoute = await db.query.liquidationRoutes.findFirst({
     where: eq(liquidationRoutes.lrId, id),
   });
@@ -20,16 +20,19 @@ export const getLiquidationRouteById = async (id: string) => {
   return liquidationRoute;
 };
 
-export const addLiquidationRoutes = async (input: {
-  lrLiqId: string;
-  liquidationRoutes: Array<{
-    lrDestination: string;
-    lrPrice: number;
-    lrFrom: string;
-    lrTo: string;
-    lrModeOfTransport: string;
-  }>;
-}) => {
+export const addLiquidationRoutes = async (
+  db: DB,
+  input: {
+    lrLiqId: string;
+    liquidationRoutes: Array<{
+      lrDestination: string;
+      lrPrice: number;
+      lrFrom: string;
+      lrTo: string;
+      lrModeOfTransport: string;
+    }>;
+  }
+) => {
   await Promise.all(
     input.liquidationRoutes.map(async (liquidationRoute) => {
       const newLiquidationRouteId = `lrId ${crypto.randomUUID()}`;
@@ -39,7 +42,7 @@ export const addLiquidationRoutes = async (input: {
         lrId: newLiquidationRouteId,
       });
 
-      await addRoute({
+      await addRoute(db, {
         routeEnd: liquidationRoute.lrTo,
         routeStart: liquidationRoute.lrFrom,
         routePrice: liquidationRoute.lrPrice,
@@ -59,7 +62,7 @@ export const addLiquidationRoutes = async (input: {
       });
 
       if (route?.routePrice !== lr?.lrPrice)
-        await addRouteDiscrepancy({
+        await addRouteDiscrepancy(db, {
           rdLrId: lr!.lrId,
           rdRouteId: route!.routeId,
         });
