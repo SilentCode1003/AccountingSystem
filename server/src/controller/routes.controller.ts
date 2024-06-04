@@ -1,7 +1,14 @@
 import { Request, Response } from "express";
 import db from "../database";
-import { editRoute, getAllRoutes } from "../database/services/routes.service";
-import { updateValidator } from "../utils/validators/routes.validator";
+import {
+  editRoute,
+  getAllRoutes,
+  removeRoute,
+} from "../database/services/routes.service";
+import {
+  deleteValidator,
+  updateValidator,
+} from "../utils/validators/routes.validator";
 
 export const getRoutes = async (req: Request, res: Response) => {
   try {
@@ -31,6 +38,25 @@ export const updateRoute = async (req: Request, res: Response) => {
     return res.status(200).send({ route: editedRoute });
   } catch (error) {
     console.log("error updating an route");
+    console.log(error);
+    return res.status(500).send({ error: "Server error" });
+  }
+};
+
+export const deleteRoute = async (req: Request, res: Response) => {
+  const input = deleteValidator.safeParse(req.params);
+
+  if (!input.success)
+    return res.status(400).send({
+      error: input.error.errors[0].message,
+    });
+
+  try {
+    const deletedRoute = await removeRoute(db, input.data);
+    console.log("successfully deleted an route");
+    return res.status(200).send({ ...deletedRoute });
+  } catch (error) {
+    console.log("error deleting an route");
     console.log(error);
     return res.status(500).send({ error: "Server error" });
   }

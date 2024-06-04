@@ -59,3 +59,9 @@ export const editRoute = async (
   const updatedRoute = await getRouteById(db, input.routeId);
   return updatedRoute;
 };
+
+export const removeRoute = async (db: DB, input: { routeId: string }) => {
+  await db.delete(routes).where(eq(routes.routeId, input.routeId));
+
+  return { deletedRouteId: input.routeId };
+};
