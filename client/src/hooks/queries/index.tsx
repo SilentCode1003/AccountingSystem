@@ -22,6 +22,7 @@ import {
   liquidationsOptions,
   modesOfPaymentOptions,
   payrollsOptions,
+  routeDiscrepanciesOptions,
   routesOptions,
   transactionPartnersOptions,
   transactionsOptions,
@@ -39,6 +40,7 @@ export const useCurrentUserSuspense = () =>
   useSuspenseQuery(currentUserOptions())
 
 export const useRoutes = () => useQuery(routesOptions())
+export const useRouteDiscrepancies = () => useQuery(routeDiscrepanciesOptions())
 
 export const useUser = () => {
   const queryClient = useQueryClient()

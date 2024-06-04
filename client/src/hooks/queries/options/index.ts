@@ -9,6 +9,7 @@ import { InventoryEntries } from '@/components/table-columns/inventoryEntries.co
 import { Liquidations } from '@/components/table-columns/liquidations.columns'
 import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
+import { RouteDiscrepancies } from '@/components/table-columns/routeDiscrepancies.columns'
 import { Routes } from '@/components/table-columns/routes.columns'
 import {
   Customer,
@@ -61,6 +62,28 @@ export const routesOptions = () => {
 
       const data = (await response.json()) as Promise<{
         routes: Array<Routes>
+      }>
+
+      return data
+    },
+  })
+}
+
+export const routeDiscrepanciesOptions = () => {
+  return queryOptions({
+    queryKey: ['routeDiscrepancies'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routeDiscrepancies`,
+        {
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        routeDiscrepancies: Array<RouteDiscrepancies>
       }>
 
       return data

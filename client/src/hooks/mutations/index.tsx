@@ -7,6 +7,7 @@ import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
+import { RouteDiscrepancies } from '@/components/table-columns/routeDiscrepancies.columns'
 import { Routes } from '@/components/table-columns/routes.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
 import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
@@ -40,6 +41,7 @@ import {
   updateModeOfPaymentSchema,
 } from '@/validators/modesOfPayment.validator'
 import { updatePayrollSchema } from '@/validators/payrolls.validators'
+import { toggleRouteDiscrepancySchema } from '@/validators/routeDiscrepancies.validator'
 import {
   deleteRouteSchema,
   updateRouteSchema,
@@ -2838,7 +2840,7 @@ export const useDeleteRoute = () => {
       if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
-        deletedRouteId: string
+        toggledRouteId: string
       }>
 
       return data
@@ -2849,7 +2851,7 @@ export const useDeleteRoute = () => {
         (old: { routes: Array<Routes> }) => {
           return {
             routes: old.routes.filter(
-              (route) => route.routeId !== data.deletedRouteId,
+              (route) => route.routeId !== data.toggledRouteId,
             ),
           }
         },
@@ -2865,7 +2867,7 @@ export const useDeleteRoute = () => {
             Success
           </div>
         ),
-        description: 'Route was deleted successfully',
+        description: 'Route was toggled successfully',
       })
     },
     onError: (error) => {
@@ -2877,6 +2879,71 @@ export const useDeleteRoute = () => {
           </div>
         ),
         description: error.message ?? 'Failed to delete route',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useToggleRouteDiscrepancy = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['toggleRouteDiscrepancy'],
+    mutationFn: async (
+      payload: z.infer<typeof toggleRouteDiscrepancySchema>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routeDiscrepancies/${payload.routeId}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        routeDiscrepancy: RouteDiscrepancies
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['routeDiscrepancies'],
+        (old: { routeDiscrepancies: Array<RouteDiscrepancies> }) => {
+          return {
+            routeDiscrepancies: old.routeDiscrepancies.map(
+              (routeDiscrepancy) => {
+                if (routeDiscrepancy.rdId === data.routeDiscrepancy.rdId) {
+                  return data.routeDiscrepancy
+                }
+                return routeDiscrepancy
+              },
+            ),
+          }
+        },
+      )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Route discrepancy was toggled successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description:
+          error.message ??
+          'Failed to delete route discrepancy was toggled successfully',
         variant: 'destructive',
       })
     },
