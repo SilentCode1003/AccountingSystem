@@ -1,4 +1,5 @@
-import { updateTransactionTypeSchema } from '@/validators/transactionTypes.validator'
+import { useDeleteRoute, useUpdateRoute } from '@/hooks/mutations'
+import { updateRouteSchema } from '@/validators/routes.validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CellContext } from '@tanstack/react-table'
 import { MoreHorizontalIcon } from 'lucide-react'
@@ -6,9 +7,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { PromptModal } from '../PromptModal'
-import { TransactionTypes } from '../table-columns/transactionTypes.columns'
+import { Routes } from '../table-columns/routes.columns'
 import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
-import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import {
   Dialog,
@@ -36,53 +36,46 @@ import {
 } from '../ui/Form'
 import { Input } from '../ui/input'
 import { Text } from '../ui/text'
-import {
-  useToggleTransactionType,
-  useUpdateTransactionType,
-} from '@/hooks/mutations'
-import { useAccountTypes } from '@/hooks/queries'
-import { ComboBox } from '../Combobox'
 
-export const TranTypeNameColumn = ({
-  row,
-}: CellContext<TransactionTypes, unknown>) => {
-  return <Badge variant={'secondary'}>{row.original.tranTypeName}</Badge>
+export const RoutePriceColumn = ({ row }: CellContext<Routes, unknown>) => {
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'PHP',
+  }).format(row.getValue('routePrice'))
+
+  return formatted
 }
 
-export const TranTypeAccountTypeColumn = ({
+export const RouteModeOfTransportColumn = ({
   row,
-}: CellContext<TransactionTypes, unknown>) => {
+}: CellContext<Routes, unknown>) => {
   const [open, setOpen] = useState<boolean>(false)
-
-  const accountTypes = useAccountTypes()
 
   const form = useForm({
     defaultValues: {
-      tranTypeId: row.original.tranTypeId,
+      routeId: row.original.routeId,
       newData: {
-        tranTypeName: row.original.tranTypeName,
-        tranTypeAccTypeId: row.original.tranTypeAccTypeId,
+        routeStart: row.original.routeStart,
+        routeEnd: row.original.routeEnd,
+        routePrice: Number.parseFloat(String(row.original.routePrice)),
+        routeModeOfTransport: row.original.routeModeOfTransport,
       },
     },
-    resolver: zodResolver(updateTransactionTypeSchema),
+    resolver: zodResolver(updateRouteSchema),
   })
 
-  const updateTranType = useUpdateTransactionType({ setOpen })
+  const updateRoute = useUpdateRoute({ setOpen })
 
-  const toggleTransactionType = useToggleTransactionType()
+  const deleteRoute = useDeleteRoute()
 
-  const handleSubmit = (
-    values: z.infer<typeof updateTransactionTypeSchema>,
-  ) => {
-    updateTranType.mutate(values)
+  const handleSubmit = (values: z.infer<typeof updateRouteSchema>) => {
+    updateRoute.mutate(values)
   }
 
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-col gap-4">
-        <Badge variant={'secondary'}>
-          {row.original.accountType.accTypeName}
-        </Badge>
+        {row.original.routeModeOfTransport}
       </div>
 
       <div>
@@ -99,41 +92,39 @@ export const TranTypeAccountTypeColumn = ({
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() =>
-                    navigator.clipboard.writeText(row.original.tranTypeId)
+                    navigator.clipboard.writeText(row.original.routeId)
                   }
                 >
-                  Copy Transaction Type ID
+                  Copy Route ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DialogTrigger asChild>
-                  <DropdownMenuItem>Update Transaction Type</DropdownMenuItem>
+                  <DropdownMenuItem>Update Route</DropdownMenuItem>
                 </DialogTrigger>
 
                 <DropdownMenuSeparator />
                 <AlertDialogTrigger asChild>
-                  <DropdownMenuItem>
-                    Toggle Transaction Type Status
-                  </DropdownMenuItem>
+                  <DropdownMenuItem>Delete Route Status</DropdownMenuItem>
                 </AlertDialogTrigger>
               </DropdownMenuContent>
             </DropdownMenu>
             <PromptModal
               callback={() =>
-                toggleTransactionType.mutate({
-                  tranTypeId: row.original.tranTypeId,
+                deleteRoute.mutate({
+                  routeId: row.original.routeId,
                 })
               }
               nonButton
               dialogMessage="Continue?"
-              prompType="TOGGLE"
-              dialogTitle="You are about to TOGGLE this transaction type! Data loss may occur and cannot be undone!"
-              triggerText="TOGGLE TRANSACTION TYPE"
+              prompType="DELETE"
+              dialogTitle="You are about to DELETE this route! Data loss may occur and cannot be undone!"
+              triggerText="DELETE ROUTE"
             />
 
             <DialogContent className="scale-75 md:scale-100">
               <DialogHeader>
                 <DialogTitle>
-                  <Text variant="heading3bold">Update Transaction Type</Text>
+                  <Text variant="heading3bold">Update Route</Text>
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
@@ -143,11 +134,11 @@ export const TranTypeAccountTypeColumn = ({
                       <div className="flex flex-col gap-4 overflow-y-auto max-h-96">
                         <FormField
                           control={form.control}
-                          name="tranTypeId"
+                          name="routeId"
                           render={({ field }) => (
                             <FormItem>
                               <div className="flex items-center justify-between">
-                                <FormLabel>Account ID</FormLabel>
+                                <FormLabel>Route ID</FormLabel>
                                 <FormMessage />
                               </div>
                               <FormControl>
@@ -158,17 +149,17 @@ export const TranTypeAccountTypeColumn = ({
                         />
                         <FormField
                           control={form.control}
-                          name="newData.tranTypeName"
+                          name="newData.routeStart"
                           render={({ field }) => (
                             <FormItem>
                               <div className="flex items-center justify-between">
-                                <FormLabel>Account Type Name</FormLabel>
+                                <FormLabel>Route Start</FormLabel>
                                 <FormMessage />
                               </div>
                               <FormControl>
                                 <Input
                                   className="w-full"
-                                  placeholder="Account Name"
+                                  placeholder="Route Start"
                                   {...field}
                                 />
                               </FormControl>
@@ -177,26 +168,68 @@ export const TranTypeAccountTypeColumn = ({
                         />
                         <FormField
                           control={form.control}
-                          name="newData.tranTypeAccTypeId"
+                          name="newData.routeEnd"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Account Type</FormLabel>
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Route End</FormLabel>
+                                <FormMessage />
+                              </div>
                               <FormControl>
-                                {accountTypes.isSuccess && (
-                                  <ComboBox
-                                    data={accountTypes.data.accountTypes.map(
-                                      (t) => ({
-                                        label: t.accTypeName,
-                                        value: t.accTypeId,
-                                      }),
-                                    )}
-                                    emptyLabel="Nothing Found"
-                                    value={field.value as string}
-                                    setValue={field.onChange}
-                                  />
-                                )}
+                                <Input
+                                  className="w-full"
+                                  placeholder="Route End"
+                                  {...field}
+                                />
                               </FormControl>
-                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="newData.routePrice"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Route Price</FormLabel>
+                                <FormMessage />
+                              </div>
+                              <FormControl>
+                                <Input
+                                  className="w-full"
+                                  type="number"
+                                  placeholder="Price"
+                                  step="0.01"
+                                  {...field}
+                                  value={
+                                    Number.isNaN(field.value)
+                                      ? ''
+                                      : Number.parseFloat(String(field.value))
+                                  }
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="newData.routeModeOfTransport"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex items-center justify-between">
+                                <FormLabel>Mode of Transport</FormLabel>
+                                <FormMessage />
+                              </div>
+                              <FormControl>
+                                <Input
+                                  className="w-full"
+                                  placeholder="Mode of Transport"
+                                  {...field}
+                                />
+                              </FormControl>
                             </FormItem>
                           )}
                         />
@@ -208,7 +241,7 @@ export const TranTypeAccountTypeColumn = ({
                   <PromptModal
                     dialogMessage="Continue?"
                     prompType="UPDATE"
-                    dialogTitle="You are about to update this transaction type"
+                    dialogTitle="You are about to update this route"
                     triggerText="Update"
                     callback={form.handleSubmit(handleSubmit)}
                   />

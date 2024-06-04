@@ -35,9 +35,11 @@ import { Route as AuthenticatedLayoutSettingslayoutIndexImport } from './routes/
 import { Route as AuthenticatedLayoutSettingslayoutVendorsImport } from './routes/_authenticated/_layout/settings_/_layout/vendors'
 import { Route as AuthenticatedLayoutSettingslayoutUsersImport } from './routes/_authenticated/_layout/settings_/_layout/users'
 import { Route as AuthenticatedLayoutSettingslayoutTransactionTypesImport } from './routes/_authenticated/_layout/settings_/_layout/transactionTypes'
+import { Route as AuthenticatedLayoutSettingslayoutRouteDiscrepanciesImport } from './routes/_authenticated/_layout/settings_/_layout/routeDiscrepancies'
 import { Route as AuthenticatedLayoutSettingslayoutReportsImport } from './routes/_authenticated/_layout/settings_/_layout/reports'
 import { Route as AuthenticatedLayoutSettingslayoutModesOfPaymentImport } from './routes/_authenticated/_layout/settings_/_layout/modesOfPayment'
 import { Route as AuthenticatedLayoutSettingslayoutInventoryImport } from './routes/_authenticated/_layout/settings_/_layout/inventory'
+import { Route as AuthenticatedLayoutSettingslayoutFieldRoutesImport } from './routes/_authenticated/_layout/settings_/_layout/fieldRoutes'
 import { Route as AuthenticatedLayoutSettingslayoutEmployeesImport } from './routes/_authenticated/_layout/settings_/_layout/employees'
 import { Route as AuthenticatedLayoutSettingslayoutCustomersImport } from './routes/_authenticated/_layout/settings_/_layout/customers'
 import { Route as AuthenticatedLayoutSettingslayoutAccountsImport } from './routes/_authenticated/_layout/settings_/_layout/accounts'
@@ -194,6 +196,12 @@ const AuthenticatedLayoutSettingslayoutTransactionTypesRoute =
     getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
   } as any)
 
+const AuthenticatedLayoutSettingslayoutRouteDiscrepanciesRoute =
+  AuthenticatedLayoutSettingslayoutRouteDiscrepanciesImport.update({
+    path: '/routeDiscrepancies',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
 const AuthenticatedLayoutSettingslayoutReportsRoute =
   AuthenticatedLayoutSettingslayoutReportsImport.update({
     path: '/reports',
@@ -209,6 +217,12 @@ const AuthenticatedLayoutSettingslayoutModesOfPaymentRoute =
 const AuthenticatedLayoutSettingslayoutInventoryRoute =
   AuthenticatedLayoutSettingslayoutInventoryImport.update({
     path: '/inventory',
+    getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
+  } as any)
+
+const AuthenticatedLayoutSettingslayoutFieldRoutesRoute =
+  AuthenticatedLayoutSettingslayoutFieldRoutesImport.update({
+    path: '/fieldRoutes',
     getParentRoute: () => AuthenticatedLayoutSettingslayoutRoute,
   } as any)
 
@@ -241,130 +255,240 @@ const AuthenticatedLayoutSettingslayoutAccountTypesRoute =
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
       preLoaderRoute: typeof AuthenticatedImport
       parentRoute: typeof rootRoute
     }
     '/_authenticated/_layout': {
+      id: '/_authenticated/_layout'
+      path: ''
+      fullPath: ''
       preLoaderRoute: typeof AuthenticatedLayoutImport
       parentRoute: typeof AuthenticatedImport
     }
     '/forgotPassword': {
+      id: '/forgotPassword'
+      path: '/forgotPassword'
+      fullPath: '/forgotPassword'
       preLoaderRoute: typeof ForgotPasswordImport
       parentRoute: typeof rootRoute
     }
     '/forgotPassword/_layout': {
+      id: '/forgotPassword/_layout'
+      path: '/forgotPassword'
+      fullPath: '/forgotPassword'
       preLoaderRoute: typeof ForgotPasswordlayoutImport
       parentRoute: typeof ForgotPasswordRoute
     }
     '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
     '/login/_layout': {
+      id: '/login/_layout'
+      path: '/login'
+      fullPath: '/login'
       preLoaderRoute: typeof LoginlayoutImport
       parentRoute: typeof LoginRoute
     }
     '/_authenticated/_layout/': {
+      id: '/_authenticated/_layout/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof AuthenticatedLayoutIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/forgotPassword/_layout/': {
+      id: '/forgotPassword/_layout/'
+      path: '/'
+      fullPath: '/forgotPassword/'
       preLoaderRoute: typeof ForgotPasswordlayoutIndexImport
       parentRoute: typeof ForgotPasswordlayoutImport
     }
     '/login/_layout/': {
+      id: '/login/_layout/'
+      path: '/'
+      fullPath: '/login/'
       preLoaderRoute: typeof LoginlayoutIndexImport
       parentRoute: typeof LoginlayoutImport
     }
     '/_authenticated/_layout/settings': {
+      id: '/_authenticated/_layout/settings'
+      path: '/settings'
+      fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedLayoutSettingsImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/settings/_layout': {
+      id: '/_authenticated/_layout/settings/_layout'
+      path: '/settings'
+      fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutImport
       parentRoute: typeof AuthenticatedLayoutSettingsRoute
     }
     '/_authenticated/_layout/balance_sheet/': {
+      id: '/_authenticated/_layout/balance_sheet/'
+      path: '/balance_sheet/'
+      fullPath: '/balance_sheet/'
       preLoaderRoute: typeof AuthenticatedLayoutBalancesheetIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/budgets/': {
+      id: '/_authenticated/_layout/budgets/'
+      path: '/budgets/'
+      fullPath: '/budgets/'
       preLoaderRoute: typeof AuthenticatedLayoutBudgetsIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/cash_flow/': {
+      id: '/_authenticated/_layout/cash_flow/'
+      path: '/cash_flow/'
+      fullPath: '/cash_flow/'
       preLoaderRoute: typeof AuthenticatedLayoutCashflowIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/cheques/': {
+      id: '/_authenticated/_layout/cheques/'
+      path: '/cheques/'
+      fullPath: '/cheques/'
       preLoaderRoute: typeof AuthenticatedLayoutChequesIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/income_statement/': {
+      id: '/_authenticated/_layout/income_statement/'
+      path: '/income_statement/'
+      fullPath: '/income_statement/'
       preLoaderRoute: typeof AuthenticatedLayoutIncomestatementIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/inventoryEntries/': {
+      id: '/_authenticated/_layout/inventoryEntries/'
+      path: '/inventoryEntries/'
+      fullPath: '/inventoryEntries/'
       preLoaderRoute: typeof AuthenticatedLayoutInventoryEntriesIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/liquidations/': {
+      id: '/_authenticated/_layout/liquidations/'
+      path: '/liquidations/'
+      fullPath: '/liquidations/'
       preLoaderRoute: typeof AuthenticatedLayoutLiquidationsIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/payrolls/': {
+      id: '/_authenticated/_layout/payrolls/'
+      path: '/payrolls/'
+      fullPath: '/payrolls/'
       preLoaderRoute: typeof AuthenticatedLayoutPayrollsIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/_authenticated/_layout/transactions/': {
+      id: '/_authenticated/_layout/transactions/'
+      path: '/transactions/'
+      fullPath: '/transactions/'
       preLoaderRoute: typeof AuthenticatedLayoutTransactionsIndexImport
       parentRoute: typeof AuthenticatedLayoutImport
     }
     '/forgotPassword/_layout/$fprId/': {
+      id: '/forgotPassword/_layout/$fprId/'
+      path: '/$fprId/'
+      fullPath: '/forgotPassword/$fprId/'
       preLoaderRoute: typeof ForgotPasswordlayoutFprIdIndexImport
       parentRoute: typeof ForgotPasswordlayoutImport
     }
     '/_authenticated/_layout/settings/_layout/accountTypes': {
+      id: '/_authenticated/_layout/settings/_layout/accountTypes'
+      path: '/accountTypes'
+      fullPath: '/settings/accountTypes'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutAccountTypesImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/accounts': {
+      id: '/_authenticated/_layout/settings/_layout/accounts'
+      path: '/accounts'
+      fullPath: '/settings/accounts'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutAccountsImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/customers': {
+      id: '/_authenticated/_layout/settings/_layout/customers'
+      path: '/customers'
+      fullPath: '/settings/customers'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutCustomersImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/employees': {
+      id: '/_authenticated/_layout/settings/_layout/employees'
+      path: '/employees'
+      fullPath: '/settings/employees'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutEmployeesImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
+    '/_authenticated/_layout/settings/_layout/fieldRoutes': {
+      id: '/_authenticated/_layout/settings/_layout/fieldRoutes'
+      path: '/fieldRoutes'
+      fullPath: '/settings/fieldRoutes'
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutFieldRoutesImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
     '/_authenticated/_layout/settings/_layout/inventory': {
+      id: '/_authenticated/_layout/settings/_layout/inventory'
+      path: '/inventory'
+      fullPath: '/settings/inventory'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutInventoryImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/modesOfPayment': {
+      id: '/_authenticated/_layout/settings/_layout/modesOfPayment'
+      path: '/modesOfPayment'
+      fullPath: '/settings/modesOfPayment'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutModesOfPaymentImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/reports': {
+      id: '/_authenticated/_layout/settings/_layout/reports'
+      path: '/reports'
+      fullPath: '/settings/reports'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutReportsImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
+    '/_authenticated/_layout/settings/_layout/routeDiscrepancies': {
+      id: '/_authenticated/_layout/settings/_layout/routeDiscrepancies'
+      path: '/routeDiscrepancies'
+      fullPath: '/settings/routeDiscrepancies'
+      preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutRouteDiscrepanciesImport
+      parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
+    }
     '/_authenticated/_layout/settings/_layout/transactionTypes': {
+      id: '/_authenticated/_layout/settings/_layout/transactionTypes'
+      path: '/transactionTypes'
+      fullPath: '/settings/transactionTypes'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutTransactionTypesImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/users': {
+      id: '/_authenticated/_layout/settings/_layout/users'
+      path: '/users'
+      fullPath: '/settings/users'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutUsersImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/vendors': {
+      id: '/_authenticated/_layout/settings/_layout/vendors'
+      path: '/vendors'
+      fullPath: '/settings/vendors'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutVendorsImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
     '/_authenticated/_layout/settings/_layout/': {
+      id: '/_authenticated/_layout/settings/_layout/'
+      path: '/'
+      fullPath: '/settings/'
       preLoaderRoute: typeof AuthenticatedLayoutSettingslayoutIndexImport
       parentRoute: typeof AuthenticatedLayoutSettingslayoutImport
     }
@@ -373,25 +497,29 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren([
-  AuthenticatedRoute.addChildren([
-    AuthenticatedLayoutRoute.addChildren([
+export const routeTree = rootRoute.addChildren({
+  AuthenticatedRoute: AuthenticatedRoute.addChildren({
+    AuthenticatedLayoutRoute: AuthenticatedLayoutRoute.addChildren({
       AuthenticatedLayoutIndexRoute,
-      AuthenticatedLayoutSettingsRoute.addChildren([
-        AuthenticatedLayoutSettingslayoutRoute.addChildren([
-          AuthenticatedLayoutSettingslayoutAccountTypesRoute,
-          AuthenticatedLayoutSettingslayoutAccountsRoute,
-          AuthenticatedLayoutSettingslayoutCustomersRoute,
-          AuthenticatedLayoutSettingslayoutEmployeesRoute,
-          AuthenticatedLayoutSettingslayoutInventoryRoute,
-          AuthenticatedLayoutSettingslayoutModesOfPaymentRoute,
-          AuthenticatedLayoutSettingslayoutReportsRoute,
-          AuthenticatedLayoutSettingslayoutTransactionTypesRoute,
-          AuthenticatedLayoutSettingslayoutUsersRoute,
-          AuthenticatedLayoutSettingslayoutVendorsRoute,
-          AuthenticatedLayoutSettingslayoutIndexRoute,
-        ]),
-      ]),
+      AuthenticatedLayoutSettingsRoute:
+        AuthenticatedLayoutSettingsRoute.addChildren({
+          AuthenticatedLayoutSettingslayoutRoute:
+            AuthenticatedLayoutSettingslayoutRoute.addChildren({
+              AuthenticatedLayoutSettingslayoutAccountTypesRoute,
+              AuthenticatedLayoutSettingslayoutAccountsRoute,
+              AuthenticatedLayoutSettingslayoutCustomersRoute,
+              AuthenticatedLayoutSettingslayoutEmployeesRoute,
+              AuthenticatedLayoutSettingslayoutFieldRoutesRoute,
+              AuthenticatedLayoutSettingslayoutInventoryRoute,
+              AuthenticatedLayoutSettingslayoutModesOfPaymentRoute,
+              AuthenticatedLayoutSettingslayoutReportsRoute,
+              AuthenticatedLayoutSettingslayoutRouteDiscrepanciesRoute,
+              AuthenticatedLayoutSettingslayoutTransactionTypesRoute,
+              AuthenticatedLayoutSettingslayoutUsersRoute,
+              AuthenticatedLayoutSettingslayoutVendorsRoute,
+              AuthenticatedLayoutSettingslayoutIndexRoute,
+            }),
+        }),
       AuthenticatedLayoutBalancesheetIndexRoute,
       AuthenticatedLayoutBudgetsIndexRoute,
       AuthenticatedLayoutCashflowIndexRoute,
@@ -401,17 +529,17 @@ export const routeTree = rootRoute.addChildren([
       AuthenticatedLayoutLiquidationsIndexRoute,
       AuthenticatedLayoutPayrollsIndexRoute,
       AuthenticatedLayoutTransactionsIndexRoute,
-    ]),
-  ]),
-  ForgotPasswordRoute.addChildren([
-    ForgotPasswordlayoutRoute.addChildren([
+    }),
+  }),
+  ForgotPasswordRoute: ForgotPasswordRoute.addChildren({
+    ForgotPasswordlayoutRoute: ForgotPasswordlayoutRoute.addChildren({
       ForgotPasswordlayoutIndexRoute,
       ForgotPasswordlayoutFprIdIndexRoute,
-    ]),
-  ]),
-  LoginRoute.addChildren([
-    LoginlayoutRoute.addChildren([LoginlayoutIndexRoute]),
-  ]),
-])
+    }),
+  }),
+  LoginRoute: LoginRoute.addChildren({
+    LoginlayoutRoute: LoginlayoutRoute.addChildren({ LoginlayoutIndexRoute }),
+  }),
+})
 
 /* prettier-ignore-end */
