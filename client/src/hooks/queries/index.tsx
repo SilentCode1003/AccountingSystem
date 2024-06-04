@@ -22,6 +22,7 @@ import {
   liquidationsOptions,
   modesOfPaymentOptions,
   payrollsOptions,
+  routesOptions,
   transactionPartnersOptions,
   transactionsOptions,
   transactionTypesOptions,
@@ -36,6 +37,8 @@ export const useCurrentUser = () => {
 
 export const useCurrentUserSuspense = () =>
   useSuspenseQuery(currentUserOptions())
+
+export const useRoutes = () => useQuery(routesOptions())
 
 export const useUser = () => {
   const queryClient = useQueryClient()

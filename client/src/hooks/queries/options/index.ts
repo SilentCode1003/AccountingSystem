@@ -9,6 +9,7 @@ import { InventoryEntries } from '@/components/table-columns/inventoryEntries.co
 import { Liquidations } from '@/components/table-columns/liquidations.columns'
 import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
+import { Routes } from '@/components/table-columns/routes.columns'
 import {
   Customer,
   Transactions,
@@ -38,6 +39,28 @@ export const currentUserOptions = () => {
           userId: string
           userType: string
         }
+      }>
+
+      return data
+    },
+  })
+}
+
+export const routesOptions = () => {
+  return queryOptions({
+    queryKey: ['routes'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routes`,
+        {
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        routes: Array<Routes>
       }>
 
       return data

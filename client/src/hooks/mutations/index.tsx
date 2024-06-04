@@ -7,6 +7,7 @@ import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
+import { Routes } from '@/components/table-columns/routes.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
 import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
 import { Users } from '@/components/table-columns/users.columns'
@@ -39,6 +40,10 @@ import {
   updateModeOfPaymentSchema,
 } from '@/validators/modesOfPayment.validator'
 import { updatePayrollSchema } from '@/validators/payrolls.validators'
+import {
+  deleteRouteSchema,
+  updateRouteSchema,
+} from '@/validators/routes.validator'
 import { createTransactionSchema } from '@/validators/transactions.validator'
 import {
   createTransactionTypeSchema,
@@ -2296,6 +2301,14 @@ export const useCreateTransactionByFile = ({
         queryKey: ['employeeBudgets'],
         type: 'inactive',
       })
+      await queryClient.invalidateQueries({
+        queryKey: ['routes'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
+        type: 'inactive',
+      })
       setOpen(false)
       toast({
         title: (
@@ -2731,6 +2744,139 @@ export const useChangePassword = ({
           </div>
         ),
         description: error.message ?? 'Failed to change password',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useUpdateRoute = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['updateRoute'],
+    mutationFn: async (payload: z.infer<typeof updateRouteSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routes`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        route: Routes
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['routes'],
+        (old: { routes: Array<Routes> }) => {
+          return {
+            routes: old.routes.map((route) => {
+              if (route.routeId === data.route.routeId) {
+                return data.route
+              }
+              return route
+            }),
+          }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
+        type: 'inactive',
+      })
+
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Route was updated successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update route',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useDeleteRoute = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['deleteRoute'],
+    mutationFn: async (payload: z.infer<typeof deleteRouteSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routes/${payload.routeId}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        deletedRouteId: string
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['routes'],
+        (old: { routes: Array<Routes> }) => {
+          return {
+            routes: old.routes.filter(
+              (route) => route.routeId !== data.deletedRouteId,
+            ),
+          }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
+        type: 'inactive',
+      })
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Route was deleted successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to delete route',
         variant: 'destructive',
       })
     },
