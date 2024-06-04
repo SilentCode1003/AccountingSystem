@@ -30,6 +30,7 @@ import vendorRouter from "./routes/vendors.routes";
 import { authMiddleware } from "./utils/middlewares/auth.middleware";
 import { errorHandler } from "./utils/middlewares/errorHandler.middleware";
 import routesRouter from "./routes/routes.routes";
+import routeDiscrepanciesRouter from "./routes/routeDiscrepancies.routes";
 
 declare module "express-session" {
   interface SessionData {
@@ -122,6 +123,9 @@ app.use("/payrolls", payrollRouter);
 
 //route for all routes actions
 app.use("/routes", routesRouter);
+
+//route for all route discrepancies actions
+app.use("/routeDiscrepancies", routeDiscrepanciesRouter);
 
 //route for all transaction actions
 app.use("/transactions", transactionRouter);
