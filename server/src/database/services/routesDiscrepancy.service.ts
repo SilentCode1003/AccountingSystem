@@ -7,7 +7,19 @@ export const getAllRouteDiscrepancies = async (db: DB) => {
   const routeDiscrepancies = await db.query.routeDiscrepancies.findMany({
     with: {
       route: true,
-      liquidationRoute: true,
+      liquidationRoute: {
+        with: {
+          liquidation: {
+            with: {
+              employee: {
+                columns: {
+                  empName: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
