@@ -2216,11 +2216,35 @@ export const useCreateTransaction = (
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
         queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['cashFlowBarChart'],
+        queryKey: ['liquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeLiquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['budgets'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeBudgets'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['routes'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
         type: 'inactive',
       })
       form.reset()
@@ -2293,6 +2317,10 @@ export const useCreateTransactionByFile = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['liquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeLiquidations'],
         type: 'inactive',
       })
       await queryClient.invalidateQueries({

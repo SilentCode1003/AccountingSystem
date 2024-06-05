@@ -3,6 +3,8 @@ import { AccountTypes } from '@/components/table-columns/accountTypes.column'
 import { Budgets } from '@/components/table-columns/budgets.columns'
 import { Cheques } from '@/components/table-columns/cheques.columns'
 import { Customers } from '@/components/table-columns/customers.columns'
+import { EmployeeBudgets } from '@/components/table-columns/employeeBudgets.columns'
+import { EmployeeLiquidations } from '@/components/table-columns/employeeLiquidations.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
@@ -596,10 +598,35 @@ export const employeeBudgetsOptions = ({ date }: { date?: Date }) => {
       )
       if (!response.ok) throw new Error((await response.json()).error)
       const data = response.json() as Promise<{
-        employeeBudgets: Array<{
-          employee: Pick<Employees, 'empId' | 'empName'>
-          amount: number
-        }>
+        employeeBudgets: Array<EmployeeBudgets>
+      }>
+      return data
+    },
+  })
+}
+
+export const employeeLiquidationsOptions = ({ date }: { date?: Date }) => {
+  return queryOptions({
+    queryKey: [
+      'employeeLiquidations',
+      { date: date ? date.getMonth() : undefined },
+    ],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/liquidations/employeeLiquidations` +
+          (date
+            ? '?' +
+              new URLSearchParams({
+                date: date.toISOString(),
+              })
+            : ''),
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        employeeLiquidations: Array<EmployeeLiquidations>
       }>
       return data
     },
