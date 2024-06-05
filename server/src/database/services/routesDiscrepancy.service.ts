@@ -64,7 +64,19 @@ export const toggleRouteDiscrepancy = async (
     where: eq(routeDiscrepancies.rdId, input.rdId),
     with: {
       route: true,
-      liquidationRoute: true,
+      liquidationRoute: {
+        with: {
+          liquidation: {
+            with: {
+              employee: {
+                columns: {
+                  empName: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
