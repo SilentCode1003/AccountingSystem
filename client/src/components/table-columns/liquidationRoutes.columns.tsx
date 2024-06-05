@@ -1,4 +1,5 @@
 import { ColumnDef } from '@tanstack/table-core'
+import { Liquidations } from './liquidations.columns'
 
 export type LiquidationRoutes = {
   lrId: string
@@ -8,6 +9,7 @@ export type LiquidationRoutes = {
   lrTo: string
   lrPrice: number
   lrModeOfTransport: string
+  liquidation?: Liquidations
 }
 
 export const liquidationsRoutesColumns: ColumnDef<LiquidationRoutes>[] = [

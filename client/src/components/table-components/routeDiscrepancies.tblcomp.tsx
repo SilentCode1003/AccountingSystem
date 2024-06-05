@@ -2,11 +2,16 @@ import { useToggleRouteDiscrepancy } from '@/hooks/mutations'
 import { cn } from '@/lib/utils'
 import { CellContext, Row } from '@tanstack/table-core'
 import { MoreHorizontalIcon } from 'lucide-react'
+import CleanTable from '../CleanTable'
 import { PromptModal } from '../PromptModal'
-import { RouteDiscrepancies } from '../table-columns/routeDiscrepancies.columns'
+import {
+  RouteDiscrepancies,
+  RouteDiscrepancyCardColumns,
+} from '../table-columns/routeDiscrepancies.columns'
 import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
+import { Card } from '../ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
+import { Text } from '../ui/text'
 
 export const RouteDiscrepanciesStatusColumn = ({
   row,
@@ -85,9 +91,77 @@ export const RouteDiscrepanciesSubComponent = ({
   row: Row<RouteDiscrepancies>
 }) => {
   return (
-    <>
-      <div>{JSON.stringify(row.original.route)}</div>
-      <div>{JSON.stringify(row.original.liquidationRoute)}</div>
-    </>
+    <div className="flex gap-4 p-4 ">
+      <DiscrepancyCard
+        title="Liquidation Route"
+        data={{
+          startPoint: row.original.liquidationRoute.lrFrom,
+          endPoint: row.original.liquidationRoute.lrTo,
+          price: row.original.liquidationRoute.lrPrice,
+          modeOfTransport: row.original.liquidationRoute.lrModeOfTransport,
+          gtr:
+            row.original.liquidationRoute.lrPrice >
+            row.original.route.routePrice,
+        }}
+        type="liquidationRoute"
+        date={row.original.liquidationRoute.liquidation?.liquidationDate}
+        empName={row.original.liquidationRoute.liquidation?.employee.empName}
+      />
+      <DiscrepancyCard
+        title="Route"
+        data={{
+          startPoint: row.original.route.routeStart,
+          endPoint: row.original.route.routeEnd,
+          price: row.original.route.routePrice,
+          modeOfTransport: row.original.route.routeModeOfTransport,
+          gtr:
+            row.original.liquidationRoute.lrPrice <
+            row.original.route.routePrice,
+        }}
+        type="route"
+      />
+    </div>
+  )
+}
+
+const DiscrepancyCard = ({
+  title,
+  data,
+  type,
+  date,
+  empName,
+}: {
+  title: string
+  data: {
+    startPoint: string
+    endPoint: string
+    price: number
+    modeOfTransport: string
+    gtr: boolean
+  }
+  type: 'route' | 'liquidationRoute'
+  date?: Date
+  empName?: string
+}) => {
+  return (
+    <Card className="w-full p-4">
+      <Text variant={'heading1bold'}>{title}</Text>
+
+      <CleanTable columns={RouteDiscrepancyCardColumns} data={[data]} />
+
+      <Text variant={'heading1bold'} className="mt-4"></Text>
+      {type === 'liquidationRoute' && (
+        <>
+          <div className="flex gap-4">
+            <Text variant={'heading4bold'}>Date:</Text>
+            <Text variant={'body'}>{new Date(date!).toLocaleDateString()}</Text>
+          </div>
+          <div className="flex gap-4">
+            <Text variant={'heading4bold'}>Employee Name:</Text>
+            <Text variant={'body'}>{empName}</Text>
+          </div>
+        </>
+      )}
+    </Card>
   )
 }

@@ -11,14 +11,14 @@ export type Routes = {
   routeId: string
   routeStart: string
   routeEnd: string
-  routePrice: string
+  routePrice: number
   routeModeOfTransport: string
 }
 
 export const RoutesColumns: ColumnDef<Routes>[] = [
   {
     accessorKey: 'routeStart',
-    meta: 'Start',
+    meta: 'Start Point',
     header: ({ column }) => {
       return (
         <Button
@@ -29,7 +29,7 @@ export const RoutesColumns: ColumnDef<Routes>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          Start
+          Start Point
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -37,7 +37,7 @@ export const RoutesColumns: ColumnDef<Routes>[] = [
   },
   {
     accessorKey: 'routeEnd',
-    meta: 'End',
+    meta: 'End Point',
     header: ({ column }) => {
       return (
         <Button
@@ -48,7 +48,7 @@ export const RoutesColumns: ColumnDef<Routes>[] = [
             className: 'p-0 text-foreground',
           })}
         >
-          End
+          End Point
           <ArrowUpDownIcon className="ml-2 h-4 w-4" />
         </Button>
       )
