@@ -1,9 +1,9 @@
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
-import db from "..";
-import inventoryEntryProducts from "../schema/inventoryEntriesProducts.schema";
+import { isEqual, sortBy } from "lodash";
+import { DB } from "..";
 import inventory from "../schema/inventory.schema";
-import { difference, isEqual, sortBy } from "lodash";
+import inventoryEntryProducts from "../schema/inventoryEntriesProducts.schema";
 
 const INVENTORY_ENTRY_TYPE = {
   INCOMING: "INCOMING",
@@ -14,7 +14,7 @@ type ObjectTypes<T> = T[keyof T];
 
 export type InventoryEntryType = ObjectTypes<typeof INVENTORY_ENTRY_TYPE>;
 
-export const getAllInventoryEntryProducts = async () => {
+export const getAllInventoryEntryProducts = async (db: DB) => {
   const products = await db.query.inventoryEntryProducts.findMany({
     with: {
       inventoryEntry: true,
@@ -36,14 +36,17 @@ export const getAllInventoryEntryProducts = async () => {
 //   return entry;
 // };
 
-export const addInventoryEntryProducts = async (input: {
-  iepInvEntryId: string;
-  iepType?: string;
-  iepProducts: Array<{
-    iepInvId: string;
-    iepQuantity: number;
-  }>;
-}) => {
+export const addInventoryEntryProducts = async (
+  db: DB,
+  input: {
+    iepInvEntryId: string;
+    iepType?: string;
+    iepProducts: Array<{
+      iepInvId: string;
+      iepQuantity: number;
+    }>;
+  }
+) => {
   const errors: Array<string> = [];
   await Promise.all(
     input.iepProducts.map(async (product) => {
@@ -102,15 +105,18 @@ export const addInventoryEntryProducts = async (input: {
   //   return newInventoryEntryProductId;
 };
 
-export const editInventoryEntryProducts = async (input: {
-  iepInvEntryId: string;
-  iepType?: string;
-  prevInvEntryType: string;
-  iepProducts: Array<{
-    iepInvId: string;
-    iepQuantity: number;
-  }>;
-}) => {
+export const editInventoryEntryProducts = async (
+  db: DB,
+  input: {
+    iepInvEntryId: string;
+    iepType?: string;
+    prevInvEntryType: string;
+    iepProducts: Array<{
+      iepInvId: string;
+      iepQuantity: number;
+    }>;
+  }
+) => {
   const previousProducts = await db.query.inventoryEntryProducts.findMany({
     where: eq(inventoryEntryProducts.iepInvEntryId, input.iepInvEntryId),
   });
@@ -224,9 +230,12 @@ export const editInventoryEntryProducts = async (input: {
   } as typeof newInventoryEntryProducts & { totalPrice: number };
 };
 
-export const deleteInventoryEntryProducts = async (input: {
-  iepId: string;
-}) => {
+export const deleteInventoryEntryProducts = async (
+  db: DB,
+  input: {
+    iepId: string;
+  }
+) => {
   await db
     .delete(inventoryEntryProducts)
     .where(eq(inventoryEntryProducts.iepId, input.iepId));

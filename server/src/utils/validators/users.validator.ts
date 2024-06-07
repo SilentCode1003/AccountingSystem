@@ -4,27 +4,14 @@ import { type UploadedFile } from "express-fileupload";
 //validator for POST /users inputs
 export const createValidator = z.object({
   userType: z.enum(["FINANCE", "HIGHER_DEPARTMENT"]),
-  userUsername: z.string(),
-  userPassword: z.string(),
-  userFullName: z.string(),
-  userContactNumber: z.string(),
-  userProfilePic: z
-    .custom<UploadedFile>()
-    .refine(
-      (file) => {
-        if (
-          file.mimetype === "image/png" ||
-          file.mimetype === "image/jpeg" ||
-          file.mimetype === "image/jpg"
-        )
-          return true;
-        return false;
-      },
-      {
-        message: "Only PNG files are allowed",
-      }
-    )
-    .transform((file) => file.name),
+  empId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "empId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not an employee id.`,
+      });
+    }
+  }),
 });
 
 //validator for GET /users single user input
@@ -33,13 +20,7 @@ export const getByIdValidator = z.object({
     if (val.split(" ")[0] !== "userId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an user id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
+        message: `Not a user id.`,
       });
     }
   }),
@@ -51,13 +32,7 @@ export const updateValidator = z.object({
     if (val.split(" ")[0] !== "userId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an user id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
+        message: `Not a user id.`,
       });
     }
   }),
@@ -94,14 +69,24 @@ export const toggleIsActiveValidator = z.object({
     if (val.split(" ")[0] !== "userId") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Not an user id.`,
-      });
-    }
-    if (!z.string().uuid().safeParse(val.split(" ")[1]).success) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Not valid uuid.`,
+        message: `Not a user id.`,
       });
     }
   }),
+});
+
+export const forgetPasswordValidator = z.object({
+  userName: z.string().min(1, { message: "Username is required" }),
+});
+
+export const changePasswordValidator = z.object({
+  userId: z.string().superRefine((val, ctx) => {
+    if (val.split(" ")[0] !== "userId") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Not a user id.`,
+      });
+    }
+  }),
+  newPassword: z.string().min(1, { message: "Password is required" }),
 });

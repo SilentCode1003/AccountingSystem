@@ -1,12 +1,10 @@
-import { sql, sum } from "drizzle-orm";
-import db from "../index";
-import accounts from "../schema/accounts.schema";
 import crypto from "crypto";
-import { eq, not } from "drizzle-orm";
-import { and } from "drizzle-orm";
+import { and, eq, not, sql, sum } from "drizzle-orm";
+import { DB } from "../index";
+import accounts from "../schema/accounts.schema";
 import accountTypes from "../schema/accountType.schema";
 
-export const getAllAccounts = async () => {
+export const getAllAccounts = async (db: DB) => {
   const accounts = await db.query.accounts.findMany({
     with: { accountType: true },
   });
@@ -14,7 +12,7 @@ export const getAllAccounts = async () => {
   return accounts;
 };
 
-export const getAccountByID = async (accId: string) => {
+export const getAccountByID = async (db: DB, accId: string) => {
   const account = await db.query.accounts.findFirst({
     where: (account) => eq(account.accId, accId),
     with: {
@@ -25,7 +23,11 @@ export const getAccountByID = async (accId: string) => {
   return account;
 };
 
-export const getBalanceSheet = async (month: Date, accTypes: string[]) => {
+export const getBalanceSheet = async (
+  db: DB,
+  month: Date,
+  accTypes: string[]
+) => {
   const accountsByMonth = Promise.all(
     accTypes.map(async (accTypeId) => {
       const accType = await db.query.accountTypes.findFirst({
@@ -57,7 +59,11 @@ export const getBalanceSheet = async (month: Date, accTypes: string[]) => {
   return accountsByMonth;
 };
 
-export const getIncomeStatement = async (month: Date, accTypes: string[]) => {
+export const getIncomeStatement = async (
+  db: DB,
+  month: Date,
+  accTypes: string[]
+) => {
   const accountsByMonth = Promise.all(
     accTypes.map(async (accTypeId) => {
       const accType = await db.query.accountTypes.findFirst({
@@ -89,13 +95,17 @@ export const getIncomeStatement = async (month: Date, accTypes: string[]) => {
   return accountsByMonth;
 };
 
-export const addAccount = async (input: {
-  accName: string;
-  accTypeId: string;
-  accDescription: string;
-  accAmount: number;
-  accCreatedAt?: Date;
-}) => {
+export const addAccount = async (
+  db: DB,
+  input: {
+    accName: string;
+    accTypeId: string;
+    accDescription: string;
+    accAmount: number;
+    accCreatedAt?: Date;
+    accIsActive?: boolean;
+  }
+) => {
   const newAccountId = `accId ${crypto.randomUUID()}`;
 
   await db.insert(accounts).values({ ...input, accId: newAccountId });
@@ -110,16 +120,19 @@ export const addAccount = async (input: {
   return newAccount;
 };
 
-export const editAccount = async (input: {
-  accId: string;
-  newData: {
-    accName?: string;
-    accTypeId?: string;
-    accDescription?: string;
-    accAmount?: number;
-    accCreatedAt?: Date;
-  };
-}) => {
+export const editAccount = async (
+  db: DB,
+  input: {
+    accId: string;
+    newData: {
+      accName?: string;
+      accTypeId?: string;
+      accDescription?: string;
+      accAmount?: number;
+      accCreatedAt?: Date;
+    };
+  }
+) => {
   await db
     .update(accounts)
     .set({ ...input.newData, accUpdatedAt: new Date() })
@@ -135,7 +148,10 @@ export const editAccount = async (input: {
   return updatedAcc;
 };
 
-export const updateAccountIsActive = async (input: { accId: string }) => {
+export const updateAccountIsActive = async (
+  db: DB,
+  input: { accId: string }
+) => {
   await db
     .update(accounts)
     .set({

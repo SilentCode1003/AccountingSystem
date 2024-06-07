@@ -281,6 +281,118 @@
       "when": 1716601640692,
       "tag": "0039_blushing_hellfire_club",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1716773685535,
+      "tag": "0040_burly_silverclaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "5",
+      "when": 1716779299004,
+      "tag": "0041_closed_dorian_gray",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "5",
+      "when": 1716798473598,
+      "tag": "0042_omniscient_robbie_robertson",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "5",
+      "when": 1716865070907,
+      "tag": "0043_wakeful_harpoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "5",
+      "when": 1716875365045,
+      "tag": "0044_shiny_spyke",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "5",
+      "when": 1716946778936,
+      "tag": "0045_far_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "5",
+      "when": 1716954046083,
+      "tag": "0046_petite_sandman",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "5",
+      "when": 1716960116826,
+      "tag": "0047_famous_elektra",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "5",
+      "when": 1716960701972,
+      "tag": "0048_dusty_scream",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "5",
+      "when": 1716962726866,
+      "tag": "0049_noisy_sharon_carter",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "5",
+      "when": 1716964845068,
+      "tag": "0050_familiar_pride",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "5",
+      "when": 1717395287155,
+      "tag": "0051_fancy_betty_ross",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "5",
+      "when": 1717397798133,
+      "tag": "0052_chubby_jubilee",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "5",
+      "when": 1717399767860,
+      "tag": "0053_legal_morph",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "5",
+      "when": 1717400388644,
+      "tag": "0054_icy_vertigo",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "5",
+      "when": 1717485018104,
+      "tag": "0055_cute_the_order",
+      "breakpoints": true
     }
   ]
 }

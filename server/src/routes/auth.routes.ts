@@ -2,6 +2,7 @@ import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import { login } from "../controller/login.controller";
 import { logout } from "../controller/logout.controller";
+import { changePassword, forgetPassword } from "../controller/users.controller";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -17,7 +18,14 @@ const limiter = rateLimit({
 
 const authRouter = Router();
 
+//forgot password
+authRouter.post("/forgetPassword", forgetPassword);
+
+//change password
+authRouter.put("/changePassword/reset", changePassword);
+
 authRouter.use(limiter);
+
 authRouter.post("/login", login);
 
 authRouter.post("/logout", logout);

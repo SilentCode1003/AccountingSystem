@@ -375,12 +375,14 @@ export const DateHiredColumn = ({ row }: CellContext<Employees, unknown>) => {
 // )
 
 export const NameColumn = ({ row }: CellContext<Employees, unknown>) => {
+  const names = row.original.empName.split(' ')
+
   return (
     <div className="flex gap-4 min-w-32 items-center">
       <div>
         <Avatar>
           <AvatarImage src={row.original.empImage} />
-          <AvatarFallback>NG</AvatarFallback>
+          <AvatarFallback>{names[0][0] + names[1][0]}</AvatarFallback>
         </Avatar>
       </div>
       <div>{row.original.empName}</div>

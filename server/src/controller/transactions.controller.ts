@@ -1,11 +1,15 @@
+import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
 import path from "path";
 import * as xlsx from "xlsx";
 import db from "../database";
+import modesOfPayment from "../database/schema/modeOfPayment";
 import { getAllAccountTypes } from "../database/services/accountType.service";
+import { addBudget } from "../database/services/budgets.service";
 import { getCustomerByName } from "../database/services/customers.service";
 import { getEmployeeByName } from "../database/services/employees.service";
+import { addLiquidation } from "../database/services/liquidations.service";
 import {
   addTransaction,
   editTransaction,
@@ -17,12 +21,11 @@ import {
   createValidator,
   updateValidator,
 } from "../utils/validators/transactions.validator";
-import crypto from "crypto";
-import modesOfPayment from "../database/schema/modeOfPayment";
+import { addTransactionType } from "../database/services/transactionTypes.service";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
-    const transactions = await getAllTransactions();
+    const transactions = await getAllTransactions(db);
     console.log("successfully fetched all transactions");
     return res.status(200).send({ transactions });
   } catch (error) {
@@ -44,7 +47,7 @@ export const createTransaction = async (req: Request, res: Response) => {
       .send({ error: "Invalid inputs", message: input.error.errors });
 
   try {
-    const newTransaction = await addTransaction({
+    const newTransaction = await addTransaction(db, {
       ...input.data,
     });
     input.data.tranFile?.mv(
@@ -75,7 +78,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const updatedTransaction = await editTransaction(input.data);
+    const updatedTransaction = await editTransaction(db, input.data);
 
     input.data.tranFile?.mv(
       path.join(
@@ -116,7 +119,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
     const secondWordRegex = /[^\w]\w+/;
 
-    const accountTypes = await getAllAccountTypes();
+    const accountTypes = await getAllAccountTypes(db);
 
     let entryAccType: string = "";
 
@@ -147,20 +150,45 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       }
     }
 
+    type LiquidationRoute = {
+      lrDestination: string;
+      lrModeOfTransport: string;
+      lrFrom: string;
+      lrTo: string;
+      lrPrice: number;
+    };
+
     const lq: Array<{
       tranPartner?: string;
       amount?: number;
       description?: string;
       date?: Date;
+      budgetRemaining?: number;
+      budgetGiven?: number;
+      liquidationRoutes?: Array<LiquidationRoute>;
       tranAccTypeId?: string;
       tranMopName?: string;
     }> = await Promise.all(
       excelEntries.map(async (entry) => {
         const entryObj: any = {};
+        let count: number = 0;
+        const routes: Array<string> = [];
+        const liquidationRoutes: Array<LiquidationRoute> = [];
         for (let i = 0; i < entry.length; i++) {
           const val = String(f[entry[i]].v).replaceAll(/\s/g, "");
 
           const targetVal = f[entry[i + 1]];
+
+          if (val === "ROUTE") {
+            count = 1;
+          }
+          if (val === "REMARKS/COMMENTS:") {
+            count = 0;
+          }
+
+          if (count === 1) {
+            routes.push(val);
+          }
 
           if (val === "SUBTOTAL:") {
             entryObj["amount"] = Number(targetVal.v);
@@ -170,16 +198,24 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
             entryObj["date"] = new Date(targetVal.w);
           }
 
+          if (val === "BUDGETRECEIVED") {
+            entryObj["budgetGiven"] = Number(targetVal.v);
+          }
+
+          if (val === "FUNDREMAINING:") {
+            entryObj["budgetRemaining"] = Number(targetVal.v);
+          }
+
           if (val === "NAME:") {
             if (file.name.toLowerCase().includes("employee")) {
-              const tranPartner = await getEmployeeByName(targetVal.v);
+              const tranPartner = await getEmployeeByName(db, targetVal.v);
 
               entryObj["tranPartner"] = tranPartner?.empId as string;
             } else if (file.name.includes("customer")) {
-              const tranPartner = await getCustomerByName(targetVal.v);
+              const tranPartner = await getCustomerByName(db, targetVal.v);
               entryObj["tranPartner"] = tranPartner?.custId as string;
             } else if (file.name.includes("vendor")) {
-              const tranPartner = await getVendorByName(targetVal.v);
+              const tranPartner = await getVendorByName(db, targetVal.v);
               entryObj["tranPartner"] = tranPartner?.vdId as string;
             }
           }
@@ -193,7 +229,23 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
             entryObj["description"] = file.name.match(firstWordRegex)![0];
           }
         }
-        return entryObj;
+
+        const chunkSize = 5;
+        routes.shift();
+        routes.shift();
+        for (let i = 0; i < routes.length; i += chunkSize) {
+          const chunk = routes.slice(i, i + chunkSize);
+          if (i + 1 > chunkSize)
+            liquidationRoutes.push({
+              lrDestination: chunk[0],
+              lrFrom: chunk[1],
+              lrTo: chunk[2],
+              lrPrice: Number(chunk[3]),
+              lrModeOfTransport: chunk[4],
+            });
+        }
+
+        return { ...entryObj, liquidationRoutes };
       })
     );
 
@@ -209,26 +261,84 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
 
     const newMultiFileName = `multiFile ${crypto.randomUUID()}`;
 
-    const transactions = await Promise.all(
-      lq.map(async (tran) => {
-        const tranMop = await db.query.modesOfPayment.findFirst({
-          where: eq(modesOfPayment.mopName, tran.tranMopName!),
-        });
+    const newTransactions: Array<{
+      tranId: string;
+      tranAccId: string;
+      tranDescription: string;
+      tranAmount: number;
+      tranEmpId: string | null;
+      tranVdId: string | null;
+      tranCustId: string | null;
+      tranMopId: string;
+      tranTransactionDate: Date;
+      tranOtherPartner: string | null;
+      tranCreatedAt: Date;
+      tranUpdatedAt: Date;
+      tranFile: string;
+      tranTypeId: string | null;
+    }> = [];
 
-        const transaction = await addTransaction({
-          tranAccTypeId: tran.tranAccTypeId as string,
-          tranAmount: tran.amount!,
-          tranDescription: tran.description ?? "FILE TRANSACTION",
-          tranTransactionDate: tran.date!,
-          tranPartner: tran.tranPartner,
-          tranTypeId: transactionType?.tranTypeId as string,
-          tranFileName: newMultiFileName,
-          tranMopId: tranMop?.mopId as string,
-        });
+    await db.transaction(async (tx) => {
+      await addTransactionType(tx, {
+        tranTypeName: "BUDGET",
+        tranTypeAccTypeId: transactionType!.tranTypeAccTypeId,
+      });
 
-        return transaction;
-      })
-    );
+      await Promise.all(
+        lq.map(async (tran) => {
+          const tranMop = await tx.query.modesOfPayment.findFirst({
+            where: eq(modesOfPayment.mopName, tran.tranMopName!),
+          });
+
+          const transaction = await addTransaction(tx, {
+            tranAccTypeId: tran.tranAccTypeId as string,
+            tranAmount: tran.amount!,
+            tranDescription: tran.description ?? "FILE TRANSACTION",
+            tranTransactionDate: tran.date!,
+            tranPartner: tran.tranPartner,
+            tranTypeId: transactionType?.tranTypeId as string,
+            tranFileName: newMultiFileName,
+            tranMopId: tranMop?.mopId as string,
+          });
+
+          // budgetRemaining < amount || budgetGiven then create a new budget
+          if (tran.budgetRemaining! < tran.amount! || tran.budgetGiven) {
+            const budgetTranType = await tx.query.tranTypes.findFirst({
+              where: (tranType) => eq(tranType.tranTypeName, "BUDGET"),
+            });
+
+            const budgetTransaction = await addTransaction(tx, {
+              tranAccTypeId: tran.tranAccTypeId!,
+              tranAmount: tran.budgetGiven!,
+              tranDescription: "BUDGET" ?? "FILE TRANSACTION",
+              tranTransactionDate: tran.date!,
+              tranPartner: tran.tranPartner,
+              tranTypeId: budgetTranType!.tranTypeId,
+              tranFileName: newMultiFileName,
+              tranMopId: tranMop!.mopId,
+            });
+            await addBudget(tx, {
+              budgetEmpId: tran.tranPartner!,
+              budgetAmount: tran.budgetGiven!,
+              budgetDate: tran.date!,
+              budgetTranId: budgetTransaction!.tranId,
+            });
+            newTransactions.push(budgetTransaction!);
+          }
+
+          // create a new liquidation
+          await addLiquidation(tx, {
+            liquidationEmpId: tran.tranPartner!,
+            liquidationAmount: tran.amount!,
+            liquidationDate: tran.date!,
+            liquidationTranId: transaction!.tranId,
+            liquidationRoutes: tran.liquidationRoutes!,
+          });
+
+          newTransactions.push(transaction!);
+        })
+      );
+    });
 
     file.mv(
       path.join(
@@ -241,7 +351,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
     );
 
     console.log("successfully created transaction by file");
-    return res.send({ transactions });
+    return res.send({ transactions: newTransactions });
   } catch (error) {
     console.log("error creating transaction by file");
     console.log(error);

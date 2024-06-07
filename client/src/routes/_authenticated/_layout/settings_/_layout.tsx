@@ -81,6 +81,26 @@ function SettingsLayout() {
             </Link>
             <Link
               className={cn(
+                router.location.pathname === '/settings/fieldRoutes' &&
+                  "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
+                'px-4 py-2 rounded-md',
+              )}
+              to="/settings/fieldRoutes"
+            >
+              Routes
+            </Link>
+            <Link
+              className={cn(
+                router.location.pathname === '/settings/routeDiscrepancies' &&
+                  "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
+                'px-4 py-2 rounded-md',
+              )}
+              to="/settings/routeDiscrepancies"
+            >
+              Route Discrepancies
+            </Link>
+            <Link
+              className={cn(
                 router.location.pathname === '/settings/employees' &&
                   "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
                 'px-4 py-2 rounded-md',
@@ -118,6 +138,16 @@ function SettingsLayout() {
               to="/settings/inventory"
             >
               Inventory
+            </Link>
+            <Link
+              className={cn(
+                router.location.pathname === '/settings/users' &&
+                  "font-semibold text-primary bg-muted relative before:absolute before:top-0 before:-left-4 before:content-[''] before:h-full before:w-2 before:bg-primary before:rounded-md transition-all duration-500",
+                'px-4 py-2 rounded-md',
+              )}
+              to="/settings/users"
+            >
+              Users
             </Link>
             <Link
               className={cn(
