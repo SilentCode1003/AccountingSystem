@@ -43,7 +43,7 @@ function Settings() {
     contactNumber: user.data.user.userContactNumber,
   })
 
-  const updateUser = useUpdateUser({ setToggleEdit, setUserData })
+  const updateUser = useUpdateUser({ setOpen: setToggleEdit, setUserData })
 
   const handleUserDataChange = (e: any) => {
     setUserData({

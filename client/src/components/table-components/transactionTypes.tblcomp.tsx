@@ -125,9 +125,9 @@ export const TranTypeAccountTypeColumn = ({
               }
               nonButton
               dialogMessage="Continue?"
-              prompType="DELETE"
-              dialogTitle="You are about to DELETE this transaction type! Data loss may occur and cannot be undone!"
-              triggerText="DELETE TRANSACTION TYPE"
+              prompType="TOGGLE"
+              dialogTitle="You are about to TOGGLE this transaction type! Data loss may occur and cannot be undone!"
+              triggerText="TOGGLE TRANSACTION TYPE"
             />
 
             <DialogContent className="scale-75 md:scale-100">

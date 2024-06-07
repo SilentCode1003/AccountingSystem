@@ -10,10 +10,11 @@ import {
   toggleIsActiveValidator,
   updateValidator,
 } from "../utils/validators/transactionTypes.validator";
+import db from "../database";
 
 export const getTransactionTypes = async (req: Request, res: Response) => {
   try {
-    const transactionTypes = await getAllTransactionTypes();
+    const transactionTypes = await getAllTransactionTypes(db);
     console.log("successfully fetched all transaction types");
     return res.status(200).send({
       transactionTypes,
@@ -36,7 +37,7 @@ export const createTransactionType = async (req: Request, res: Response) => {
     });
 
   try {
-    const newTransactionType = await addTransactionType(input.data);
+    const newTransactionType = await addTransactionType(db, input.data);
     console.log("successfully created a transaction type");
     return res.status(200).send({
       transactionType: newTransactionType,
@@ -58,7 +59,7 @@ export const updateTransactionType = async (req: Request, res: Response) => {
     });
 
   try {
-    const updatedTransactionType = await editTransactionType(input.data);
+    const updatedTransactionType = await editTransactionType(db, input.data);
     console.log("successfully updated a transaction type");
     return res.status(200).send({
       transactionType: updatedTransactionType,
@@ -85,6 +86,7 @@ export const toggleTransactionTypeIsActive = async (
 
   try {
     const updatedTransactionType = await changeTransactionTypeIsActive(
+      db,
       input.data
     );
     console.log("successfully toggled a transaction type");

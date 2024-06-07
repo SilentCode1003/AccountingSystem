@@ -1,9 +1,8 @@
-import { and, eq, sql, sum } from "drizzle-orm";
-import db from "..";
-import accountTypes from "../schema/accountType.schema";
 import crypto from "crypto";
+import { and, eq, not, sql, sum } from "drizzle-orm";
+import { DB } from "..";
 import accounts from "../schema/accounts.schema";
-import { not } from "drizzle-orm";
+import accountTypes from "../schema/accountType.schema";
 
 const ACCTYPE_DEFAULT = {
   CASHFLOW: "CASHFLOW",
@@ -15,7 +14,7 @@ type ObjectTypes<T> = T[keyof T];
 
 type AccountTypeDefault = ObjectTypes<typeof ACCTYPE_DEFAULT>;
 
-export const getAllAccountTypes = async () => {
+export const getAllAccountTypes = async (db: DB) => {
   const accountTypes = await db.query.accountTypes.findMany({
     with: {
       accounts: true,
@@ -25,7 +24,10 @@ export const getAllAccountTypes = async () => {
   return accountTypes;
 };
 
-export const getAccountTypeById = async (input: { accTypeId: string }) => {
+export const getAccountTypeById = async (
+  db: DB,
+  input: { accTypeId: string }
+) => {
   const accountType = await db.query.accountTypes.findFirst({
     where: (accType) => eq(accType.accTypeId, input.accTypeId),
     with: {
@@ -36,10 +38,13 @@ export const getAccountTypeById = async (input: { accTypeId: string }) => {
   return accountType;
 };
 
-export const addAccountType = async (input: {
-  accTypeName: string;
-  accTypeDefault: AccountTypeDefault;
-}) => {
+export const addAccountType = async (
+  db: DB,
+  input: {
+    accTypeName: string;
+    accTypeDefault: AccountTypeDefault;
+  }
+) => {
   const newAccountTypeId = `accTypeId ${crypto.randomUUID()}`;
   await db.insert(accountTypes).values({
     accTypeId: newAccountTypeId,
@@ -47,46 +52,55 @@ export const addAccountType = async (input: {
     accTypeDefault: input.accTypeDefault,
   });
 
-  const newAccountType = await getAccountTypeById({
+  const newAccountType = await getAccountTypeById(db, {
     accTypeId: newAccountTypeId,
   });
   return newAccountType;
 };
 
-export const editAccountType = async (input: {
-  accTypeId: string;
-  newData: {
-    accTypeName?: string;
-    accTypeDefault?: AccountTypeDefault;
-  };
-}) => {
+export const editAccountType = async (
+  db: DB,
+  input: {
+    accTypeId: string;
+    newData: {
+      accTypeName?: string;
+      accTypeDefault?: AccountTypeDefault;
+    };
+  }
+) => {
   await db
     .update(accountTypes)
     .set(input.newData)
     .where(eq(accountTypes.accTypeId, input.accTypeId));
-  const updatedAccountType = await getAccountTypeById({
+  const updatedAccountType = await getAccountTypeById(db, {
     accTypeId: input.accTypeId,
   });
 
   return updatedAccountType;
 };
 
-export const changeAccountTypeIsActive = async (input: {
-  accTypeId: string;
-}) => {
+export const changeAccountTypeIsActive = async (
+  db: DB,
+  input: {
+    accTypeId: string;
+  }
+) => {
   await db
     .update(accountTypes)
     .set({
       accTypeIsActive: not(accountTypes.accTypeIsActive),
     })
     .where(eq(accountTypes.accTypeId, input.accTypeId));
-  const editedAccountType = await getAccountTypeById(input);
+  const editedAccountType = await getAccountTypeById(db, input);
   return editedAccountType;
 };
-export const getAccountTypeTotalPerMonthQuery = async (input: {
-  accTypeId: string;
-  date: Date;
-}) => {
+export const getAccountTypeTotalPerMonthQuery = async (
+  db: DB,
+  input: {
+    accTypeId: string;
+    date: Date;
+  }
+) => {
   const data = await db
     .select({
       total: sum(accounts.accAmount),
@@ -96,15 +110,19 @@ export const getAccountTypeTotalPerMonthQuery = async (input: {
       and(
         eq(sql`month(acc_created_at)`, sql`month(${input.date})`),
         eq(sql`year(acc_created_at)`, sql`year(${input.date})`),
-        eq(accounts.accTypeId, input.accTypeId)
+        eq(accounts.accTypeId, input.accTypeId),
+        eq(accounts.accIsActive, true)
       )
     );
   return data[0].total;
 };
 
-export const getAccountTypeBarChartData = async (input: {
-  accTypeId: string;
-}) => {
+export const getAccountTypeBarChartData = async (
+  db: DB,
+  input: {
+    accTypeId: string;
+  }
+) => {
   const currentMonth = new Date().getMonth();
 
   let data: Array<any> = [];
@@ -128,6 +146,7 @@ export const getAccountTypeBarChartData = async (input: {
             sql`year(${new Date(new Date().getFullYear(), i)})`
           ),
           eq(accounts.accTypeId, input.accTypeId)
+          // eq(accounts.accIsActive, true)
         )
       )
       .groupBy(accounts.accName);

@@ -19,7 +19,7 @@ import crypto from "crypto";
 
 export const getPayrolls = async (req: Request, res: Response) => {
   try {
-    const payrolls = await getAllPayrolls();
+    const payrolls = await getAllPayrolls(db);
     console.log("successfully fetched all payrolls");
     return res.status(200).send({
       payrolls,
@@ -43,7 +43,7 @@ export const createPayroll = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const newPayroll = await addPayroll({
+    const newPayroll = await addPayroll(db, {
       ...input.data,
       prTranFileMimeType:
         input.data.prFile.mimetype ===
@@ -85,7 +85,7 @@ export const updatePayroll = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0] });
 
   try {
-    const updatedPayroll = await editPayroll({
+    const updatedPayroll = await editPayroll(db, {
       ...input.data,
       prTranFileMimeType:
         input.data.prFile &&
@@ -176,7 +176,7 @@ export const createPayrollByFile = async (req: Request, res: Response) => {
         if (!modeOfPayment) throw new Error("Mode of payment does not exists");
 
         //insert payroll
-        const newPayroll = await addPayroll({
+        const newPayroll = await addPayroll(db, {
           prDateFrom: new Date(
             Math.round((Number(pr.prDateFrom) - 25569) * 86400 * 1000)
           ),

@@ -9,16 +9,20 @@ function ErrorComponent({
   error,
   resetErrorBoundary,
   router,
+  passwordReset,
 }: {
   router?: any
   resetErrorBoundary: Function
   error: any
+  passwordReset?: boolean
 }) {
   // resetErrorBoundary()
   return (
     <>
-      <Header />
-      <div className="p-4 min-h-[85vh] flex flex-col items-center">
+      {!passwordReset && <Header />}
+      <div
+        className={`p-4 min-h-[${!passwordReset ? '85' : '95'}vh] flex flex-col items-center`}
+      >
         <div className="w-full mt-10 md:w-[70vw] ">
           <Card>
             <CardContent>
@@ -42,7 +46,11 @@ function ErrorComponent({
                   variant={'outline'}
                   onClick={() => {
                     resetErrorBoundary(error)
-                    router?.history.back()
+                    if (passwordReset)
+                      router?.navigate({
+                        to: '/login',
+                      })
+                    else router?.history.back()
                   }}
                 >
                   Go back
@@ -52,7 +60,7 @@ function ErrorComponent({
           </Card>
         </div>
       </div>
-      <Footer />
+      {!passwordReset && <Footer />}
     </>
   )
 }

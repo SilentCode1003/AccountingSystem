@@ -10,10 +10,11 @@ import {
   toggleIsActiveValidator,
   updateValidator,
 } from "../utils/validators/customers.validator";
+import db from "../database";
 
 export const getCustomers = async (req: Request, res: Response) => {
   try {
-    const customers = await getAllCustomers();
+    const customers = await getAllCustomers(db);
     console.log("successfully fetched all customers");
     return res.status(200).send({
       customers,
@@ -30,7 +31,7 @@ export const createCustomer = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: "invalid input" });
 
   try {
-    const newCustomer = await addCustomer(input.data);
+    const newCustomer = await addCustomer(db, input.data);
     console.log("successfully created an customer");
     return res.status(200).send({ customer: newCustomer });
   } catch (error) {
@@ -49,7 +50,7 @@ export const updateCustomer = async (req: Request, res: Response) => {
     });
 
   try {
-    const editedCustomer = await editCustomer(input.data);
+    const editedCustomer = await editCustomer(db, input.data);
     console.log("successfully updated an customer");
     return res.status(200).send({ customer: editedCustomer });
   } catch (error) {
@@ -67,7 +68,7 @@ export const toggleCustomerIsActive = async (req: Request, res: Response) => {
     });
 
   try {
-    const editedCustomer = await updateCustomerIsActive(input.data);
+    const editedCustomer = await updateCustomerIsActive(db, input.data);
 
     console.log("successfully updated an customer");
 

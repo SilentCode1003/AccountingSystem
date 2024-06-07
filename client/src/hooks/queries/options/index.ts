@@ -1,18 +1,25 @@
 import { Accounts } from '@/components/table-columns/accounts.columns'
 import { AccountTypes } from '@/components/table-columns/accountTypes.column'
+import { Budgets } from '@/components/table-columns/budgets.columns'
 import { Cheques } from '@/components/table-columns/cheques.columns'
 import { Customers } from '@/components/table-columns/customers.columns'
+import { EmployeeBudgets } from '@/components/table-columns/employeeBudgets.columns'
+import { EmployeeLiquidations } from '@/components/table-columns/employeeLiquidations.columns'
 import { Employees } from '@/components/table-columns/employees.columns'
 import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
+import { Liquidations } from '@/components/table-columns/liquidations.columns'
 import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
+import { RouteDiscrepancies } from '@/components/table-columns/routeDiscrepancies.columns'
+import { Routes } from '@/components/table-columns/routes.columns'
 import {
   Customer,
   Transactions,
   Vendor,
 } from '@/components/table-columns/transactions.columns'
 import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
+import { Users } from '@/components/table-columns/users.columns'
 import { Vendors } from '@/components/table-columns/vendors.columns'
 import { QueryClient, queryOptions } from '@tanstack/react-query'
 
@@ -42,6 +49,73 @@ export const currentUserOptions = () => {
   })
 }
 
+export const routesOptions = () => {
+  return queryOptions({
+    queryKey: ['routes'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routes`,
+        {
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        routes: Array<Routes>
+      }>
+
+      return data
+    },
+  })
+}
+
+export const routeDiscrepanciesOptions = () => {
+  return queryOptions({
+    queryKey: ['routeDiscrepancies'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routeDiscrepancies`,
+        {
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        routeDiscrepancies: Array<RouteDiscrepancies>
+      }>
+
+      return data
+    },
+  })
+}
+
+export const forgetPasswordRequestOptions = (id: string) => {
+  return queryOptions({
+    queryKey: ['forgetPasswordRequest'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/forgetPasswordRequests/${id}`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        id: string
+        userId: string
+        remarks: string
+      }>
+
+      return data
+    },
+  })
+}
+
 export const userOptions = (queryClient: QueryClient) => {
   return queryOptions({
     queryKey: ['userData'],
@@ -63,12 +137,24 @@ export const userOptions = (queryClient: QueryClient) => {
       if (!response.ok) throw new Error((await response.json()).error)
 
       const data = (await response.json()) as Promise<{
-        user: {
-          userUsername: string
-          userFullName: string
-          userContactNumber: string
-          userProfilePic: string
-        }
+        user: Users
+      }>
+
+      return data
+    },
+  })
+}
+export const usersOptions = (queryClient: QueryClient) => {
+  return queryOptions({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users`, {
+        credentials: 'include',
+      })
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        users: Array<Users>
       }>
 
       return data
@@ -474,3 +560,94 @@ export const cashFlowBarChartDataOptions = () =>
       return data
     },
   })
+
+export const budgetsOptions = () => {
+  return queryOptions({
+    queryKey: ['budgets'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/budgets`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        budgets: Array<Budgets>
+      }>
+      return data
+    },
+  })
+}
+
+export const employeeBudgetsOptions = ({ date }: { date?: Date }) => {
+  return queryOptions({
+    queryKey: ['employeeBudgets', { date: date ? date.getMonth() : undefined }],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/budgets/employeeBudgets` +
+          (date
+            ? '?' +
+              new URLSearchParams({
+                date: date.toISOString(),
+              })
+            : ''),
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        employeeBudgets: Array<EmployeeBudgets>
+      }>
+      return data
+    },
+  })
+}
+
+export const employeeLiquidationsOptions = ({ date }: { date?: Date }) => {
+  return queryOptions({
+    queryKey: [
+      'employeeLiquidations',
+      { date: date ? date.getMonth() : undefined },
+    ],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/liquidations/employeeLiquidations` +
+          (date
+            ? '?' +
+              new URLSearchParams({
+                date: date.toISOString(),
+              })
+            : ''),
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        employeeLiquidations: Array<EmployeeLiquidations>
+      }>
+      return data
+    },
+  })
+}
+
+export const liquidationsOptions = () => {
+  return queryOptions({
+    queryKey: ['liquidations'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/liquidations`,
+        {
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      const data = response.json() as Promise<{
+        liquidations: Array<Liquidations>
+      }>
+      return data
+    },
+  })
+}

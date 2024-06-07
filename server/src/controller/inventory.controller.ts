@@ -8,10 +8,11 @@ import {
   createValidator,
   updateValidator,
 } from "../utils/validators/inventory.validator";
+import db from "../database";
 
 export const getInventories = async (req: Request, res: Response) => {
   try {
-    const inventories = await getAllInventories();
+    const inventories = await getAllInventories(db);
     console.log("successfully fetched all inventories");
     return res.status(200).send({ inventories });
   } catch (error) {
@@ -28,7 +29,7 @@ export const createInventory = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: "Invalid inputs" });
 
   try {
-    const newInventory = await addInventory(input.data);
+    const newInventory = await addInventory(db, input.data);
     console.log("successfully created an inventory");
     return res.status(200).send({ inventory: newInventory });
   } catch (error) {
@@ -46,7 +47,7 @@ export const updateInventory = async (req: Request, res: Response) => {
     });
 
   try {
-    const updatedInventory = await editInventory(input.data);
+    const updatedInventory = await editInventory(db, input.data);
     console.log("successfully updated an inventory");
     return res.status(200).send({ inventory: updatedInventory });
   } catch (error) {

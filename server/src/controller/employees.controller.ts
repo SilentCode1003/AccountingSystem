@@ -10,10 +10,11 @@ import {
   terminateEmpValidator,
   updateValidator,
 } from "../utils/validators/employees.validator";
+import db from "../database";
 
 export const getEmployees = async (req: Request, res: Response) => {
   try {
-    const employees = await getAllEmployees();
+    const employees = await getAllEmployees(db);
 
     console.log("successfully fetched all employees");
     return res.status(200).send({ employees });
@@ -35,7 +36,7 @@ export const createEmployee = async (req: Request, res: Response) => {
     });
 
   try {
-    const newEmployee = await addEmployee(input.data);
+    const newEmployee = await addEmployee(db, input.data);
     console.log("successfully created an employee");
     return res.status(200).send({ employee: newEmployee });
   } catch (error) {
@@ -56,7 +57,7 @@ export const updateEmployee = async (req: Request, res: Response) => {
     });
 
   try {
-    const updatedEmployee = await editEmployee(input.data);
+    const updatedEmployee = await editEmployee(db, input.data);
     console.log("successfully updated an employee");
     return res.status(200).send({
       employee: updatedEmployee,
@@ -73,7 +74,7 @@ export const terminateEmployee = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: "invalid input" });
 
   try {
-    const terminatedEmployee = await fireEmployee(input.data);
+    const terminatedEmployee = await fireEmployee(db, input.data);
     console.log(" error in updating an employee");
     return res.status(200).send({ employee: terminatedEmployee });
   } catch (error) {

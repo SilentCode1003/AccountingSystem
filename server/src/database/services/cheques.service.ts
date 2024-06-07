@@ -1,9 +1,9 @@
 import { eq, sql } from "drizzle-orm";
-import db from "../index";
 import crypto from "crypto";
 import cheques from "../schema/cheques.schema";
 import tranTypes from "../schema/transactionTypes.schema";
 import { addTransaction, editTransaction } from "./transactions.service";
+import { DB } from "..";
 
 const CHEQUE_STATUS = {
   PENDING: "PENDING",
@@ -15,7 +15,7 @@ type ObjectTypes<T> = T[keyof T];
 
 type ChequeStatus = ObjectTypes<typeof CHEQUE_STATUS>;
 
-export const getAllCheques = async () => {
+export const getAllCheques = async (db: DB) => {
   const cheques = await db.query.cheques.findMany({
     with: {
       transaction: {
@@ -29,7 +29,7 @@ export const getAllCheques = async () => {
   return cheques;
 };
 
-export const getChequeById = async (chqId: string) => {
+export const getChequeById = async (db: DB, chqId: string) => {
   const cheque = await db.query.cheques.findFirst({
     where: (cheque) => eq(cheque.chqId, chqId),
     with: { transaction: true },
@@ -38,17 +38,20 @@ export const getChequeById = async (chqId: string) => {
   return cheque;
 };
 
-export const addCheque = async (input: {
-  chqPayeeName: string;
-  chqAmount: number;
-  chqIssueDate: Date;
-  chqStatus: ChequeStatus;
-  chqAccTypeId: string;
-  chqNumber: string;
-  chqTranFileMimeType?: string;
-  chqMopId: string;
-  chqFileName?: string;
-}) => {
+export const addCheque = async (
+  db: DB,
+  input: {
+    chqPayeeName: string;
+    chqAmount: number;
+    chqIssueDate: Date;
+    chqStatus: ChequeStatus;
+    chqAccTypeId: string;
+    chqNumber: string;
+    chqTranFileMimeType?: string;
+    chqMopId: string;
+    chqFileName?: string;
+  }
+) => {
   const tranType = await db.query.tranTypes.findFirst({
     where: eq(tranTypes.tranTypeName, "CHEQUE"),
   });
@@ -61,7 +64,7 @@ export const addCheque = async (input: {
     throw new Error("Cheque number already exists");
   }
 
-  const transaction = await addTransaction({
+  const transaction = await addTransaction(db, {
     tranAccTypeId: input.chqAccTypeId,
     tranTypeId: tranType!.tranTypeId,
     tranAmount: input.chqAmount,
@@ -97,20 +100,24 @@ export const addCheque = async (input: {
   return newCheque;
 };
 
-export const editCheque = async (input: {
-  chqId: string;
-  chqPayeeName?: string;
-  chqAmount?: number;
-  chqIssueDate?: Date;
-  chqStatus?: ChequeStatus;
-  chqAccTypeId?: string;
-  chqNumber?: string;
-  chqTranId: string;
-  chqTranFileMimeType?: string;
-  chqMopId?: string;
-}) => {
-  await Promise.all([
-    db
+export const editCheque = async (
+  db: DB,
+  input: {
+    chqId: string;
+    chqPayeeName?: string;
+    chqAmount?: number;
+    chqIssueDate?: Date;
+    chqStatus?: ChequeStatus;
+    chqAccTypeId?: string;
+    chqNumber?: string;
+    chqTranId: string;
+    chqTranFileMimeType?: string;
+    chqMopId?: string;
+  }
+) => {
+  let updatedChq: typeof cheques.$inferSelect | undefined;
+  await db.transaction(async (tx) => {
+    await tx
       .update(cheques)
       .set({
         chqAmount: input.chqAmount,
@@ -127,32 +134,36 @@ export const editCheque = async (input: {
             : undefined,
       })
       .where(eq(cheques.chqId, input.chqId)),
-    editTransaction({
-      tranId: input.chqTranId,
-      tranAccTypeId: input.chqAccTypeId,
-      tranAmount: input.chqAmount,
-      tranOtherPartner: input.chqPayeeName,
-      tranTransactionDate: input.chqIssueDate,
-      tranFileMimeType: input.chqTranFileMimeType,
-      tranMopId: input.chqMopId,
-    }),
-  ]);
+      await editTransaction(tx, {
+        tranId: input.chqTranId,
+        tranAccTypeId: input.chqAccTypeId,
+        tranAmount: input.chqAmount,
+        tranOtherPartner: input.chqPayeeName,
+        tranTransactionDate: input.chqIssueDate,
+        tranFileMimeType: input.chqTranFileMimeType,
+        tranMopId: input.chqMopId,
+      });
 
-  const updatedChq = await db.query.cheques.findFirst({
-    where: (chq) => eq(chq.chqId, input.chqId),
-    with: {
-      transaction: {
-        with: {
-          account: { with: { accountType: true } },
+    updatedChq = await tx.query.cheques.findFirst({
+      where: (chq) => eq(chq.chqId, input.chqId),
+      with: {
+        transaction: {
+          with: {
+            account: { with: { accountType: true } },
+          },
         },
       },
-    },
+    });
   });
 
   return updatedChq;
 };
 
-export const setChequeStatus = async (chqId: string, status: ChequeStatus) => {
+export const setChequeStatus = async (
+  db: DB,
+  chqId: string,
+  status: ChequeStatus
+) => {
   await db
     .update(cheques)
     .set({ chqStatus: status })
@@ -165,7 +176,7 @@ export const setChequeStatus = async (chqId: string, status: ChequeStatus) => {
   return updatedCheque;
 };
 
-export const incrementChequeApproval = async (chqId: string) => {
+export const incrementChequeApproval = async (db: DB, chqId: string) => {
   await db
     .update(cheques)
     .set({ chqApprovalCount: sql`${cheques.chqApprovalCount} + 1` })

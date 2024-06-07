@@ -9,20 +9,27 @@ import {
   accountTypesOptions,
   accountTypeTotalPerMonthOptions,
   balanceSheetOptions,
+  budgetsOptions,
   cashFlowBarChartDataOptions,
   chequesOptions,
   currentUserOptions,
   customersOptions,
+  employeeBudgetsOptions,
+  employeeLiquidationsOptions,
   employeesOptions,
   incomeStatementOptions,
   inventoriesOptions,
   inventoryEntriesOptions,
+  liquidationsOptions,
   modesOfPaymentOptions,
   payrollsOptions,
+  routeDiscrepanciesOptions,
+  routesOptions,
   transactionPartnersOptions,
   transactionsOptions,
   transactionTypesOptions,
   userOptions,
+  usersOptions,
   vendorsOptions,
 } from './options'
 
@@ -33,9 +40,16 @@ export const useCurrentUser = () => {
 export const useCurrentUserSuspense = () =>
   useSuspenseQuery(currentUserOptions())
 
+export const useRoutes = () => useQuery(routesOptions())
+export const useRouteDiscrepancies = () => useQuery(routeDiscrepanciesOptions())
+
 export const useUser = () => {
   const queryClient = useQueryClient()
   return useQuery(userOptions(queryClient))
+}
+export const useUsers = () => {
+  const queryClient = useQueryClient()
+  return useQuery(usersOptions(queryClient))
 }
 
 export const useUserSuspense = () => {
@@ -68,6 +82,16 @@ export const useInventoryEntries = () => useQuery(inventoryEntriesOptions())
 export const usePayrolls = () => useQuery(payrollsOptions())
 
 export const useAccounts = () => useQuery(accountsOptions())
+
+export const useBudgets = () => useQuery(budgetsOptions())
+
+export const useEmployeeBudgets = ({ date }: { date?: Date }) =>
+  useQuery(employeeBudgetsOptions({ date }))
+
+export const useEmployeeLiquidations = ({ date }: { date?: Date }) =>
+  useQuery(employeeLiquidationsOptions({ date }))
+
+export const useLiquidations = () => useQuery(liquidationsOptions())
 
 export const useModesOfPayment = () => useQuery(modesOfPaymentOptions())
 

@@ -19,6 +19,11 @@ export const login = async (req: Request, res: Response) => {
         error: "Username does not exist!",
       });
 
+    if (checkUser.userIsActive === false)
+      return res.status(404).send({
+        error: "User is inactive!",
+      });
+
     const checkPassword = await bcrypt.compare(
       input.data.password,
       checkUser!.userPassword

@@ -7,8 +7,11 @@ import { Inventories } from '@/components/table-columns/inventory.columns'
 import { InventoryEntries } from '@/components/table-columns/inventoryEntries.columns'
 import { ModesOfPayment } from '@/components/table-columns/modesOfPayment.columns'
 import { Payrolls } from '@/components/table-columns/payrolls.columns'
+import { RouteDiscrepancies } from '@/components/table-columns/routeDiscrepancies.columns'
+import { Routes } from '@/components/table-columns/routes.columns'
 import { Transactions } from '@/components/table-columns/transactions.columns'
 import { TransactionTypes } from '@/components/table-columns/transactionTypes.columns'
+import { Users } from '@/components/table-columns/users.columns'
 import { Vendors } from '@/components/table-columns/vendors.columns'
 import { toast } from '@/components/ui/use-toast'
 import { updateAccountSchema } from '@/validators/accounts.validator'
@@ -16,6 +19,10 @@ import {
   createAccountTypeSchema,
   updateAccountTypeSchema,
 } from '@/validators/accountTypes.validator'
+import {
+  changePasswordSchema,
+  forgetPasswordSchema,
+} from '@/validators/auth.validator'
 import {
   createCustomerSchema,
   updateCustomersSchema,
@@ -34,11 +41,20 @@ import {
   updateModeOfPaymentSchema,
 } from '@/validators/modesOfPayment.validator'
 import { updatePayrollSchema } from '@/validators/payrolls.validators'
+import { toggleRouteDiscrepancySchema } from '@/validators/routeDiscrepancies.validator'
+import {
+  deleteRouteSchema,
+  updateRouteSchema,
+} from '@/validators/routes.validator'
 import { createTransactionSchema } from '@/validators/transactions.validator'
 import {
   createTransactionTypeSchema,
   updateTransactionTypeSchema,
 } from '@/validators/transactionTypes.validator'
+import {
+  createUserSchema,
+  updateUserSchema,
+} from '@/validators/users.validator'
 import {
   createVendorSchema,
   updateVendorSchema,
@@ -322,7 +338,7 @@ export const useToggleAccountType = () => {
             </div>
           </div>
         ),
-        description: 'Account type was deleted successfully',
+        description: 'Account type was toggled successfully',
       })
     },
     onError: (error) => {
@@ -333,7 +349,70 @@ export const useToggleAccountType = () => {
             Something went wrong!
           </div>
         ),
-        description: error.message ?? 'Failed to delete account type ',
+        description: error.message ?? 'Failed to toggle account type ',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useToggleUser = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['toggleUser'],
+    mutationFn: async (
+      payload: Pick<z.infer<typeof updateUserSchema>, 'userId'>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/users/${payload.userId}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+        },
+      )
+
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        user: Users
+      }>
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['users'],
+        (old: { users: Array<Users> }) => {
+          return {
+            users: old.users.map((user) => {
+              if (user.userId === data.user.userId) {
+                return data.user
+              }
+              return user
+            }),
+          }
+        },
+      ),
+        toast({
+          title: (
+            <div>
+              <div className="flex gap-2 items-centers">
+                <PartyPopperIcon />
+                Success
+              </div>
+            </div>
+          ),
+          description: 'User was toggled successfully',
+        })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to toggle user ',
         variant: 'destructive',
       })
     },
@@ -402,6 +481,14 @@ export const useUpdateTransactionType = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['accounts'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['accountTypes'],
         type: 'inactive',
       })
       setOpen(false)
@@ -1952,11 +2039,67 @@ export const useCreateTransactionType = ({
   })
 }
 
+export const useCreateUser = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: z.infer<typeof createUserSchema>) => {
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      })
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{ user: Users }>
+      return data
+    },
+    onSuccess: async (data) => {
+      setOpen(false)
+      await queryClient.setQueryData(
+        ['users'],
+        (old: { users: Array<Users> }) => {
+          return {
+            users: [...old.users, data.user],
+          }
+        },
+      )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'User was created successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to create User',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
 export const useUpdateUser = ({
-  setToggleEdit,
+  setOpen,
   setUserData,
 }: {
-  setUserData: React.Dispatch<
+  setUserData?: React.Dispatch<
     React.SetStateAction<{
       fullName: string
       username: string
@@ -1966,7 +2109,7 @@ export const useUpdateUser = ({
       contactNumber: string
     }>
   >
-  setToggleEdit: React.Dispatch<React.SetStateAction<boolean>>
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -2001,15 +2144,20 @@ export const useUpdateUser = ({
           },
         }
       })
-      setToggleEdit((prev) => !prev)
-      setUserData({
-        fullName: data.user.userFullName,
-        username: data.user.userUsername,
-        profileLink: '',
-        password: '',
-        profilePic: data.user.userProfilePic,
-        contactNumber: data.user.userContactNumber,
+      await queryClient.invalidateQueries({
+        queryKey: ['users'],
+        type: 'inactive',
       })
+      setOpen(false)
+      if (setUserData)
+        setUserData({
+          fullName: data.user.userFullName,
+          username: data.user.userUsername,
+          profileLink: '',
+          password: '',
+          profilePic: data.user.userProfilePic,
+          contactNumber: data.user.userContactNumber,
+        })
       toast({
         title: (
           <div className="flex gap-2 items-centers">
@@ -2068,11 +2216,35 @@ export const useCreateTransaction = (
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
+        queryKey: ['cashFlowBarChart'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
         queryKey: ['accountTypeTotalPerMonth'],
         type: 'inactive',
       })
       await queryClient.invalidateQueries({
-        queryKey: ['cashFlowBarChart'],
+        queryKey: ['liquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeLiquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['budgets'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeBudgets'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['routes'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
         type: 'inactive',
       })
       form.reset()
@@ -2141,6 +2313,30 @@ export const useCreateTransactionByFile = ({
       })
       await queryClient.invalidateQueries({
         queryKey: ['accountTypeTotalPerMonth'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['liquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeLiquidations'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['budgets'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['employeeBudgets'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['routes'],
+        type: 'inactive',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
         type: 'inactive',
       })
       setOpen(false)
@@ -2479,6 +2675,303 @@ export const useSyncEmployeeByFile = ({
           </div>
         ),
         description: error.message ?? 'Failed to sync employees',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useForgetPassword = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  return useMutation({
+    mutationKey: ['forgetPassword'],
+    mutationFn: async (payload: z.infer<typeof forgetPasswordSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/forgetPassword`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      return response.json()
+    },
+    onSuccess: async (data) => {
+      setOpen(true)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Email sent successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to send email',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useChangePassword = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  return useMutation({
+    mutationKey: ['changePassword'],
+    mutationFn: async (payload: z.infer<typeof changePasswordSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/auth/changePassword/reset?` +
+          new URLSearchParams({ ...payload }),
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+      return response.json()
+    },
+    onSuccess: async (data) => {
+      setOpen(true)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Password changed successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to change password',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useUpdateRoute = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['updateRoute'],
+    mutationFn: async (payload: z.infer<typeof updateRouteSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routes`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        route: Routes
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['routes'],
+        (old: { routes: Array<Routes> }) => {
+          return {
+            routes: old.routes.map((route) => {
+              if (route.routeId === data.route.routeId) {
+                return data.route
+              }
+              return route
+            }),
+          }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
+        type: 'inactive',
+      })
+
+      setOpen(false)
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Route was updated successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to update route',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useDeleteRoute = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['deleteRoute'],
+    mutationFn: async (payload: z.infer<typeof deleteRouteSchema>) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routes/${payload.routeId}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        toggledRouteId: string
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['routes'],
+        (old: { routes: Array<Routes> }) => {
+          return {
+            routes: old.routes.filter(
+              (route) => route.routeId !== data.toggledRouteId,
+            ),
+          }
+        },
+      )
+      await queryClient.invalidateQueries({
+        queryKey: ['routeDiscrepancies'],
+        type: 'inactive',
+      })
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Route was toggled successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description: error.message ?? 'Failed to delete route',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+export const useToggleRouteDiscrepancy = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['toggleRouteDiscrepancy'],
+    mutationFn: async (
+      payload: z.infer<typeof toggleRouteDiscrepancySchema>,
+    ) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/routeDiscrepancies/${payload.routeId}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+        },
+      )
+      if (!response.ok) throw new Error((await response.json()).error)
+
+      const data = (await response.json()) as Promise<{
+        routeDiscrepancy: RouteDiscrepancies
+      }>
+
+      return data
+    },
+    onSuccess: async (data) => {
+      await queryClient.setQueryData(
+        ['routeDiscrepancies'],
+        (old: { routeDiscrepancies: Array<RouteDiscrepancies> }) => {
+          return {
+            routeDiscrepancies: old.routeDiscrepancies.map(
+              (routeDiscrepancy) => {
+                if (routeDiscrepancy.rdId === data.routeDiscrepancy.rdId) {
+                  return data.routeDiscrepancy
+                }
+                return routeDiscrepancy
+              },
+            ),
+          }
+        },
+      )
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <PartyPopperIcon />
+            Success
+          </div>
+        ),
+        description: 'Route discrepancy was toggled successfully',
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: (
+          <div className="flex gap-2 items-centers">
+            <CircleXIcon />
+            Something went wrong!
+          </div>
+        ),
+        description:
+          error.message ??
+          'Failed to delete route discrepancy was toggled successfully',
         variant: 'destructive',
       })
     },

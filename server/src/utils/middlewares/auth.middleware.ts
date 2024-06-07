@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import z from "zod";
 import { getAksById } from "../../database/services/apiKeyStore.service";
 import { getUserById } from "../../database/services/users.service";
+import db from "../../database";
 
 export const authMiddleware = async (
   req: Request,
@@ -12,7 +13,7 @@ export const authMiddleware = async (
     return res.status(401).send({ error: "Login First!" });
 
   try {
-    const checkUser = await getUserById({
+    const checkUser = await getUserById(db, {
       userId: req.session.userId as string,
     });
     if (!checkUser) return res.status(404).send({ error: "Not authorized" });
@@ -43,7 +44,7 @@ export const checkApiKey = async (
   const aksId = input.data.apiKey.slice(0, 16);
   const hashedKey = input.data.apiKey.slice(16);
 
-  const aks = await getAksById(aksId);
+  const aks = await getAksById(db, aksId);
 
   if (!aks) return res.status(400).send({ error: "API key does not exist!" });
 
