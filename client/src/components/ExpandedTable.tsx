@@ -45,10 +45,9 @@ const dateBetweenFilter: FilterFn<any> = (row, columnId, value) => {
   } else return true
 }
 
-function InventoryEntryProducsTable<TData, TValue>({
+function ExpandedTable<TData, TValue>({
   columns,
   data,
-  pageSize,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
 
@@ -122,4 +121,4 @@ function InventoryEntryProducsTable<TData, TValue>({
   )
 }
 
-export default InventoryEntryProducsTable
+export default ExpandedTable

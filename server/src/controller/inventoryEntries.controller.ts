@@ -9,10 +9,11 @@ import {
   updateValidator,
 } from "../utils/validators/inventoryEntries.validator";
 import path from "path";
+import db from "../database";
 
 export const getInventoryEntries = async (req: Request, res: Response) => {
   try {
-    const inventoryEntries = await getAllInventoryEntries();
+    const inventoryEntries = await getAllInventoryEntries(db);
     console.log("successfully fetched all inventory entries");
     return res.status(200).send({ inventoryEntries });
   } catch (error) {
@@ -35,7 +36,7 @@ export const createInventoryEntry = async (req: Request, res: Response) => {
   if (!input.success)
     return res.status(400).send({ error: input.error.errors });
   try {
-    const newInventoryEntry = await addInventoryEntry({
+    const newInventoryEntry = await addInventoryEntry(db, {
       ...input.data,
       invEntryTranFileMimeType:
         input.data.invEntryFile.mimetype ===
@@ -87,7 +88,7 @@ export const updateInventoryEntry = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const updatedInventoryEntry = await editInventoryEntry({
+    const updatedInventoryEntry = await editInventoryEntry(db, {
       ...input.data,
       invEntryTranFileMimeType:
         input.data.invEntryFile &&

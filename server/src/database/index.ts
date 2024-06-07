@@ -1,60 +1,13 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/mysql2";
+import { ExtractTablesWithRelations } from "drizzle-orm";
+import { MySqlDatabase, MySqlTransaction } from "drizzle-orm/mysql-core";
+import {
+  drizzle,
+  MySql2PreparedQueryHKT,
+  MySql2QueryResultHKT,
+} from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import accounts, { accountTypeRelation } from "./schema/accounts.schema";
-import accountTypes, {
-  accountTypesAccountManyRelations,
-  accountTypeTransactionTypeManyRelations,
-} from "./schema/accountType.schema";
-import apiKeys from "./schema/apiKeyStore.schema";
-import cheques, { chequesRelations } from "./schema/cheques.schema";
-import customers from "./schema/customers.schema";
-import employees from "./schema/employees.schema";
-import inventory from "./schema/inventory.schema";
-import inventoryEntries, {
-  inventoryEntriesCustomerRelation,
-  inventoryEntriesInventoryEntryProductsManyRelation,
-  inventoryEntriesTransactionRelation,
-  inventoryEntriesVendorRelation,
-} from "./schema/inventoryEntries.schema";
-import inventoryEntryProducts, {
-  inventoryEntriesProductsInventoryEntryRelations,
-  inventoryEntriesProductsInventoryRelations,
-} from "./schema/inventoryEntriesProducts.schema";
-import modesOfPayment, {
-  modesOfPaymentTransactionRelations,
-} from "./schema/modeOfPayment";
-import payrolls, {
-  payrollEmployeeRelation,
-  payrollTransactionrelation,
-} from "./schema/payrolls.schema";
-import transactions, {
-  transactionAccountRelation,
-  transactionCustomerRelation,
-  transactionEmployeeRelation,
-  transactionModeOfPaymentRelation,
-  transactionVendorRelation,
-  tranTypeRelation,
-} from "./schema/transactions.schema";
-import tranTypes, {
-  tranTypeAccTypeIdRelations,
-  tranTypeTransactionManyRelations,
-} from "./schema/transactionTypes.schema";
-import users from "./schema/users.schema";
-import vendors from "./schema/vendors.schema";
-
-// type DBSchema = {
-//   accounts: MySqlTable;
-//   users: MySqlTable;
-//   employees: MySqlTable;
-//   cheques: MySqlTable;
-//   vendors: MySqlTable;
-//   customers: MySqlTable;
-//   inventory: MySqlTable;
-//   transactions: MySqlTable;
-//   payrolls: MySqlTable;
-//   chequesRelations: Relations;
-// };
+import schema from "./schema/schema";
 
 export const connection = mysql.createPool({
   host: process.env.DB_HOST,
@@ -65,45 +18,25 @@ export const connection = mysql.createPool({
 });
 
 const db = drizzle(connection, {
-  schema: {
-    accounts,
-    users,
-    employees,
-    cheques,
-    accountTypes,
-    vendors,
-    customers,
-    transactions,
-    inventory,
-    payrolls,
-    apiKeys,
-    tranTypes,
-    inventoryEntryProducts,
-    inventoryEntriesProductsInventoryEntryRelations,
-    inventoryEntriesProductsInventoryRelations,
-    tranTypeTransactionManyRelations,
-    tranTypeRelation,
-    chequesRelations,
-    transactionAccountRelation,
-    transactionCustomerRelation,
-    transactionEmployeeRelation,
-    transactionVendorRelation,
-    accountTypesAccountManyRelations,
-    tranTypeAccTypeIdRelations,
-    payrollEmployeeRelation,
-    payrollTransactionrelation,
-    accountTypeRelation,
-    inventoryEntries,
-    inventoryEntriesTransactionRelation,
-    inventoryEntriesInventoryEntryProductsManyRelation,
-    accountTypeTransactionTypeManyRelations,
-    inventoryEntriesVendorRelation,
-    inventoryEntriesCustomerRelation,
-    modesOfPayment,
-    modesOfPaymentTransactionRelations,
-    transactionModeOfPaymentRelation,
-  },
+  schema,
   mode: "default",
 });
+
+db.transaction;
+
+export type DBTransaction = MySqlTransaction<
+  MySql2QueryResultHKT,
+  MySql2PreparedQueryHKT,
+  typeof schema,
+  ExtractTablesWithRelations<typeof schema>
+>;
+
+export type Database = MySqlDatabase<
+  MySql2QueryResultHKT,
+  MySql2PreparedQueryHKT,
+  typeof schema
+>;
+
+export type DB = DBTransaction | Database;
 
 export default db;

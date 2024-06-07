@@ -1,12 +1,10 @@
-import db from "../index";
 import crypto from "crypto";
+import { eq, inArray } from "drizzle-orm";
+import { DB } from "../index";
 import inventory from "../schema/inventory.schema";
-import { eq, sql } from "drizzle-orm";
 import inventoryEntries from "../schema/inventoryEntries.schema";
-import { editInventoryEntry } from "./inventoryEntries.service";
-import { inArray } from "drizzle-orm";
 import inventoryEntryProducts from "../schema/inventoryEntriesProducts.schema";
-import { editInventoryEntryProducts } from "./inventoryEntryProducts.service";
+import { editInventoryEntry } from "./inventoryEntries.service";
 
 const INVENTORY_STATUS = {
   GOOD: "GOOD",
@@ -18,25 +16,28 @@ type ObjectTypes<T> = T[keyof T];
 
 type Inventoriestatus = ObjectTypes<typeof INVENTORY_STATUS>;
 
-export const getAllInventories = async () => {
+export const getAllInventories = async (db: DB) => {
   const Inventories = await db.query.inventory.findMany();
 
   return Inventories;
 };
 
-export const getInventoriesByIds = async (invIds: string[]) => {
+export const getInventoriesByIds = async (db: DB, invIds: string[]) => {
   const inventories = await db.query.inventory.findMany({
     where: inArray(inventory.invId, invIds),
   });
   return inventories;
 };
 
-export const addInventory = async (input: {
-  invAssetName: string;
-  invStatus: Inventoriestatus;
-  invStocks: number;
-  invPricePerUnit: number;
-}) => {
+export const addInventory = async (
+  db: DB,
+  input: {
+    invAssetName: string;
+    invStatus: Inventoriestatus;
+    invStocks: number;
+    invPricePerUnit: number;
+  }
+) => {
   const newInventoryId = `invId ${crypto.randomUUID()}`;
 
   await db.insert(inventory).values({ ...input, invId: newInventoryId });
@@ -48,15 +49,18 @@ export const addInventory = async (input: {
   return newInventory;
 };
 
-export const editInventory = async (input: {
-  invId: string;
-  newData: {
-    invAssetName?: string;
-    invStatus?: Inventoriestatus;
-    invStocks?: number;
-    invPricePerUnit?: number;
-  };
-}) => {
+export const editInventory = async (
+  db: DB,
+  input: {
+    invId: string;
+    newData: {
+      invAssetName?: string;
+      invStatus?: Inventoriestatus;
+      invStocks?: number;
+      invPricePerUnit?: number;
+    };
+  }
+) => {
   const prevValues = await db.query.inventory.findFirst({
     where: (inv) => eq(inv.invId, input.invId),
   });
@@ -98,7 +102,7 @@ export const editInventory = async (input: {
         const products = await db.query.inventoryEntryProducts.findMany({
           where: eq(inventoryEntryProducts.iepInvEntryId, invEntry),
         });
-        await editInventoryEntry({
+        await editInventoryEntry(db, {
           invEntryId: origInvEntry!.invEntryId,
           invEntryPartner: (origInvEntry!.invEntryCustId ??
             origInvEntry!.invEntryVdId)!,

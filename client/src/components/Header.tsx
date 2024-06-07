@@ -10,6 +10,7 @@ import { Link } from '@tanstack/react-router'
 import {
   ArchiveIcon,
   ArrowLeftRightIcon,
+  BadgeDollarSignIcon,
   BookMinusIcon,
   BookPlusIcon,
   BookTextIcon,
@@ -18,6 +19,7 @@ import {
   LogOutIcon,
   MoonIcon,
   ReceiptIcon,
+  ReceiptTextIcon,
   SettingsIcon,
 } from 'lucide-react'
 import { RxHamburgerMenu } from 'react-icons/rx'
@@ -261,6 +263,30 @@ function Header() {
               >
                 <ArchiveIcon />
                 Inventory Entries
+              </Text>
+            </SheetClose>
+          </Link>
+          <Link to="/liquidations/">
+            <SheetClose>
+              <Text
+                variant={'heading1'}
+                style={'underline'}
+                className="flex gap-4 items-center text-start "
+              >
+                <ReceiptTextIcon />
+                Liquidations
+              </Text>
+            </SheetClose>
+          </Link>
+          <Link to="/budgets/">
+            <SheetClose>
+              <Text
+                variant={'heading1'}
+                style={'underline'}
+                className="flex gap-4 items-center text-start "
+              >
+                <BadgeDollarSignIcon />
+                Budgets
               </Text>
             </SheetClose>
           </Link>

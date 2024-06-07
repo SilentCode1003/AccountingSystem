@@ -12,10 +12,11 @@ import {
   toggleIsActiveValidator,
   updateValidator,
 } from "../utils/validators/modesOfPayment.validator";
+import db from "../database";
 
 export const getModesOfPayments = async (req: Request, res: Response) => {
   try {
-    const modesOfPayment = await getAllModesOfPayment();
+    const modesOfPayment = await getAllModesOfPayment(db);
     console.log("successfully fetched all modes of payment");
     return res.status(200).send({ modesOfPayment });
   } catch (error) {
@@ -34,7 +35,7 @@ export const createModeOfPayment = async (req: Request, res: Response) => {
       error: input.error.errors[0].message,
     });
   try {
-    const modeOfPayment = await addModeOfPayment(input.data);
+    const modeOfPayment = await addModeOfPayment(db, input.data);
     console.log("successfully created an mode of payment");
     return res.status(200).send({ modeOfPayment });
   } catch (error) {
@@ -54,7 +55,7 @@ export const updateModeOfPayment = async (req: Request, res: Response) => {
       error: input.error.errors[0].message,
     });
   try {
-    const modeOfPayment = await editModeOfPayment(input.data);
+    const modeOfPayment = await editModeOfPayment(db, input.data);
     console.log("successfully updated an mode of payment");
     return res.status(200).send({ modeOfPayment });
   } catch (error) {
@@ -78,7 +79,10 @@ export const toggleModeOfPaymentIsActive = async (
     });
 
   try {
-    const updatedModeOfPayment = await changeModeOfPaymentIsActive(input.data);
+    const updatedModeOfPayment = await changeModeOfPaymentIsActive(
+      db,
+      input.data
+    );
     console.log("successfully toggled a mode of payment");
     return res.status(200).send({ modeOfPayment: updatedModeOfPayment });
   } catch (error) {

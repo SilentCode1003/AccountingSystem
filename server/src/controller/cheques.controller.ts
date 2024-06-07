@@ -23,7 +23,7 @@ import crypto from "crypto";
 
 export const getCheques = async (req: Request, res: Response) => {
   try {
-    const cheques = await getAllCheques();
+    const cheques = await getAllCheques(db);
     console.log("successfully fetched all cheques");
     return res.status(200).send({ cheques });
   } catch (error) {
@@ -44,7 +44,7 @@ export const createCheque = async (req: Request, res: Response) => {
     return res.status(400).send({ error: input.error.errors[0].message });
 
   try {
-    const newCheque = await addCheque({
+    const newCheque = await addCheque(db, {
       ...input.data,
       chqTranFileMimeType:
         input.data.chqFile &&
@@ -86,7 +86,7 @@ export const updateCheque = async (req: Request, res: Response) => {
   if (!input.success) return res.status(400).send({ error: input.error });
 
   try {
-    const updatedChq = await editCheque({
+    const updatedChq = await editCheque(db, {
       ...input.data,
       chqTranFileMimeType:
         input.data.chqFile &&
@@ -123,7 +123,7 @@ export const approveCheque = async (req: Request, res: Response) => {
 
   if (!input.success) return res.status(400).send({ error: "invalid inputs" });
   try {
-    const chq = await getChequeById(input.data.chqId);
+    const chq = await getChequeById(db, input.data.chqId);
 
     if (!chq) return res.status(404).send({ error: "Cheque not found" });
 
@@ -132,10 +132,14 @@ export const approveCheque = async (req: Request, res: Response) => {
       return res.status(200).send({ cheque: chq });
     }
 
-    const incrementedChq = await incrementChequeApproval(input.data.chqId);
+    const incrementedChq = await incrementChequeApproval(db, input.data.chqId);
 
     if (incrementedChq!.chqApprovalCount >= 3) {
-      const updatedChq = await setChequeStatus(input.data.chqId, "APPROVED");
+      const updatedChq = await setChequeStatus(
+        db,
+        input.data.chqId,
+        "APPROVED"
+      );
       console.log("Set cheque status to approved");
 
       return res.status(200).send({ cheque: updatedChq });
@@ -202,7 +206,7 @@ export const createChequeByFile = async (req: Request, res: Response) => {
         if (!modeOfPayment) throw new Error("Mode of payment does not exists");
         if (!accType) throw new Error("Account type does not exists");
 
-        const newChq = await addCheque({
+        const newChq = await addCheque(db, {
           chqAccTypeId: accType?.accTypeId as string,
           chqAmount: chq.chqAmount,
           chqIssueDate: new Date(
