@@ -133,7 +133,10 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
       }
     });
 
-    const f = xlsx.read(file.data, { type: "buffer" }).Sheets["Liquidation"];
+    const f = xlsx.read(file.data, {
+      type: "buffer",
+      // sheetStubs: true
+    }).Sheets["Liquidation"];
 
     const cells = Object.keys(f);
 
@@ -178,7 +181,6 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
           const val = String(f[entry[i]].v).replaceAll(/\s/g, "");
 
           const targetVal = f[entry[i + 1]];
-
           if (val === "ROUTE") {
             count = 1;
           }
@@ -230,18 +232,28 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
           }
         }
 
-        const chunkSize = 5;
+        const chunkSize = 4;
         routes.shift();
         routes.shift();
+        routes.shift();
+
+        let lrDestination = "";
+
         for (let i = 0; i < routes.length; i += chunkSize) {
+          if (/inc-[0-9]/i.test(routes[i])) routes.shift();
+          if (/st[0-9]/i.test(routes[i])) {
+            lrDestination = routes[i];
+            routes.shift();
+          }
+
           const chunk = routes.slice(i, i + chunkSize);
-          if (i + 1 > chunkSize)
+          if (i + 1 > chunkSize && chunk.length === chunkSize)
             liquidationRoutes.push({
-              lrDestination: chunk[0],
-              lrFrom: chunk[1],
-              lrTo: chunk[2],
-              lrPrice: Number(chunk[3]),
-              lrModeOfTransport: chunk[4],
+              lrDestination: lrDestination,
+              lrFrom: chunk[0],
+              lrTo: chunk[1],
+              lrPrice: Number(chunk[2]),
+              lrModeOfTransport: chunk[3],
             });
         }
 
