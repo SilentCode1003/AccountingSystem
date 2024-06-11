@@ -22,6 +22,10 @@ import {
   updateValidator,
 } from "../utils/validators/transactions.validator";
 import { addTransactionType } from "../database/services/transactionTypes.service";
+import {
+  addRunningBalance,
+  getLastRunningBalanceForEmployee,
+} from "../database/services/runningBalance.service";
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -200,7 +204,7 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
             entryObj["date"] = new Date(targetVal.w);
           }
 
-          if (val === "BUDGETRECEIVED") {
+          if (val === "BUDGETRECEIVED:") {
             entryObj["budgetGiven"] = Number(targetVal.v);
           }
 
@@ -296,60 +300,99 @@ export const createTransactionByFile = async (req: Request, res: Response) => {
         tranTypeAccTypeId: transactionType!.tranTypeAccTypeId,
       });
 
-      await Promise.all(
-        lq.map(async (tran) => {
-          const tranMop = await tx.query.modesOfPayment.findFirst({
-            where: eq(modesOfPayment.mopName, tran.tranMopName!),
+      for (const tran of lq) {
+        const tranMop = await tx.query.modesOfPayment.findFirst({
+          where: eq(modesOfPayment.mopName, tran.tranMopName!),
+        });
+
+        const transaction = await addTransaction(tx, {
+          tranAccTypeId: tran.tranAccTypeId as string,
+          tranAmount: tran.amount!,
+          tranDescription: tran.description ?? "FILE TRANSACTION",
+          tranTransactionDate: tran.date!,
+          tranPartner: tran.tranPartner,
+          tranTypeId: transactionType?.tranTypeId as string,
+          tranFileName: newMultiFileName,
+          tranMopId: tranMop?.mopId as string,
+        });
+
+        // budgetRemaining < amount || budgetGiven then create a new budget
+        if (tran.budgetGiven && tran.budgetGiven > 0) {
+          const budgetTranType = await tx.query.tranTypes.findFirst({
+            where: (tranType) => eq(tranType.tranTypeName, "BUDGET"),
           });
 
-          const transaction = await addTransaction(tx, {
-            tranAccTypeId: tran.tranAccTypeId as string,
-            tranAmount: tran.amount!,
-            tranDescription: tran.description ?? "FILE TRANSACTION",
+          const budgetTransaction = await addTransaction(tx, {
+            tranAccTypeId: tran.tranAccTypeId!,
+            tranAmount: tran.budgetGiven!,
+            tranDescription: "BUDGET" ?? "FILE TRANSACTION",
             tranTransactionDate: tran.date!,
             tranPartner: tran.tranPartner,
-            tranTypeId: transactionType?.tranTypeId as string,
+            tranTypeId: budgetTranType!.tranTypeId,
             tranFileName: newMultiFileName,
-            tranMopId: tranMop?.mopId as string,
+            tranMopId: tranMop!.mopId,
           });
-
-          // budgetRemaining < amount || budgetGiven then create a new budget
-          if (tran.budgetRemaining! < tran.amount! || tran.budgetGiven) {
-            const budgetTranType = await tx.query.tranTypes.findFirst({
-              where: (tranType) => eq(tranType.tranTypeName, "BUDGET"),
-            });
-
-            const budgetTransaction = await addTransaction(tx, {
-              tranAccTypeId: tran.tranAccTypeId!,
-              tranAmount: tran.budgetGiven!,
-              tranDescription: "BUDGET" ?? "FILE TRANSACTION",
-              tranTransactionDate: tran.date!,
-              tranPartner: tran.tranPartner,
-              tranTypeId: budgetTranType!.tranTypeId,
-              tranFileName: newMultiFileName,
-              tranMopId: tranMop!.mopId,
-            });
-            await addBudget(tx, {
-              budgetEmpId: tran.tranPartner!,
-              budgetAmount: tran.budgetGiven!,
-              budgetDate: tran.date!,
-              budgetTranId: budgetTransaction!.tranId,
-            });
-            newTransactions.push(budgetTransaction!);
-          }
-
-          // create a new liquidation
-          await addLiquidation(tx, {
-            liquidationEmpId: tran.tranPartner!,
-            liquidationAmount: tran.amount!,
-            liquidationDate: tran.date!,
-            liquidationTranId: transaction!.tranId,
-            liquidationRoutes: tran.liquidationRoutes!,
+          await addBudget(tx, {
+            budgetEmpId: tran.tranPartner!,
+            budgetAmount: tran.budgetGiven!,
+            budgetDate: tran.date!,
+            budgetTranId: budgetTransaction!.tranId,
           });
+          newTransactions.push(budgetTransaction!);
+        }
 
-          newTransactions.push(transaction!);
-        })
-      );
+        // create a new liquidation
+        const newLiq = await addLiquidation(tx, {
+          liquidationEmpId: tran.tranPartner!,
+          liquidationAmount: tran.amount!,
+          liquidationDate: tran.date!,
+          liquidationTranId: transaction!.tranId,
+          liquidationRoutes: tran.liquidationRoutes!,
+        });
+
+        const lastRb = await getLastRunningBalanceForEmployee(
+          tx,
+          tran.tranPartner!
+        );
+
+        if (!lastRb) {
+          const rbReimbursementAmount = tran.budgetGiven! - tran.amount!;
+
+          const rbReturnAmount =
+            rbReimbursementAmount > 0 ? rbReimbursementAmount : 0;
+
+          await addRunningBalance(tx, {
+            rbEmpId: tran.tranPartner!,
+            rbDate: tran.date!,
+            rbBudget: tran.budgetGiven!,
+            rbLiqId: newLiq?.liquidationId!,
+            rbReimbursementAmount,
+            rbReturnAmount,
+          });
+        } else {
+          const rbBudget = Number(lastRb!.rbReturnAmount) + tran.budgetGiven!;
+
+          const rbReimbursementAmount =
+            rbBudget -
+            (tran.amount! -
+              (Number(lastRb.rbReimbursementAmount) < 0
+                ? Number(lastRb.rbReimbursementAmount)
+                : 0));
+
+          const rbReturnAmount =
+            rbReimbursementAmount > 0 ? rbReimbursementAmount : 0;
+          await addRunningBalance(tx, {
+            rbEmpId: tran.tranPartner!,
+            rbDate: tran.date!,
+            rbBudget,
+            rbLiqId: newLiq?.liquidationId!,
+            rbReimbursementAmount,
+            rbReturnAmount,
+          });
+        }
+
+        newTransactions.push(transaction!);
+      }
     });
 
     file.mv(
