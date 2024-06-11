@@ -48,43 +48,39 @@ export const addInventoryEntryProducts = async (
   }
 ) => {
   const errors: Array<string> = [];
-  await Promise.all(
-    input.iepProducts.map(async (product) => {
-      const newInventoryEntryProductId = `iepId ${crypto.randomUUID()}`;
 
-      const inv = await db.query.inventory.findFirst({
-        where: (inventory) => eq(inventory.invId, product.iepInvId),
-      });
-      await db.insert(inventoryEntryProducts).values({
-        iepId: newInventoryEntryProductId,
-        iepInvEntryId: input.iepInvEntryId,
-        iepInvId: product.iepInvId,
-        iepQuantity: product.iepQuantity,
-        iepTotalPrice: product.iepQuantity * inv!.invPricePerUnit,
-      });
+  for (const product of input.iepProducts) {
+    const newInventoryEntryProductId = `iepId ${crypto.randomUUID()}`;
 
-      const updatedStocks =
-        input.iepType === "INCOMING"
-          ? inv!.invStocks + product.iepQuantity
-          : inv!.invStocks - product.iepQuantity;
+    const inv = await db.query.inventory.findFirst({
+      where: (inventory) => eq(inventory.invId, product.iepInvId),
+    });
+    await db.insert(inventoryEntryProducts).values({
+      iepId: newInventoryEntryProductId,
+      iepInvEntryId: input.iepInvEntryId,
+      iepInvId: product.iepInvId,
+      iepQuantity: product.iepQuantity,
+      iepTotalPrice: product.iepQuantity * inv!.invPricePerUnit,
+    });
 
-      if (input.iepType) {
-        if (
-          inv!.invStocks < product.iepQuantity &&
-          input.iepType === "OUTGOING"
-        )
-          errors.push(inv?.invAssetName as string);
-        else {
-          await db
-            .update(inventory)
-            .set({
-              invStocks: updatedStocks,
-            })
-            .where(eq(inventory.invId, product.iepInvId));
-        }
+    const updatedStocks =
+      input.iepType === "INCOMING"
+        ? inv!.invStocks + product.iepQuantity
+        : inv!.invStocks - product.iepQuantity;
+
+    if (input.iepType) {
+      if (inv!.invStocks < product.iepQuantity && input.iepType === "OUTGOING")
+        errors.push(inv?.invAssetName as string);
+      else {
+        await db
+          .update(inventory)
+          .set({
+            invStocks: updatedStocks,
+          })
+          .where(eq(inventory.invId, product.iepInvId));
       }
-    })
-  );
+    }
+  }
 
   if (errors.length > 0)
     throw new Error(`Not enough stocks for ${errors.join(", ")}`);
@@ -125,93 +121,88 @@ export const editInventoryEntryProducts = async (
     .delete(inventoryEntryProducts)
     .where(eq(inventoryEntryProducts.iepInvEntryId, input.iepInvEntryId));
 
-  await Promise.all(
-    previousProducts.map(async (product) => {
-      const inv = await db.query.inventory.findFirst({
-        where: (inventory) => eq(inventory.invId, product.iepInvId),
-      });
+  for (const product of previousProducts) {
+    const inv = await db.query.inventory.findFirst({
+      where: (inventory) => eq(inventory.invId, product.iepInvId),
+    });
 
-      if (
-        input.prevInvEntryType !== input.iepType ||
-        !input.iepProducts.find((p) => p.iepInvId === product.iepInvId)
-      )
-        await db
-          .update(inventory)
-          .set({
-            invStocks:
-              input.iepType === "INCOMING"
-                ? inv!.invStocks + product.iepQuantity
-                : inv!.invStocks - product.iepQuantity,
-          })
-          .where(eq(inventory.invId, product.iepInvId));
-      if (!input.iepProducts.find((p) => p.iepInvId === product.iepInvId))
-        return;
-      if (
-        product.iepQuantity !==
-        input.iepProducts.find((p) => p.iepInvId === product.iepInvId)!
-          .iepQuantity
-      )
-        await db
-          .update(inventory)
-          .set({
-            invStocks:
-              input.iepType === "INCOMING"
-                ? inv!.invStocks - product.iepQuantity
-                : inv!.invStocks + product.iepQuantity,
-          })
-          .where(eq(inventory.invId, product.iepInvId));
-    })
-  );
+    if (
+      input.prevInvEntryType !== input.iepType ||
+      !input.iepProducts.find((p) => p.iepInvId === product.iepInvId)
+    )
+      await db
+        .update(inventory)
+        .set({
+          invStocks:
+            input.iepType === "INCOMING"
+              ? inv!.invStocks + product.iepQuantity
+              : inv!.invStocks - product.iepQuantity,
+        })
+        .where(eq(inventory.invId, product.iepInvId));
+    if (!input.iepProducts.find((p) => p.iepInvId === product.iepInvId)) return;
+    if (
+      product.iepQuantity !==
+      input.iepProducts.find((p) => p.iepInvId === product.iepInvId)!
+        .iepQuantity
+    )
+      await db
+        .update(inventory)
+        .set({
+          invStocks:
+            input.iepType === "INCOMING"
+              ? inv!.invStocks - product.iepQuantity
+              : inv!.invStocks + product.iepQuantity,
+        })
+        .where(eq(inventory.invId, product.iepInvId));
+  }
 
   const errors: Array<String> = [];
 
-  await Promise.all(
-    input.iepProducts.map(async (product) => {
-      const newInventoryEntryProductId = `iepId ${crypto.randomUUID()}`;
-      const inv = await db.query.inventory.findFirst({
-        where: (inventory) => eq(inventory.invId, product.iepInvId),
-      });
+  for (const product of input.iepProducts) {
+    const newInventoryEntryProductId = `iepId ${crypto.randomUUID()}`;
+    const inv = await db.query.inventory.findFirst({
+      where: (inventory) => eq(inventory.invId, product.iepInvId),
+    });
 
-      await db.insert(inventoryEntryProducts).values({
-        iepId: newInventoryEntryProductId,
-        iepInvEntryId: input.iepInvEntryId,
-        iepInvId: product.iepInvId,
-        iepQuantity: product.iepQuantity,
-        iepTotalPrice: product.iepQuantity * inv!.invPricePerUnit,
-      });
+    await db.insert(inventoryEntryProducts).values({
+      iepId: newInventoryEntryProductId,
+      iepInvEntryId: input.iepInvEntryId,
+      iepInvId: product.iepInvId,
+      iepQuantity: product.iepQuantity,
+      iepTotalPrice: product.iepQuantity * inv!.invPricePerUnit,
+    });
 
-      const updatedStocks =
-        input.iepType === "INCOMING"
-          ? inv!.invStocks + product.iepQuantity
-          : inv!.invStocks - product.iepQuantity;
+    const updatedStocks =
+      input.iepType === "INCOMING"
+        ? inv!.invStocks + product.iepQuantity
+        : inv!.invStocks - product.iepQuantity;
 
-      if (inv!.invStocks < product.iepQuantity && input.iepType === "OUTGOING")
-        errors.push(inv?.invAssetName as string);
-      else {
-        if (
-          input.iepType !== input.prevInvEntryType ||
-          (!isEqual(
-            sortBy(input.iepProducts, (p) => p.iepInvId),
-            sortBy(
-              previousProducts.map((p) => ({
-                iepInvId: p.iepInvId,
-                iepQuantity: p.iepQuantity,
-              })),
-              (p) => p.iepInvId
-            )
-          ) &&
-            previousProducts.find((p) => p.iepInvId === product.iepInvId)
-              ?.iepQuantity !== product.iepQuantity)
-        )
-          await db
-            .update(inventory)
-            .set({
-              invStocks: updatedStocks,
-            })
-            .where(eq(inventory.invId, product.iepInvId));
-      }
-    })
-  );
+    if (inv!.invStocks < product.iepQuantity && input.iepType === "OUTGOING")
+      errors.push(inv?.invAssetName as string);
+    else {
+      if (
+        input.iepType !== input.prevInvEntryType ||
+        (!isEqual(
+          sortBy(input.iepProducts, (p) => p.iepInvId),
+          sortBy(
+            previousProducts.map((p) => ({
+              iepInvId: p.iepInvId,
+              iepQuantity: p.iepQuantity,
+            })),
+            (p) => p.iepInvId
+          )
+        ) &&
+          previousProducts.find((p) => p.iepInvId === product.iepInvId)
+            ?.iepQuantity !== product.iepQuantity)
+      )
+        await db
+          .update(inventory)
+          .set({
+            invStocks: updatedStocks,
+          })
+          .where(eq(inventory.invId, product.iepInvId));
+    }
+  }
 
   if (errors.length > 0)
     throw new Error(`Not enough stocks for ${errors.join(", ")}`);

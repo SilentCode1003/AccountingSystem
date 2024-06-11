@@ -74,16 +74,14 @@ export const editEmployee = async (
     const payrollIds = await db.query.payrolls.findMany({
       where: (payroll) => eq(payroll.prEmployeeId, input.empId),
     });
-    await Promise.all(
-      payrollIds.map(async (payroll) => {
-        await editPayroll(db, {
-          prId: payroll.prId,
-          prTranId: payroll.prTranId,
-          prTotalDeduction: payroll.prTotalDeduction,
-          prEmployeeId: payroll.prEmployeeId,
-        });
-      })
-    );
+    for (const payroll of payrollIds) {
+      await editPayroll(db, {
+        prId: payroll.prId,
+        prTranId: payroll.prTranId,
+        prTotalDeduction: payroll.prTotalDeduction,
+        prEmployeeId: payroll.prEmployeeId,
+      });
+    }
   }
 
   return editedEmployee;

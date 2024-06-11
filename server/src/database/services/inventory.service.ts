@@ -79,41 +79,37 @@ export const editInventory = async (
       where: eq(inventoryEntryProducts.iepInvId, input.invId),
     });
     let iepArr: Array<string> = [];
-    await Promise.all(
-      iepIds.map(async (iep) => {
-        iepArr.push(iep.iepInvEntryId);
-        await db
-          .update(inventoryEntryProducts)
-          .set({
-            iepTotalPrice: iep.iepQuantity * input.newData.invPricePerUnit!,
-          })
-          .where(eq(inventoryEntryProducts.iepId, iep.iepId));
-      })
-    );
+    for (const iep of iepIds) {
+      iepArr.push(iep.iepInvEntryId);
+      await db
+        .update(inventoryEntryProducts)
+        .set({
+          iepTotalPrice: iep.iepQuantity * input.newData.invPricePerUnit!,
+        })
+        .where(eq(inventoryEntryProducts.iepId, iep.iepId));
+    }
     const updatedIep = await db.query.inventoryEntryProducts.findMany({
       where: eq(inventoryEntryProducts.iepInvId, input.invId),
     });
 
-    await Promise.all(
-      Array.from(new Set(iepArr)).map(async (invEntry) => {
-        const origInvEntry = await db.query.inventoryEntries.findFirst({
-          where: eq(inventoryEntries.invEntryId, invEntry),
-        });
-        const products = await db.query.inventoryEntryProducts.findMany({
-          where: eq(inventoryEntryProducts.iepInvEntryId, invEntry),
-        });
-        await editInventoryEntry(db, {
-          invEntryId: origInvEntry!.invEntryId,
-          invEntryPartner: (origInvEntry!.invEntryCustId ??
-            origInvEntry!.invEntryVdId)!,
-          invEntryTranId: origInvEntry!.invEntryTranId,
-          iepProducts: products.map((p) => ({
-            iepInvId: p.iepInvId,
-            iepQuantity: p.iepQuantity,
-          })),
-        });
-      })
-    );
+    for (const invEntry of Array.from(new Set(iepArr))) {
+      const origInvEntry = await db.query.inventoryEntries.findFirst({
+        where: eq(inventoryEntries.invEntryId, invEntry),
+      });
+      const products = await db.query.inventoryEntryProducts.findMany({
+        where: eq(inventoryEntryProducts.iepInvEntryId, invEntry),
+      });
+      await editInventoryEntry(db, {
+        invEntryId: origInvEntry!.invEntryId,
+        invEntryPartner: (origInvEntry!.invEntryCustId ??
+          origInvEntry!.invEntryVdId)!,
+        invEntryTranId: origInvEntry!.invEntryTranId,
+        iepProducts: products.map((p) => ({
+          iepInvId: p.iepInvId,
+          iepQuantity: p.iepQuantity,
+        })),
+      });
+    }
   }
   return editedInv;
 };

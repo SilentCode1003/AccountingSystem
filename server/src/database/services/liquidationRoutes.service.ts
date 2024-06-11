@@ -33,42 +33,40 @@ export const addLiquidationRoutes = async (
     }>;
   }
 ) => {
-  await Promise.all(
-    input.liquidationRoutes.map(async (liquidationRoute) => {
-      const newLiquidationRouteId = `lrId ${crypto.randomUUID()}`;
-      await db.insert(liquidationRoutes).values({
-        ...liquidationRoute,
-        lrLiqId: input.lrLiqId,
-        lrId: newLiquidationRouteId,
-      });
+  for (const liquidationRoute of input.liquidationRoutes) {
+    const newLiquidationRouteId = `lrId ${crypto.randomUUID()}`;
+    await db.insert(liquidationRoutes).values({
+      ...liquidationRoute,
+      lrLiqId: input.lrLiqId,
+      lrId: newLiquidationRouteId,
+    });
 
-      await addRoute(db, {
-        routeEnd: liquidationRoute.lrTo,
-        routeStart: liquidationRoute.lrFrom,
-        routePrice: liquidationRoute.lrPrice,
-        routeModeOfTransport: liquidationRoute.lrModeOfTransport,
-      });
+    await addRoute(db, {
+      routeEnd: liquidationRoute.lrTo,
+      routeStart: liquidationRoute.lrFrom,
+      routePrice: liquidationRoute.lrPrice,
+      routeModeOfTransport: liquidationRoute.lrModeOfTransport,
+    });
 
-      const lr = await db.query.liquidationRoutes.findFirst({
-        where: eq(liquidationRoutes.lrId, newLiquidationRouteId),
-      });
+    const lr = await db.query.liquidationRoutes.findFirst({
+      where: eq(liquidationRoutes.lrId, newLiquidationRouteId),
+    });
 
-      const route = await db.query.routes.findFirst({
-        where: and(
-          eq(routes.routeStart, lr!.lrFrom),
-          eq(routes.routeEnd, lr!.lrTo),
-          eq(routes.routeModeOfTransport, lr!.lrModeOfTransport)
-        ),
-      });
+    const route = await db.query.routes.findFirst({
+      where: and(
+        eq(routes.routeStart, lr!.lrFrom),
+        eq(routes.routeEnd, lr!.lrTo),
+        eq(routes.routeModeOfTransport, lr!.lrModeOfTransport)
+      ),
+    });
 
-      if (route?.routePrice !== lr?.lrPrice)
-        await addRouteDiscrepancy(db, {
-          rdLrId: lr!.lrId,
-          rdRouteId: route!.routeId,
-        });
-      // return;
-    })
-  );
+    if (route?.routePrice !== lr?.lrPrice)
+      await addRouteDiscrepancy(db, {
+        rdLrId: lr!.lrId,
+        rdRouteId: route!.routeId,
+      });
+    // return;
+  }
 
   const newliquidationRoutes = await db.query.liquidationRoutes.findMany({
     where: eq(liquidationRoutes.lrLiqId, input.lrLiqId),

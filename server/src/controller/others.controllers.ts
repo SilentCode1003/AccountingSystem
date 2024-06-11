@@ -323,18 +323,16 @@ export const syncEmployeesByAPI = async (req: Request, res: Response) => {
         res.json() as Promise<{
           msg: string;
           data: Array<{
-            newEmployeeId: string;
-            firstname: string;
+            id: string;
+            fullname: string;
             phone: string;
             email: string;
             jobstatus: string;
-            me_department: string;
-            me_position: string;
+            departmentname: string;
+            positionname: string;
           }>;
         }>
     );
-
-    console.log(data);
 
     const shapeDataToDB: Array<{
       empId: string;
@@ -345,35 +343,31 @@ export const syncEmployeesByAPI = async (req: Request, res: Response) => {
       empDepartment: string;
       empPosition: string;
     }> = data.data.map((emp) => ({
-      empId: emp.newEmployeeId,
-      empName: emp.firstname,
+      empId: emp.id,
+      empName: emp.fullname,
       empContactInfo: emp.phone,
       empEmail: emp.email,
       empJobStatus: emp.jobstatus,
-      empDepartment: emp.me_department,
-      empPosition: emp.me_position,
+      empDepartment: emp.departmentname,
+      empPosition: emp.positionname,
     }));
 
-    await Promise.all(
-      shapeDataToDB.map(async (emp) => {
-        //check if employee exists
-        const empExists = await db.query.employees.findFirst({
-          where: eq(employees.empId, `empId ${emp.empId}`),
-        });
+    for (const emp of shapeDataToDB) {
+      //check if employee exists
+      const empExists = await db.query.employees.findFirst({
+        where: eq(employees.empId, `empId ${emp.empId}`),
+      });
 
-        //early return if employee does not exist
-        if (empExists) return;
+      //early return if employee does not exist
+      if (empExists) continue;
 
-        //insert employee
-        const newEmployee = await db.insert(employees).values({
-          ...emp,
-          empId: `empId ${emp.empId}`,
-          empDateHired: new Date(),
-        });
-
-        return newEmployee;
-      })
-    );
+      //insert employee
+      await db.insert(employees).values({
+        ...emp,
+        empId: `empId ${emp.empId}`,
+        empDateHired: new Date(),
+      });
+    }
 
     //query all synced employees
     const syncedEmployees = await db.query.employees.findMany();
@@ -426,27 +420,24 @@ export const syncEmployeesByFile = async (req: Request, res: Response) => {
     });
 
     shapeDataToDB.shift();
+    console.log(shapeDataToDB);
 
-    await Promise.all(
-      shapeDataToDB.map(async (emp) => {
-        //check if employee exists
-        const empExists = await db.query.employees.findFirst({
-          where: eq(employees.empId, `empId ${emp.empId}`),
-        });
+    for (const emp of shapeDataToDB) {
+      //check if employee exists
+      const empExists = await db.query.employees.findFirst({
+        where: eq(employees.empId, `empId ${emp.empId}`),
+      });
 
-        //early return if employee does not exist
-        if (empExists) return;
+      //early return if employee does not exist
+      if (empExists) continue;
 
-        //insert employee
-        const newEmployee = await db.insert(employees).values({
-          ...emp,
-          empId: `empId ${emp.empId}`,
-          empDateHired: new Date(),
-        });
-
-        return newEmployee;
-      })
-    );
+      //insert employee
+      await db.insert(employees).values({
+        ...emp,
+        empId: `empId ${emp.empId}`,
+        empDateHired: new Date(),
+      });
+    }
 
     //query all synced employees
     const syncedEmployees = await db.query.employees.findMany();
