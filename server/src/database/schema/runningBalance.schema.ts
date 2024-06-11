@@ -1,8 +1,8 @@
 import {
   AnyMySqlColumn,
   date,
+  datetime,
   decimal,
-  int,
   mysqlTable,
   varchar,
 } from "drizzle-orm/mysql-core";
@@ -11,7 +11,6 @@ import employees from "./employees.schema";
 import { relations } from "drizzle-orm";
 
 export const runningBalance = mysqlTable("running_balance", {
-  id: int("id"),
   rbId: varchar("rb_id", { length: 60 }).primaryKey(),
   rbBudget: decimal("rb_budget", {
     precision: 13,
@@ -43,6 +42,7 @@ export const runningBalance = mysqlTable("running_balance", {
     }
   ),
   rbDate: date("rb_date").notNull(),
+  rbCreatedAt: datetime("rb_created_at").notNull().default(new Date()),
 });
 
 export const runningBalanceEmployeeRelation = relations(
