@@ -2,20 +2,22 @@ import {
   AnyMySqlColumn,
   date,
   decimal,
+  int,
   mysqlTable,
   varchar,
 } from "drizzle-orm/mysql-core";
-import budgets from "./Budget.schema";
 import liquidations from "./Liquidation.schema";
 import employees from "./employees.schema";
 import { relations } from "drizzle-orm";
 
 export const runningBalance = mysqlTable("running_balance", {
+  id: int("id"),
   rbId: varchar("rb_id", { length: 60 }).primaryKey(),
-  rbBudgetId: varchar("rb_budget_id", { length: 60 })
-    .references((): AnyMySqlColumn => budgets.budgetId, {
-      onDelete: "cascade",
-    })
+  rbBudget: decimal("rb_budget", {
+    precision: 13,
+    scale: 2,
+  })
+    .$type<number>()
     .notNull(),
   rbLiqId: varchar("rb_liq_id", { length: 60 })
     .references((): AnyMySqlColumn => liquidations.liquidationId, {
@@ -49,16 +51,6 @@ export const runningBalanceEmployeeRelation = relations(
     employee: one(employees, {
       fields: [runningBalance.rbEmpId],
       references: [employees.empId],
-    }),
-  })
-);
-
-export const runningBalanceBudgetRelation = relations(
-  runningBalance,
-  ({ one }) => ({
-    budget: one(budgets, {
-      fields: [runningBalance.rbBudgetId],
-      references: [budgets.budgetId],
     }),
   })
 );

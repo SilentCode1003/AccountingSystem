@@ -41,7 +41,6 @@ import routeDiscrepancies, {
 import routes from "./routes.schema";
 import {
   runningBalance,
-  runningBalanceBudgetRelation,
   runningBalanceEmployeeRelation,
   runningBalanceLiquidationRelation,
 } from "./runningBalance.schema";
@@ -92,7 +91,6 @@ const schema = {
   chequesRelations,
   runningBalance,
   runningBalanceEmployeeRelation,
-  runningBalanceBudgetRelation,
   runningBalanceLiquidationRelation,
   transactionAccountRelation,
   transactionCustomerRelation,
